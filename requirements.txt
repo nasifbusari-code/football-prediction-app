@@ -11,3 +11,4 @@ tqdm
 rapidfuzz
 paystack
 gunicorn
+paystackapi
