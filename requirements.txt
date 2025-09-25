@@ -1,0 +1,13 @@
+flask
+flask-session
+requests
+pandas
+numpy
+scipy
+scikit-learn
+xgboost
+joblib
+tqdm
+rapidfuzz
+paystack
+gunicorn
