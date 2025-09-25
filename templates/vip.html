@@ -1,29 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>VIP Football Predictions</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; font-size: 18px; }
-        .details { font-size: 14px; color: #555; }
-    </style>
-</head>
-<body>
-    <h1>VIP Best Picks</h1>
-    <ul>
-        {% for pred in predictions %}
-            <li>
-                {{ pred.Match }}: {{ pred.Recommendation }}
-                <div class="details">
-                    Over 1.5: {{ pred.MetaOverProb }}% | Under 3.5: {{ pred.MetaUnderProb }}%<br>
-                    Confidence - Over: {{ pred.OverConfidence }}% | Under: {{ pred.UnderConfidence }}%<br>
-                    Reason: {{ pred.Reason }}<br>
-                    Rules: {{ pred.TriggeredRules|join(', ') }}
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+    <h1>VIP Predictions</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Match</th>
+                <th>Recommendation</th>
+                <th>Over 1.5 Prob</th>
+                <th>Under 3.5 Prob</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pred in predictions %}
+                <tr>
+                    <td>{{ pred.Match }}</td>
+                    <td>{{ pred.Recommendation }}</td>
+                    <td>{{ pred.MetaOverProb|round(1) }}%</td>
+                    <td>{{ pred.MetaUnderProb|round(1) }}%</td>
+                    <td>{{ pred.Reason }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
