@@ -12,3 +12,6 @@ rapidfuzz
 paystack
 gunicorn
 paystackapi
+flask-login
+bcrypt
+flask-sqlalchemy
