@@ -611,7 +611,7 @@ def main(date_from=None):
 
     # List of league IDs to include
     target_league_ids = [
-        1, 683, 3
+        250, 118, 593, 152, 302, 207, 175, 168, 244, 245, 251, 223, 322, 329, 330, 332, 653, 7097
     ]
 
     leagues = fetch_all_leagues()
