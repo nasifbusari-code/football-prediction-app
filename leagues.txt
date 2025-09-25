@@ -1,0 +1,579 @@
+Filtered League List (Excluding Cups, Women's, and Youth Leagues):
+ID: 152, Name: Premier League, Country: England
+ID: 302, Name: La Liga, Country: Spain
+ID: 207, Name: Serie A, Country: Italy
+ID: 175, Name: Bundesliga, Country: Germany
+ID: 168, Name: Ligue 1, Country: France
+ID: 344, Name: Premier League, Country: Russia
+ID: 266, Name: Primeira Liga, Country: Portugal
+ID: 63, Name: First Division A, Country: Belgium
+ID: 244, Name: Eredivisie, Country: Netherlands
+ID: 332, Name: MLS, Country: USA
+ID: 322, Name: Süper Lig, Country: Turkey
+ID: 99, Name: Serie A, Country: Brazil
+ID: 235, Name: Liga MX, Country: Mexico
+ID: 279, Name: Premiership, Country: Scotland
+ID: 56, Name: Bundesliga, Country: Austria
+ID: 325, Name: Premier League, Country: Ukraine
+ID: 135, Name: Superliga, Country: Denmark
+ID: 308, Name: Super League, Country: Switzerland
+ID: 127, Name: First NL, Country: Croatia
+ID: 178, Name: Super League 1, Country: Greece
+ID: 307, Name: Allsvenskan, Country: Sweden
+ID: 134, Name: Czech Liga, Country: Czech Republic
+ID: 130, Name: 1. Division, Country: Cyprus
+ID: 288, Name: Super Liga, Country: Serbia
+ID: 278, Name: Saudi League, Country: Saudi Arabia
+ID: 259, Name: Ekstraklasa, Country: Poland
+ID: 118, Name: Chinese Super League, Country: China
+ID: 120, Name: Primera A, Country: Colombia
+ID: 202, Name: Ligat Ha'al, Country: Israel
+ID: 209, Name: J1 League, Country: Japan
+ID: 253, Name: Eliteserien, Country: Norway
+ID: 111, Name: First League, Country: Bulgaria
+ID: 272, Name: Liga I, Country: Romania
+ID: 269, Name: Stars League, Country: Qatar
+ID: 171, Name: 2. Bundesliga, Country: Germany
+ID: 293, Name: 1. liga, Country: Slovakia
+ID: 255, Name: Division Profesional, Country: Paraguay
+ID: 164, Name: Ligue 2, Country: France
+ID: 301, Name: Segunda División, Country: Spain
+ID: 191, Name: NB I, Country: Hungary
+ID: 57, Name: Premyer Liqa, Country: Azerbaijan
+ID: 214, Name: Premier League, Country: Kazakhstan
+ID: 206, Name: Serie B, Country: Italy
+ID: 219, Name: K League 1, Country: Korea Republic
+ID: 195, Name: Persian Gulf Pro League, Country: Iran
+ID: 328, Name: Pro League, Country: United Arab Emirates
+ID: 121, Name: Primera División, Country: Costa Rica
+ID: 406, Name: LPF, Country: Panama
+ID: 14, Name: Damallsvenskan, Country: Sweden
+ID: 18, Name: CONMEBOL Libertadores, Country: intl
+ID: 44, Name: Liga Profesional Argentina, Country: Argentina
+ID: 49, Name: A-League Men, Country: Australia
+ID: 75, Name: Serie B, Country: Brazil
+ID: 115, Name: Primera División, Country: Chile
+ID: 145, Name: League Two, Country: England
+ID: 153, Name: Championship, Country: England
+ID: 154, Name: League One, Country: England
+ID: 165, Name: Coupe de France, Country: France
+ID: 172, Name: DFB Pokal, Country: Germany
+ID: 205, Name: Coppa Italia, Country: Italy
+ID: 243, Name: KNVB Beker, Country: Netherlands
+ID: 257, Name: Liga 1, Country: Peru
+ID: 265, Name: Taça de Portugal, Country: Portugal
+ID: 377, Name: Community Shield, Country: England
+ID: 385, Name: CONMEBOL Sudamericana, Country: intl
+ID: 566, Name: Indian Super League, Country: India
+ID: 1194, Name: KNVB Beker, Country: Netherlands
+ID: 53, Name: 2. Liga, Country: Austria
+ID: 61, Name: Premier League, Country: Belarus
+ID: 83, Name: Carioca Série A, Country: Brazil
+ID: 91, Name: Pernambucano 1, Country: Brazil
+ID: 124, Name: HNL, Country: Croatia
+ID: 140, Name: Liga Pro, Country: Ecuador
+ID: 141, Name: Premier League, Country: Egypt
+ID: 166, Name: Coupe de la Ligue, Country: France
+ID: 193, Name: I-League, Country: India
+ID: 194, Name: Liga 1, Country: Indonesia
+ID: 239, Name: Botola Pro, Country: Morocco
+ID: 245, Name: Eerste Divisie, Country: Netherlands
+ID: 267, Name: Segunda Liga, Country: Portugal
+ID: 296, Name: 1. SNL, Country: Slovenia
+ID: 297, Name: PSL, Country: South Africa
+ID: 314, Name: Thai League 1, Country: Thailand
+ID: 476, Name: Taça da Liga, Country: Portugal
+ID: 6, Name: Première Ligue, Country: France
+ID: 7, Name: Frauen Bundesliga, Country: Germany
+ID: 12, Name: ASEAN Championship, Country: intl
+ID: 13, Name: Primera División Femenina, Country: Spain
+ID: 31, Name: Superliga, Country: Albania
+ID: 32, Name: 1st Division, Country: Albania
+ID: 33, Name: 2nd Division, Country: Albania
+ID: 34, Name: Ligue 1, Country: Algeria
+ID: 35, Name: Ligue 2, Country: Algeria
+ID: 36, Name: 2a Divisió, Country: Andorra
+ID: 37, Name: 1a Divisió, Country: Andorra
+ID: 38, Name: Girabola, Country: Angola
+ID: 39, Name: Torneo Federal A, Country: Argentina
+ID: 40, Name: Prim B Metro, Country: Argentina
+ID: 41, Name: Primera Nacional, Country: Argentina
+ID: 42, Name: Primera C, Country: Argentina
+ID: 43, Name: Primera D, Country: Argentina
+ID: 45, Name: Premier League, Country: Armenia
+ID: 46, Name: First League, Country: Armenia
+ID: 47, Name: Division di Honor, Country: Aruba
+ID: 48, Name: South Australia NPL, Country: Australia
+ID: 50, Name: New South Wales NPL, Country: Australia
+ID: 51, Name: Western Australia NPL, Country: Australia
+ID: 52, Name: Landesliga, Country: Austria
+ID: 55, Name: Regionalliga, Country: Austria
+ID: 58, Name: Birinci Dasta, Country: Azerbaijan
+ID: 59, Name: Premier League, Country: Bahrain
+ID: 60, Name: Premier League, Country: Bangladesh
+ID: 62, Name: 1. Division, Country: Belarus
+ID: 65, Name: Challenger Pro League, Country: Belgium
+ID: 66, Name: Third Amateur Division, Country: Belgium
+ID: 67, Name: Second Amateur Division, Country: Belgium
+ID: 68, Name: Premier League, Country: Bermuda
+ID: 69, Name: Primera División, Country: Bolivia
+ID: 70, Name: Premijer Liga, Country: Bosnia and Herzegovina
+ID: 71, Name: 1st League, Country: Bosnia and Herzegovina
+ID: 72, Name: Gaúcho 2, Country: Brazil
+ID: 73, Name: Piauiense, Country: Brazil
+ID: 74, Name: Sul-Matogrossense, Country: Brazil
+ID: 76, Name: Potiguar 1, Country: Brazil
+ID: 77, Name: Acreano, Country: Brazil
+ID: 78, Name: Paranaense 2, Country: Brazil
+ID: 79, Name: Serie C, Country: Brazil
+ID: 80, Name: Serie D, Country: Brazil
+ID: 81, Name: Amazonense 1, Country: Brazil
+ID: 82, Name: Mineiro 1, Country: Brazil
+ID: 84, Name: Carioca B1, Country: Brazil
+ID: 85, Name: Sergipano 1, Country: Brazil
+ID: 86, Name: Paulista A2, Country: Brazil
+ID: 87, Name: Paraense A, Country: Brazil
+ID: 88, Name: Goiano 1, Country: Brazil
+ID: 89, Name: Matogrossense 1, Country: Brazil
+ID: 90, Name: Tocantinense, Country: Brazil
+ID: 92, Name: Rondoniense, Country: Brazil
+ID: 93, Name: Alagoano 1, Country: Brazil
+ID: 94, Name: Baiano 2, Country: Brazil
+ID: 95, Name: Baiano 1, Country: Brazil
+ID: 96, Name: Paulista A3, Country: Brazil
+ID: 97, Name: Paraibano 1, Country: Brazil
+ID: 98, Name: Catarinense 1, Country: Brazil
+ID: 100, Name: Paranaense 1, Country: Brazil
+ID: 101, Name: Roraimense, Country: Brazil
+ID: 102, Name: Gaúcho 1, Country: Brazil
+ID: 103, Name: Maranhense 1, Country: Brazil
+ID: 104, Name: Cearense 1, Country: Brazil
+ID: 105, Name: Brasiliense A, Country: Brazil
+ID: 106, Name: Paulista A1, Country: Brazil
+ID: 107, Name: Amapaense, Country: Brazil
+ID: 108, Name: Capixaba A, Country: Brazil
+ID: 109, Name: Second League, Country: Bulgaria
+ID: 110, Name: Third League, Country: Bulgaria
+ID: 112, Name: Elite One, Country: Cameroon
+ID: 113, Name: Canadian Soccer League, Country: Canada
+ID: 114, Name: PCSL, Country: Canada
+ID: 116, Name: Primera B, Country: Chile
+ID: 117, Name: Chinese Football League 1, Country: China
+ID: 119, Name: Taiwan Football Premier League, Country: Chinese Taipei
+ID: 122, Name: Liga de Ascenso, Country: Costa Rica
+ID: 123, Name: Ligue 1, Country: Ivory Coast
+ID: 126, Name: Third NL, Country: Croatia
+ID: 128, Name: 3. Division, Country: Cyprus
+ID: 129, Name: 2. Division, Country: Cyprus
+ID: 131, Name: 3. liga, Country: Czech Republic
+ID: 132, Name: 4. liga, Country: Czech Republic
+ID: 133, Name: FNL, Country: Czech Republic
+ID: 136, Name: 2. Division, Country: Denmark
+ID: 137, Name: Denmark Series, Country: Denmark
+ID: 138, Name: 1. Division, Country: Denmark
+ID: 139, Name: Liga Pro Serie B, Country: Ecuador
+ID: 142, Name: Primera Division, Country: El Salvador
+ID: 143, Name: Non League Div One, Country: England
+ID: 149, Name: Non League Premier, Country: England
+ID: 150, Name: National League N / S, Country: England
+ID: 151, Name: National League, Country: England
+ID: 156, Name: Premium liiga, Country: Estonia
+ID: 157, Name: Meistaradeildin, Country: Faroe Islands
+ID: 158, Name: 1. Deild, Country: Faroe Islands
+ID: 159, Name: National Football League, Country: Fiji
+ID: 160, Name: Kakkonen, Country: Finland
+ID: 162, Name: National 3, Country: France
+ID: 163, Name: National 2, Country: France
+ID: 167, Name: National 1, Country: France
+ID: 169, Name: Erovnuli Liga 2, Country: Georgia
+ID: 170, Name: Erovnuli Liga, Country: Georgia
+ID: 173, Name: Regionalliga, Country: Germany
+ID: 174, Name: Oberliga, Country: Germany
+ID: 176, Name: 3. Liga, Country: Germany
+ID: 177, Name: Premier League, Country: Ghana
+ID: 180, Name: Gamma Ethniki, Country: Greece
+ID: 181, Name: Football League, Country: Greece
+ID: 182, Name: Liga Nacional, Country: Guatemala
+ID: 183, Name: Primera Division, Country: Guatemala
+ID: 184, Name: Ligue Haïtienne, Country: Haiti
+ID: 185, Name: Liga Nacional, Country: Honduras
+ID: 186, Name: Premier League, Country: Hong Kong
+ID: 187, Name: HKFA 1st Division, Country: Hong Kong
+ID: 188, Name: NB II, Country: Hungary
+ID: 189, Name: Magyar Kupa, Country: Hungary
+ID: 190, Name: NB III, Country: Hungary
+ID: 192, Name: Besta deild, Country: Iceland
+ID: 196, Name: Azadegan League, Country: Iran
+ID: 198, Name: First Division, Country: Ireland
+ID: 200, Name: Premier Division, Country: Ireland
+ID: 201, Name: Liga Leumit, Country: Israel
+ID: 204, Name: Serie D, Country: Italy
+ID: 208, Name: Premier League, Country: Jamaica
+ID: 211, Name: Japan Football League, Country: Japan
+ID: 212, Name: J2 League, Country: Japan
+ID: 213, Name: League, Country: Jordan
+ID: 215, Name: 1. Division, Country: Kazakhstan
+ID: 216, Name: FKF Premier League, Country: Kenya
+ID: 217, Name: K3 League, Country: Korea Republic
+ID: 218, Name: K League 2, Country: Korea Republic
+ID: 220, Name: Premier League, Country: Kuwait
+ID: 221, Name: Division 1, Country: Kuwait
+ID: 222, Name: 1. Liga, Country: Latvia
+ID: 223, Name: Virsliga, Country: Latvia
+ID: 224, Name: Premier League, Country: Lebanon
+ID: 225, Name: Premier League, Country: Libya
+ID: 226, Name: 1 Lyga, Country: Lithuania
+ID: 227, Name: A Lyga, Country: Lithuania
+ID: 228, Name: National Division, Country: Luxembourg
+ID: 229, Name: Second League, Country: North Macedonia
+ID: 230, Name: First League, Country: North Macedonia
+ID: 231, Name: Premier League, Country: Malaysia
+ID: 232, Name: Super League, Country: Malaysia
+ID: 233, Name: Challenge League, Country: Malta
+ID: 234, Name: Premier League, Country: Malta
+ID: 236, Name: Liga de Expansión MX, Country: Mexico
+ID: 237, Name: Super Liga, Country: Moldova
+ID: 238, Name: Liga 1, Country: Moldova
+ID: 240, Name: Second League, Country: Montenegro
+ID: 241, Name: Botola 2, Country: Morocco
+ID: 242, Name: Derde Divisie, Country: Netherlands
+ID: 246, Name: Premiership, Country: New Zealand
+ID: 247, Name: Primera Division, Country: Nicaragua
+ID: 248, Name: NPFL, Country: Nigeria
+ID: 250, Name: Championship, Country: Northern Ireland
+ID: 251, Name: Premiership, Country: Northern Ireland
+ID: 254, Name: Professional League, Country: Oman
+ID: 256, Name: Division Intermedia, Country: Paraguay
+ID: 258, Name: Liga 2, Country: Peru
+ID: 261, Name: II Liga, Country: Poland
+ID: 262, Name: III Liga, Country: Poland
+ID: 263, Name: I Liga, Country: Poland
+ID: 264, Name: Campeonato de Portugal Prio, Country: Portugal
+ID: 270, Name: Liga III, Country: Romania
+ID: 271, Name: Liga II, Country: Romania
+ID: 273, Name: Second League B, Country: Russia
+ID: 274, Name: First League, Country: Russia
+ID: 276, Name: Campionato, Country: San Marino
+ID: 277, Name: Division 1, Country: Saudi Arabia
+ID: 282, Name: Championship, Country: Scotland
+ID: 284, Name: League Two, Country: Scotland
+ID: 285, Name: League One, Country: Scotland
+ID: 286, Name: Highland / Lowland, Country: Scotland
+ID: 287, Name: Prva Liga, Country: Serbia
+ID: 289, Name: Premier League, Country: Singapore
+ID: 291, Name: 3. liga, Country: Slovakia
+ID: 294, Name: 2. SNL, Country: Slovenia
+ID: 298, Name: Tercera División RFEF, Country: Spain
+ID: 299, Name: Primera División RFEF, Country: Spain
+ID: 303, Name: Sudani Premier League, Country: Sudan
+ID: 304, Name: Suriname Major League, Country: Surinam
+ID: 305, Name: Superettan, Country: Sweden
+ID: 309, Name: Schweizer Pokal, Country: Switzerland
+ID: 310, Name: 2. Liga Interregional, Country: Switzerland
+ID: 311, Name: 1. Liga Classic, Country: Switzerland
+ID: 312, Name: Challenge League, Country: Switzerland
+ID: 313, Name: Premier League, Country: Syria
+ID: 315, Name: TT Premier League, Country: Trinidad and Tobago
+ID: 316, Name: Ligue 2, Country: Tunisia
+ID: 317, Name: Ligue 1, Country: Tunisia
+ID: 318, Name: 2. Lig, Country: Turkey
+ID: 319, Name: 1. Lig, Country: Turkey
+ID: 321, Name: 3. Lig, Country: Turkey
+ID: 324, Name: Persha Liga, Country: Ukraine
+ID: 327, Name: Druha Liga, Country: Ukraine
+ID: 329, Name: USL League Two, Country: USA
+ID: 330, Name: USL Championship, Country: USA
+ID: 331, Name: USL 2, Country: USA
+ID: 333, Name: Liga AUF, Country: Uruguay
+ID: 334, Name: Segunda División, Country: Uruguay
+ID: 335, Name: Super League, Country: Uzbekistan
+ID: 336, Name: Segunda División, Country: Venezuela
+ID: 337, Name: Primera División, Country: Venezuela
+ID: 338, Name: V.League 2, Country: Vietnam
+ID: 339, Name: V.League 1, Country: Vietnam
+ID: 340, Name: FAW Championship, Country: Wales
+ID: 341, Name: Premier League, Country: Wales
+ID: 342, Name: Super League, Country: Zambia
+ID: 343, Name: Premier Soccer League, Country: Zimbabwe
+ID: 345, Name: Premier Division, Country: Gibraltar
+ID: 351, Name: DBU Pokalen, Country: Denmark
+ID: 352, Name: Veikkausliiga, Country: Finland
+ID: 353, Name: Ykkönen, Country: Finland
+ID: 355, Name: Club Friendlies, Country: intl
+ID: 356, Name: Friendlies, Country: intl
+ID: 359, Name: Serie C, Country: Italy
+ID: 362, Name: 1. Division, Country: Norway
+ID: 363, Name: 2. Division, Country: Norway
+ID: 366, Name: Ettan, Country: Sweden
+ID: 367, Name: Division 2, Country: Sweden
+ID: 373, Name: Northern Territory Premier League, Country: Australia
+ID: 374, Name: FQPL 3 Metro, Country: Australia
+ID: 375, Name: Northern NSW NPL, Country: Australia
+ID: 376, Name: 2. Division, Country: Belarus
+ID: 388, Name: Division d'Honneur, Country: Guadeloupe
+ID: 389, Name: Trophée des Champions, Country: France
+ID: 395, Name: 1. Deild, Country: Iceland
+ID: 397, Name: Second Division, Country: Qatar
+ID: 398, Name: First League, Country: Montenegro
+ID: 399, Name: Srpska Liga, Country: Serbia
+ID: 400, Name: Liga Mayor, Country: Dominican Republic
+ID: 403, Name: Premier League, Country: Barbados
+ID: 407, Name: Canadian Championship, Country: Canada
+ID: 410, Name: Liga 2, Country: Indonesia
+ID: 417, Name: Ligue 1, Country: Congo DR
+ID: 420, Name: 2. liga, Country: Slovakia
+ID: 421, Name: Capital Territory NPL, Country: Australia
+ID: 433, Name: Brasileiro U20 A, Country: Brazil
+ID: 434, Name: WAFF Championship, Country: Waff Championship
+ID: 437, Name: Liga Premier Serie A, Country: Mexico
+ID: 439, Name: Super League 2, Country: Greece
+ID: 441, Name: COSAFA U20 Championship, Country: intl
+ID: 442, Name: Trofeo de Campeones, Country: Argentina
+ID: 444, Name: Elite Two, Country: Cameroon
+ID: 446, Name: Premier League, Country: Mongolia
+ID: 449, Name: NISA, Country: USA
+ID: 450, Name: Liga Primera U20, Country: Nicaragua
+ID: 453, Name: Kansallinen Liiga, Country: Finland
+ID: 456, Name: Lao League, Country: Laos
+ID: 457, Name: Curaçao Promé Divishon, Country: Curacao
+ID: 461, Name: NWSL Fall Series, Country: USA
+ID: 464, Name: I-League 2, Country: India
+ID: 465, Name: Brasileiro de Aspirantes, Country: Brazil
+ID: 466, Name: Liga Femenina, Country: Colombia
+ID: 467, Name: Nacional B, Country: Bolivia
+ID: 469, Name: Diski Challenge, Country: South Africa
+ID: 473, Name: Olympic Qualifying Concacaf, Country: World
+ID: 477, Name: Asian Games, Country: intl
+ID: 479, Name: AFF Championship, Country: intl
+ID: 480, Name: CAF African Nations Championship, Country: intl
+ID: 482, Name: Kvindeliga, Country: Denmark
+ID: 483, Name: Division 1, Country: United Arab Emirates
+ID: 484, Name: CONMEBOL U20, Country: intl
+ID: 486, Name: Queensland NPL, Country: Australia
+ID: 487, Name: Provincial, Country: Belgium
+ID: 488, Name: Premier League, Country: Belize
+ID: 489, Name: Super League, Country: Bhutan
+ID: 490, Name: Premier League, Country: Botswana
+ID: 491, Name: Mineiro 2, Country: Brazil
+ID: 492, Name: Cearense 2, Country: Brazil
+ID: 493, Name: Premier League, Country: Cambodia
+ID: 494, Name: 2. Deild, Country: Iceland
+ID: 495, Name: Iraqi League, Country: Iraq
+ID: 496, Name: A Division, Country: Nepal
+ID: 497, Name: Ligue 1, Country: Senegal
+ID: 498, Name: Toppserien, Country: Norway
+ID: 500, Name: Olympics Men, Country: intl
+ID: 517, Name: Primera B, Country: Colombia
+ID: 523, Name: 1. Liga Promotion, Country: Switzerland
+ID: 526, Name: EAFF E-1 Football Championship, Country: intl
+ID: 527, Name: Superliga, Country: Colombia
+ID: 528, Name: Concacaf U20, Country: intl
+ID: 529, Name: Coupe Nationale, Country: Algeria
+ID: 530, Name: 1st Division, Country: South Africa
+ID: 532, Name: 3. Lig, Country: Turkey
+ID: 543, Name: Coppa Titano, Country: San Marino
+ID: 544, Name: Superliga, Country: Kosovo
+ID: 545, Name: Ligue A, Country: Burundi
+ID: 546, Name: LFA First Division, Country: Liberia
+ID: 549, Name: Championnat National, Country: Benin
+ID: 550, Name: Premier League, Country: Rwanda
+ID: 551, Name: Ligi kuu Bara, Country: Tanzania
+ID: 552, Name: GFA League, Country: Gambia
+ID: 553, Name: Ligue 1, Country: Guinea
+ID: 554, Name: Ligue 1, Country: Burkina Faso
+ID: 555, Name: Premier League, Country: Uganda
+ID: 556, Name: Premier League, Country: Ethiopia
+ID: 557, Name: Mauritian League, Country: Mauritius
+ID: 558, Name: Première Division, Country: Mali
+ID: 559, Name: Premier League, Country: Mauritania
+ID: 560, Name: Ligue 1, Country: Congo
+ID: 564, Name: Super League, Country: Malawi
+ID: 567, Name: Somali Premier League, Country: Somalia
+ID: 569, Name: Vysshaya Liga, Country: Tajikistan
+ID: 571, Name: Pacific Games, Country: intl
+ID: 574, Name: Super League, Country: Belgium
+ID: 575, Name: Premier League (Crimea), Country: Europe
+ID: 579, Name: Primeira Liga, Country: Brazil
+ID: 581, Name: Victoria NPL, Country: Australia
+ID: 582, Name: Ýokary Liga, Country: Turkmenistan
+ID: 583, Name: Premier League, Country: Kyrgyzstan
+ID: 584, Name: Tweede Divisie, Country: Netherlands
+ID: 586, Name: First Amateur Division, Country: Belgium
+ID: 589, Name: National League, Country: Myanmar
+ID: 593, Name: Premier League 2, Country: England
+ID: 599, Name: Segunda División, Country: Chile
+ID: 600, Name: SAFF Championship, Country: intl
+ID: 601, Name: J3 League, Country: Japan
+ID: 602, Name: Thai League 2, Country: Thailand
+ID: 606, Name: Premier Intermediate League, Country: Northern Ireland
+ID: 607, Name: Elitettan, Country: Sweden
+ID: 608, Name: Tasmania NPL, Country: Australia
+ID: 609, Name: 3. SNL, Country: Slovenia
+ID: 610, Name: Liga Alef, Country: Israel
+ID: 612, Name: Coppa Italia Primavera, Country: Italy
+ID: 614, Name: Professional Development League, Country: England
+ID: 617, Name: West Bank Premier League, Country: Palestine
+ID: 620, Name: Dhivehi Premier League, Country: Maldives
+ID: 621, Name: Løgmanssteypid, Country: Faroe Islands
+ID: 623, Name: PFL, Country: Philippines
+ID: 624, Name: Concacaf League, Country: intl
+ID: 625, Name: Frauenliga, Country: Austria
+ID: 628, Name: Campionato Primavera 1, Country: Italy
+ID: 629, Name: DFB Junioren Pokal, Country: Germany
+ID: 630, Name: Campionato Primavera 2, Country: Italy
+ID: 634, Name: CONMEBOL Libertadores U20, Country: intl
+ID: 635, Name: Concacaf Nations League Qualification, Country: intl
+ID: 639, Name: WK-League, Country: Korea Republic
+ID: 641, Name: 3. Division, Country: Norway
+ID: 643, Name: Liga MX Femenil, Country: Mexico
+ID: 644, Name: Liga Revelação U23, Country: Portugal
+ID: 645, Name: Liga 1 Feminin, Country: Romania
+ID: 648, Name: Senior Shield, Country: Hong Kong
+ID: 652, Name: WSL 2, Country: England
+ID: 653, Name: USL League One, Country: USA
+ID: 656, Name: Piala Indonesia, Country: Indonesia
+ID: 659, Name: Canadian Premier League, Country: Canada
+ID: 660, Name: Brasileiro Feminino A1, Country: Brazil
+ID: 661, Name: Concacaf Caribbean Club Shield, Country: intl
+ID: 664, Name: Concacaf Nations League, Country: intl
+ID: 668, Name: Premier League, Country: Eswatini
+ID: 669, Name: Taça Revelação U23, Country: Portugal
+ID: 671, Name: Coupe de la Ligue, Country: Algeria
+ID: 674, Name: NWSL, Country: USA
+ID: 678, Name: Queensland Premier League, Country: Australia
+ID: 679, Name: Victoria PL 1, Country: Australia
+ID: 680, Name: South Australia State League 1, Country: Australia
+ID: 681, Name: NSW League One, Country: Australia
+ID: 682, Name: Carioca A2, Country: Brazil
+ID: 686, Name: WE League, Country: Japan
+ID: 693, Name: Premier League, Country: Pakistan
+ID: 694, Name: Liga Premier Serie B, Country: Mexico
+ID: 695, Name: Coppa Italia Serie D, Country: Italy
+ID: 697, Name: U20 League, Country: Mexico
+ID: 698, Name: 3. Division, Country: Denmark
+ID: 699, Name: Liga 3, Country: Portugal
+ID: 700, Name: Segunda División RFEF, Country: Spain
+ID: 701, Name: Second Division A, Country: Egypt
+ID: 711, Name: Premier League, Country: Pakistan
+ID: 719, Name: U20 Elite League, Country: eurocups
+ID: 720, Name: Coppa Italia Serie C, Country: Italy
+ID: 722, Name: MLS All-Star, Country: USA
+ID: 728, Name: Ligue Haïtienne, Country: Haiti
+ID: 740, Name: Amapaense, Country: Brazil
+ID: 752, Name: National League N / S, Country: England
+ID: 1185, Name: Torneo Federal A, Country: Argentina
+ID: 1188, Name: Prim B Metro, Country: Argentina
+ID: 1189, Name: Primera Nacional, Country: Argentina
+ID: 7095, Name: Primera Division, Country: Cuba
+ID: 7096, Name: Torneo Proyección, Country: Argentina
+ID: 7097, Name: MLS Next Pro, Country: USA
+ID: 7106, Name: Southeast Asian Games, Country: intl
+ID: 7107, Name: NASL, Country: USA
+ID: 7110, Name: ASEAN U23 Championship, Country: intl
+ID: 7535, Name: Tournoi Maurice Revello, Country: intl
+ID: 7538, Name: EAFF E-1 Football Championship, Country: intl
+ID: 7541, Name: League 1 Ontario, Country: Canada
+ID: 7543, Name: Super League, Country: Kenya
+ID: 7544, Name: Catarinense 2, Country: Brazil
+ID: 7545, Name: U20 Arab Championship, Country: intl
+ID: 7546, Name: Chinese Football League 2, Country: China
+ID: 7549, Name: Mediterranean Games, Country: intl
+ID: 7552, Name: Piala Presiden, Country: Indonesia
+ID: 7554, Name: Diski Shield, Country: South Africa
+ID: 8204, Name: Second NL, Country: Croatia
+ID: 8206, Name: CONMEBOL Libertadores Femenina, Country: intl
+ID: 8210, Name: Premier League, Country: Lesotho
+ID: 8211, Name: COTIF Tournament, Country: intl
+ID: 8212, Name: Islamic Solidarity Games, Country: intl
+ID: 8215, Name: National League, Country: New Zealand
+ID: 10211, Name: I-League 2, Country: India
+ID: 10218, Name: Tournoi Maurice Revello, Country: intl
+ID: 10222, Name: U23 League, Country: Mexico
+ID: 10224, Name: Premier League Summer Series, Country: England
+ID: 10226, Name: Second League A, Country: Russia
+ID: 10228, Name: Concacaf Caribbean Club Shield, Country: intl
+ID: 10229, Name: Goiano 2, Country: Brazil
+ID: 10230, Name: Premier League, Country: Bhutan
+ID: 10234, Name: Paraibano 2, Country: Brazil
+ID: 10239, Name: Championnat D1, Country: Gabon
+ID: 10247, Name: Charity Shield, Country: Northern Ireland
+ID: 10249, Name: Calcutta Premier Division, Country: India
+ID: 10251, Name: CAC Games, Country: intl
+ID: 10252, Name: Primeira Divisão, Country: Macao
+ID: 10575, Name: African Football League, Country: intl
+ID: 10578, Name: Premier Division, Country: Antigua And Barbuda
+ID: 10585, Name: Pan American Games, Country: intl
+ID: 10608, Name: CONMEBOL Pre-Olympic Tournament, Country: intl
+ID: 10609, Name: Paulista A4, Country: Brazil
+ID: 10610, Name: Premier League, Country: Barbados
+ID: 10613, Name: Paulista Série B, Country: Brazil
+ID: 10793, Name: Yemeni League, Country: Yemen
+ID: 10797, Name: Concacaf U20 Qualification, Country: intl
+ID: 10798, Name: Torneo Promocional Amateur, Country: Argentina
+ID: 10800, Name: Goiano U20, Country: Brazil
+ID: 10801, Name: Paranaense U20, Country: Brazil
+ID: 10804, Name: African Games, Country: intl
+ID: 10805, Name: Baiano U20, Country: Brazil
+ID: 11485, Name: Nacional B, Country: Bolivia
+ID: 11486, Name: Pro League, Country: Uzbekistan
+ID: 11487, Name: Premier Division, Country: Grenada
+ID: 11488, Name: Catarinense U20, Country: Brazil
+ID: 11489, Name: WAFF Championship U23, Country: intl
+ID: 11493, Name: Paulista U20, Country: Brazil
+ID: 11494, Name: Capital Territory NPL 2, Country: Australia
+ID: 11495, Name: Western Australia State League 1, Country: Australia
+ID: 11496, Name: UAE-Qatar Super Shield, Country: intl
+ID: 11497, Name: NNSW League 1, Country: Australia
+ID: 11498, Name: Tasmania Southern Championship, Country: Australia
+ID: 11499, Name: Pernambucano U20, Country: Brazil
+ID: 11500, Name: Tasmania Northern Championship, Country: Australia
+ID: 11501, Name: Ykkösliiga, Country: Finland
+ID: 11503, Name: Matogrossense 2, Country: Brazil
+ID: 11505, Name: Brasiliense U20, Country: Brazil
+ID: 11509, Name: Liga 3, Country: Georgia
+ID: 11510, Name: Carioca C, Country: Brazil
+ID: 11511, Name: Mineiro U20, Country: Brazil
+ID: 11512, Name: Sergipano U20, Country: Brazil
+ID: 11514, Name: Alagoano U20, Country: Brazil
+ID: 11515, Name: Catarinense 2, Country: Brazil
+ID: 11516, Name: Cearense U20, Country: Brazil
+ID: 11517, Name: WPSL, Country: USA
+ID: 11518, Name: NPSL, Country: USA
+ID: 11520, Name: USL W League, Country: USA
+ID: 11521, Name: Paraense B2, Country: Brazil
+ID: 11522, Name: Carioca U20, Country: Brazil
+ID: 11523, Name: Paraibano U20, Country: Brazil
+ID: 11524, Name: Cearense 3, Country: Brazil
+ID: 11525, Name: Pernambucano 2, Country: Brazil
+ID: 11530, Name: USL Super League, Country: USA
+ID: 11533, Name: Championnat National, Country: Togo
+ID: 11535, Name: CONMEBOL U20 Femenino, Country: intl
+ID: 11536, Name: Carioca A2, Country: Brazil
+ID: 11697, Name: ASEAN Club Championship, Country: intl
+ID: 11699, Name: AFC Challenge League, Country: intl
+ID: 11700, Name: Goiano 3, Country: Brazil
+ID: 11701, Name: Amazonense 2, Country: Brazil
+ID: 11702, Name: Paraibano 2, Country: Brazil
+ID: 11704, Name: Sergipano 2, Country: Brazil
+ID: 11705, Name: Paranaense 3, Country: Brazil
+ID: 11706, Name: Potiguar U20, Country: Brazil
+ID: 11709, Name: Brasiliense B, Country: Brazil
+ID: 11710, Name: Mineiro 3, Country: Brazil
+ID: 11711, Name: Estadual Junior U20, Country: Brazil
+ID: 11713, Name: Alagoano 2, Country: Brazil
+ID: 11714, Name: Capixaba B, Country: Brazil
+ID: 11715, Name: Paraense B1, Country: Brazil
+ID: 11716, Name: Maranhense 2, Country: Brazil
+ID: 11718, Name: Pernambucano 3, Country: Brazil
+ID: 11719, Name: Potiguar 2, Country: Brazil
+ID: 11720, Name: Gaúcho 3, Country: Brazil
+ID: 11722, Name: Catarinense 3, Country: Brazil
+ID: 12587, Name: Carioca B2, Country: Brazil
+ID: 12589, Name: Paraense U20, Country: Brazil
+ID: 12591, Name: CECAFA U20 Championship, Country: intl
+ID: 12599, Name: EAFF Football Championship Qualification, Country: intl
+ID: 12601, Name: Torneo Amistoso de Verano, Country: Bolivia
+ID: 12606, Name: Northern Super League, Country: Canada
+ID: 12610, Name: Brasileiro U20 B, Country: Brazil
+ID: 12616, Name: South Australia NPL, Country: Australia
+ID: 12618, Name: African Nations Championship Qualification, Country: intl

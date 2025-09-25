@@ -1,0 +1,339 @@
+2025-09-25 07:18:19,355 - INFO - Loading models...
+2025-09-25 07:18:20,598 - INFO - ✅ Models and scalers loaded in 1.24 seconds
+2025-09-25 07:18:20,754 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-09-25 07:18:20,754 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-25 07:18:20,777 - INFO -  * Restarting with stat
+2025-09-25 07:18:24,567 - INFO - Loading models...
+2025-09-25 07:18:25,477 - INFO - ✅ Models and scalers loaded in 0.91 seconds
+2025-09-25 07:18:25,528 - WARNING -  * Debugger is active!
+2025-09-25 07:18:25,562 - INFO -  * Debugger PIN: 138-049-961
+2025-09-25 07:18:41,319 - INFO - No predictions.json found, running predictions...
+2025-09-25 07:18:41,319 - INFO - Using Season ID: 2024-2025
+2025-09-25 07:18:41,328 - INFO - Fetching all leagues...
+2025-09-25 07:18:43,509 - INFO - Filtered 976 leagues to 578 after excluding cups, women's, and youth leagues
+2025-09-25 07:18:43,509 - INFO - ✅ Retrieved 578 eligible leagues
+2025-09-25 07:18:43,536 - INFO - 
+Fetching matches for 2025-09-26 across 578 leagues...
+2025-09-25 07:18:43,548 - INFO - Fetching matches for Premier League (England, ID: 152) on 2025-09-26
+2025-09-25 07:18:45,449 - WARNING - ⚠️ No matches found for Premier League on 2025-09-26
+2025-09-25 07:18:46,461 - INFO - Fetching matches for La Liga (Spain, ID: 302) on 2025-09-26
+2025-09-25 07:18:49,425 - INFO - Fetching matches for Serie A (Italy, ID: 207) on 2025-09-26
+2025-09-25 07:18:51,036 - WARNING - ⚠️ No matches found for Serie A on 2025-09-26
+2025-09-25 07:18:52,052 - INFO - Fetching matches for Bundesliga (Germany, ID: 175) on 2025-09-26
+2025-09-25 07:18:55,035 - INFO - Fetching matches for Ligue 1 (France, ID: 168) on 2025-09-26
+2025-09-25 07:18:57,930 - INFO - Fetching matches for Premier League (Russia, ID: 344) on 2025-09-26
+2025-09-25 07:19:00,845 - INFO - Fetching matches for Primeira Liga (Portugal, ID: 266) on 2025-09-26
+2025-09-25 07:19:03,659 - INFO - Fetching matches for First Division A (Belgium, ID: 63) on 2025-09-26
+2025-09-25 07:19:06,325 - INFO - Fetching matches for Eredivisie (Netherlands, ID: 244) on 2025-09-26
+2025-09-25 07:19:09,126 - INFO - Fetching matches for MLS (USA, ID: 332) on 2025-09-26
+2025-09-25 07:19:11,954 - WARNING - ⚠️ No matches found for MLS on 2025-09-26
+2025-09-25 07:19:12,969 - INFO - Fetching matches for Süper Lig (Turkey, ID: 322) on 2025-09-26
+2025-09-25 07:19:15,983 - INFO - Fetching matches for Serie A (Brazil, ID: 99) on 2025-09-26
+2025-09-25 07:19:17,890 - WARNING - ⚠️ No matches found for Serie A on 2025-09-26
+2025-09-25 07:19:18,903 - INFO - Fetching matches for Liga MX (Mexico, ID: 235) on 2025-09-26
+2025-09-25 07:19:20,597 - WARNING - ⚠️ No matches found for Liga MX on 2025-09-26
+2025-09-25 07:19:21,616 - INFO - Fetching matches for Premiership (Scotland, ID: 279) on 2025-09-26
+2025-09-25 07:19:23,361 - WARNING - ⚠️ No matches found for Premiership on 2025-09-26
+2025-09-25 07:19:24,378 - INFO - Fetching matches for Bundesliga (Austria, ID: 56) on 2025-09-26
+2025-09-25 07:19:26,132 - WARNING - ⚠️ No matches found for Bundesliga on 2025-09-26
+2025-09-25 07:19:27,143 - INFO - Fetching matches for Premier League (Ukraine, ID: 325) on 2025-09-26
+2025-09-25 07:19:30,114 - INFO - Fetching matches for Superliga (Denmark, ID: 135) on 2025-09-26
+2025-09-25 07:19:31,858 - WARNING - ⚠️ No matches found for Superliga on 2025-09-26
+2025-09-25 07:19:32,866 - INFO - Fetching matches for Super League (Switzerland, ID: 308) on 2025-09-26
+2025-09-25 07:19:34,380 - WARNING - ⚠️ No matches found for Super League on 2025-09-26
+2025-09-25 07:19:35,401 - INFO - Fetching matches for First NL (Croatia, ID: 127) on 2025-09-26
+2025-09-25 07:19:38,405 - INFO - Fetching matches for Super League 1 (Greece, ID: 178) on 2025-09-26
+2025-09-25 07:19:40,236 - WARNING - ⚠️ No matches found for Super League 1 on 2025-09-26
+2025-09-25 07:19:41,260 - INFO - Fetching matches for Allsvenskan (Sweden, ID: 307) on 2025-09-26
+2025-09-25 07:19:43,094 - WARNING - ⚠️ No matches found for Allsvenskan on 2025-09-26
+2025-09-25 07:19:44,110 - INFO - Fetching matches for Czech Liga (Czech Republic, ID: 134) on 2025-09-26
+2025-09-25 07:19:46,720 - INFO - Fetching matches for 1. Division (Cyprus, ID: 130) on 2025-09-26
+2025-09-25 07:19:49,248 - INFO - Fetching matches for Super Liga (Serbia, ID: 288) on 2025-09-26
+2025-09-25 07:19:51,843 - INFO - Fetching matches for Saudi League (Saudi Arabia, ID: 278) on 2025-09-26
+2025-09-25 07:19:54,601 - INFO - Fetching matches for Ekstraklasa (Poland, ID: 259) on 2025-09-26
+2025-09-25 07:19:57,241 - INFO - Fetching matches for Chinese Super League (China, ID: 118) on 2025-09-26
+2025-09-25 07:19:59,736 - INFO - Fetching matches for Primera A (Colombia, ID: 120) on 2025-09-26
+2025-09-25 07:20:01,312 - WARNING - ⚠️ No matches found for Primera A on 2025-09-26
+2025-09-25 07:20:02,331 - INFO - Fetching matches for Ligat Ha'al (Israel, ID: 202) on 2025-09-26
+2025-09-25 07:20:03,935 - WARNING - ⚠️ No matches found for Ligat Ha'al on 2025-09-26
+2025-09-25 07:20:04,062 - INFO - No predictions.json found, running predictions...
+2025-09-25 07:20:04,062 - INFO - Using Season ID: 2024-2025
+2025-09-25 07:20:04,071 - INFO - Fetching all leagues...
+2025-09-25 07:20:04,947 - INFO - Fetching matches for J1 League (Japan, ID: 209) on 2025-09-26
+2025-09-25 07:20:05,970 - INFO - Filtered 976 leagues to 578 after excluding cups, women's, and youth leagues
+2025-09-25 07:20:05,970 - INFO - ✅ Retrieved 578 eligible leagues
+2025-09-25 07:20:05,987 - INFO - 
+Fetching matches for 2025-09-26 across 578 leagues...
+2025-09-25 07:20:05,995 - INFO - Fetching matches for Premier League (England, ID: 152) on 2025-09-26
+2025-09-25 07:20:06,688 - WARNING - ⚠️ No matches found for J1 League on 2025-09-26
+2025-09-25 07:20:07,687 - WARNING - ⚠️ No matches found for Premier League on 2025-09-26
+2025-09-25 07:20:07,704 - INFO - Fetching matches for Eliteserien (Norway, ID: 253) on 2025-09-26
+2025-09-25 07:20:08,698 - INFO - Fetching matches for La Liga (Spain, ID: 302) on 2025-09-26
+2025-09-25 07:20:09,442 - WARNING - ⚠️ No matches found for Eliteserien on 2025-09-26
+2025-09-25 07:20:10,453 - INFO - Fetching matches for First League (Bulgaria, ID: 111) on 2025-09-26
+2025-09-25 07:20:11,725 - INFO - Fetching matches for Serie A (Italy, ID: 207) on 2025-09-26
+2025-09-25 07:20:13,136 - INFO - Fetching matches for Liga I (Romania, ID: 272) on 2025-09-26
+2025-09-25 07:20:13,756 - WARNING - ⚠️ No matches found for Serie A on 2025-09-26
+2025-09-25 07:20:14,781 - INFO - Fetching matches for Bundesliga (Germany, ID: 175) on 2025-09-26
+2025-09-25 07:20:16,795 - INFO - Fetching matches for Stars League (Qatar, ID: 269) on 2025-09-26
+2025-09-25 07:20:17,479 - INFO - Fetching matches for Ligue 1 (France, ID: 168) on 2025-09-26
+2025-09-25 07:20:19,667 - INFO - Fetching matches for 2. Bundesliga (Germany, ID: 171) on 2025-09-26
+2025-09-25 07:20:20,152 - INFO - Fetching matches for Premier League (Russia, ID: 344) on 2025-09-26
+2025-09-25 07:20:22,346 - INFO - Fetching matches for 1. liga (Slovakia, ID: 293) on 2025-09-26
+2025-09-25 07:20:22,900 - INFO - Fetching matches for Primeira Liga (Portugal, ID: 266) on 2025-09-26
+2025-09-25 07:20:24,147 - WARNING - ⚠️ No matches found for 1. liga on 2025-09-26
+2025-09-25 07:20:25,158 - INFO - Fetching matches for Division Profesional (Paraguay, ID: 255) on 2025-09-26
+2025-09-25 07:20:25,752 - INFO - Fetching matches for First Division A (Belgium, ID: 63) on 2025-09-26
+2025-09-25 07:20:26,909 - WARNING - ⚠️ No matches found for Division Profesional on 2025-09-26
+2025-09-25 07:20:27,929 - INFO - Fetching matches for Ligue 2 (France, ID: 164) on 2025-09-26
+2025-09-25 07:20:28,437 - INFO - Fetching matches for Eredivisie (Netherlands, ID: 244) on 2025-09-26
+2025-09-25 07:20:30,877 - INFO - Fetching matches for Segunda División (Spain, ID: 301) on 2025-09-26
+2025-09-25 07:20:31,075 - INFO - Fetching matches for MLS (USA, ID: 332) on 2025-09-26
+2025-09-25 07:20:32,809 - WARNING - ⚠️ No matches found for MLS on 2025-09-26
+2025-09-25 07:20:33,820 - INFO - Fetching matches for NB I (Hungary, ID: 191) on 2025-09-26
+2025-09-25 07:20:33,829 - INFO - Fetching matches for Süper Lig (Turkey, ID: 322) on 2025-09-26
+2025-09-25 07:20:36,693 - INFO - Fetching matches for Serie A (Brazil, ID: 99) on 2025-09-26
+2025-09-25 07:20:36,765 - INFO - Fetching matches for Premyer Liqa (Azerbaijan, ID: 57) on 2025-09-26
+2025-09-25 07:20:38,577 - WARNING - ⚠️ No matches found for Serie A on 2025-09-26
+2025-09-25 07:20:39,591 - INFO - Fetching matches for Liga MX (Mexico, ID: 235) on 2025-09-26
+2025-09-25 07:20:40,792 - INFO - Fetching matches for Premier League (Kazakhstan, ID: 214) on 2025-09-26
+2025-09-25 07:20:42,512 - WARNING - ⚠️ No matches found for Liga MX on 2025-09-26
+2025-09-25 07:20:42,606 - WARNING - ⚠️ No matches found for Premier League on 2025-09-26
+2025-09-25 07:20:43,522 - INFO - Fetching matches for Premiership (Scotland, ID: 279) on 2025-09-26
+2025-09-25 07:20:43,616 - INFO - Fetching matches for Serie B (Italy, ID: 206) on 2025-09-26
+2025-09-25 07:20:45,453 - WARNING - ⚠️ No matches found for Premiership on 2025-09-26
+2025-09-25 07:20:46,464 - INFO - Fetching matches for Bundesliga (Austria, ID: 56) on 2025-09-26
+2025-09-25 07:20:46,464 - INFO - Fetching matches for K League 1 (Korea Republic, ID: 219) on 2025-09-26
+2025-09-25 07:20:48,366 - WARNING - ⚠️ No matches found for K League 1 on 2025-09-26
+2025-09-25 07:20:49,375 - INFO - Fetching matches for Persian Gulf Pro League (Iran, ID: 195) on 2025-09-26
+2025-09-25 07:20:49,625 - WARNING - ⚠️ No matches found for Bundesliga on 2025-09-26
+2025-09-25 07:20:50,653 - INFO - Fetching matches for Premier League (Ukraine, ID: 325) on 2025-09-26
+2025-09-25 07:20:51,827 - INFO - Fetching matches for Pro League (United Arab Emirates, ID: 328) on 2025-09-26
+2025-09-25 07:20:53,316 - INFO - Fetching matches for Superliga (Denmark, ID: 135) on 2025-09-26
+2025-09-25 07:20:54,547 - INFO - Fetching matches for Primera División (Costa Rica, ID: 121) on 2025-09-26
+2025-09-25 07:20:55,131 - WARNING - ⚠️ No matches found for Superliga on 2025-09-26
+2025-09-25 07:20:56,139 - INFO - Fetching matches for Super League (Switzerland, ID: 308) on 2025-09-26
+2025-09-25 07:20:56,248 - WARNING - ⚠️ No matches found for Primera División on 2025-09-26
+2025-09-25 07:20:57,261 - INFO - Fetching matches for LPF (Panama, ID: 406) on 2025-09-26
+2025-09-25 07:20:57,667 - WARNING - ⚠️ No matches found for Super League on 2025-09-26
+2025-09-25 07:20:58,678 - INFO - Fetching matches for First NL (Croatia, ID: 127) on 2025-09-26
+2025-09-25 07:20:58,787 - WARNING - ⚠️ No matches found for LPF on 2025-09-26
+2025-09-25 07:20:59,798 - INFO - Fetching matches for Damallsvenskan (Sweden, ID: 14) on 2025-09-26
+2025-09-25 07:21:01,353 - WARNING - ⚠️ No matches found for Damallsvenskan on 2025-09-26
+2025-09-25 07:21:01,363 - INFO - Fetching matches for Super League 1 (Greece, ID: 178) on 2025-09-26
+2025-09-25 07:21:02,367 - INFO - Fetching matches for CONMEBOL Libertadores (intl, ID: 18) on 2025-09-26
+2025-09-25 07:21:03,073 - WARNING - ⚠️ No matches found for Super League 1 on 2025-09-26
+2025-09-25 07:21:04,086 - INFO - Fetching matches for Allsvenskan (Sweden, ID: 307) on 2025-09-26
+2025-09-25 07:21:04,961 - INFO - Fetching matches for Liga Profesional Argentina (Argentina, ID: 44) on 2025-09-26
+2025-09-25 07:21:05,586 - WARNING - ⚠️ No matches found for Allsvenskan on 2025-09-26
+2025-09-25 07:21:06,571 - WARNING - ⚠️ No matches found for Liga Profesional Argentina on 2025-09-26
+2025-09-25 07:21:06,600 - INFO - Fetching matches for Czech Liga (Czech Republic, ID: 134) on 2025-09-26
+2025-09-25 07:21:07,581 - INFO - Fetching matches for A-League Men (Australia, ID: 49) on 2025-09-26
+2025-09-25 07:21:09,056 - INFO - Fetching matches for 1. Division (Cyprus, ID: 130) on 2025-09-26
+2025-09-25 07:21:09,431 - WARNING - ⚠️ No matches found for A-League Men on 2025-09-26
+2025-09-25 07:21:10,444 - INFO - Fetching matches for Serie B (Brazil, ID: 75) on 2025-09-26
+2025-09-25 07:21:12,304 - INFO - Fetching matches for Super Liga (Serbia, ID: 288) on 2025-09-26
+2025-09-25 07:21:13,021 - INFO - Fetching matches for Primera División (Chile, ID: 115) on 2025-09-26
+2025-09-25 07:21:14,499 - WARNING - ⚠️ No matches found for Primera División on 2025-09-26
+2025-09-25 07:21:14,984 - INFO - Fetching matches for Saudi League (Saudi Arabia, ID: 278) on 2025-09-26
+2025-09-25 07:21:15,517 - INFO - Fetching matches for League Two (England, ID: 145) on 2025-09-26
+2025-09-25 07:21:17,431 - WARNING - ⚠️ No matches found for League Two on 2025-09-26
+2025-09-25 07:21:18,167 - INFO - Fetching matches for Ekstraklasa (Poland, ID: 259) on 2025-09-26
+2025-09-25 07:21:18,450 - INFO - Fetching matches for Championship (England, ID: 153) on 2025-09-26
+2025-09-25 07:21:21,173 - INFO - Fetching matches for Chinese Super League (China, ID: 118) on 2025-09-26
+2025-09-25 07:21:21,450 - INFO - Fetching matches for League One (England, ID: 154) on 2025-09-26
+2025-09-25 07:21:23,208 - WARNING - ⚠️ No matches found for League One on 2025-09-26
+2025-09-25 07:21:24,168 - INFO - Fetching matches for Primera A (Colombia, ID: 120) on 2025-09-26
+2025-09-25 07:21:24,216 - INFO - Fetching matches for Coupe de France (France, ID: 165) on 2025-09-26
+2025-09-25 07:21:26,917 - WARNING - ⚠️ No matches found for Coupe de France on 2025-09-26
+2025-09-25 07:21:26,930 - WARNING - ⚠️ No matches found for Primera A on 2025-09-26
+2025-09-25 07:21:27,927 - INFO - Fetching matches for DFB Pokal (Germany, ID: 172) on 2025-09-26
+2025-09-25 07:21:27,937 - INFO - Fetching matches for Ligat Ha'al (Israel, ID: 202) on 2025-09-26
+2025-09-25 07:21:30,359 - WARNING - ⚠️ No matches found for DFB Pokal on 2025-09-26
+2025-09-25 07:21:30,377 - WARNING - ⚠️ No matches found for Ligat Ha'al on 2025-09-26
+2025-09-25 07:21:31,375 - INFO - Fetching matches for Coppa Italia (Italy, ID: 205) on 2025-09-26
+2025-09-25 07:21:31,387 - INFO - Fetching matches for J1 League (Japan, ID: 209) on 2025-09-26
+2025-09-25 07:21:33,708 - WARNING - ⚠️ No matches found for Coppa Italia on 2025-09-26
+2025-09-25 07:21:34,218 - WARNING - ⚠️ No matches found for J1 League on 2025-09-26
+2025-09-25 07:21:34,730 - INFO - Fetching matches for KNVB Beker (Netherlands, ID: 243) on 2025-09-26
+2025-09-25 07:21:35,226 - INFO - Fetching matches for Eliteserien (Norway, ID: 253) on 2025-09-26
+2025-09-25 07:21:36,728 - WARNING - ⚠️ No matches found for KNVB Beker on 2025-09-26
+2025-09-25 07:21:37,107 - WARNING - ⚠️ No matches found for Eliteserien on 2025-09-26
+2025-09-25 07:21:37,749 - INFO - Fetching matches for Liga 1 (Peru, ID: 257) on 2025-09-26
+2025-09-25 07:21:38,117 - INFO - Fetching matches for First League (Bulgaria, ID: 111) on 2025-09-26
+2025-09-25 07:21:40,593 - INFO - Fetching matches for Taça de Portugal (Portugal, ID: 265) on 2025-09-26
+2025-09-25 07:21:41,142 - INFO - Fetching matches for Liga I (Romania, ID: 272) on 2025-09-26
+2025-09-25 07:21:43,477 - WARNING - ⚠️ No matches found for Taça de Portugal on 2025-09-26
+2025-09-25 07:21:44,494 - INFO - Fetching matches for Community Shield (England, ID: 377) on 2025-09-26
+2025-09-25 07:21:44,704 - INFO - Fetching matches for Stars League (Qatar, ID: 269) on 2025-09-26
+2025-09-25 07:21:46,466 - WARNING - ⚠️ No matches found for Community Shield on 2025-09-26
+2025-09-25 07:21:47,482 - INFO - Fetching matches for CONMEBOL Sudamericana (intl, ID: 385) on 2025-09-26
+2025-09-25 07:21:47,545 - INFO - Fetching matches for 2. Bundesliga (Germany, ID: 171) on 2025-09-26
+2025-09-25 07:21:50,235 - INFO - Fetching matches for Indian Super League (India, ID: 566) on 2025-09-26
+2025-09-25 07:21:50,358 - INFO - Fetching matches for 1. liga (Slovakia, ID: 293) on 2025-09-26
+2025-09-25 07:21:51,992 - WARNING - ⚠️ No matches found for Indian Super League on 2025-09-26
+2025-09-25 07:21:52,179 - WARNING - ⚠️ No matches found for 1. liga on 2025-09-26
+2025-09-25 07:21:53,006 - INFO - Fetching matches for KNVB Beker (Netherlands, ID: 1194) on 2025-09-26
+2025-09-25 07:21:53,202 - INFO - Fetching matches for Division Profesional (Paraguay, ID: 255) on 2025-09-26
+2025-09-25 07:21:54,932 - WARNING - ⚠️ No matches found for KNVB Beker on 2025-09-26
+2025-09-25 07:21:54,990 - WARNING - ⚠️ No matches found for Division Profesional on 2025-09-26
+2025-09-25 07:21:55,944 - INFO - Fetching matches for 2. Liga (Austria, ID: 53) on 2025-09-26
+2025-09-25 07:21:56,006 - INFO - Fetching matches for Ligue 2 (France, ID: 164) on 2025-09-26
+2025-09-25 07:21:59,733 - INFO - Fetching matches for Segunda División (Spain, ID: 301) on 2025-09-26
+2025-09-25 07:22:00,156 - INFO - Fetching matches for Premier League (Belarus, ID: 61) on 2025-09-26
+2025-09-25 07:22:02,488 - INFO - Fetching matches for NB I (Hungary, ID: 191) on 2025-09-26
+2025-09-25 07:22:02,749 - INFO - Fetching matches for Carioca Série A (Brazil, ID: 83) on 2025-09-26
+2025-09-25 07:22:04,420 - WARNING - ⚠️ No matches found for Carioca Série A on 2025-09-26
+2025-09-25 07:22:05,194 - INFO - Fetching matches for Premyer Liqa (Azerbaijan, ID: 57) on 2025-09-26
+2025-09-25 07:22:05,444 - INFO - Fetching matches for Pernambucano 1 (Brazil, ID: 91) on 2025-09-26
+2025-09-25 07:22:09,232 - WARNING - ⚠️ No matches found for Pernambucano 1 on 2025-09-26
+2025-09-25 07:22:09,853 - INFO - Fetching matches for Premier League (Kazakhstan, ID: 214) on 2025-09-26
+2025-09-25 07:22:10,252 - INFO - Fetching matches for HNL (Croatia, ID: 124) on 2025-09-26
+2025-09-25 07:22:13,474 - WARNING - ⚠️ No matches found for Premier League on 2025-09-26
+2025-09-25 07:22:14,510 - INFO - Fetching matches for Serie B (Italy, ID: 206) on 2025-09-26
+2025-09-25 07:22:15,306 - INFO - Fetching matches for Liga Pro (Ecuador, ID: 140) on 2025-09-26
+2025-09-25 07:22:18,837 - INFO - Fetching matches for K League 1 (Korea Republic, ID: 219) on 2025-09-26
+2025-09-25 07:22:18,974 - WARNING - ⚠️ No matches found for Liga Pro on 2025-09-26
+2025-09-25 07:22:19,988 - INFO - Fetching matches for Premier League (Egypt, ID: 141) on 2025-09-26
+2025-09-25 07:22:21,146 - WARNING - ⚠️ No matches found for K League 1 on 2025-09-26
+2025-09-25 07:22:22,182 - INFO - Fetching matches for Persian Gulf Pro League (Iran, ID: 195) on 2025-09-26
+2025-09-25 07:22:22,232 - WARNING - ⚠️ No matches found for Premier League on 2025-09-26
+2025-09-25 07:22:23,244 - INFO - Fetching matches for Coupe de la Ligue (France, ID: 166) on 2025-09-26
+2025-09-25 07:22:24,848 - INFO - Fetching matches for Pro League (United Arab Emirates, ID: 328) on 2025-09-26
+2025-09-25 07:22:24,947 - WARNING - ⚠️ No matches found for Coupe de la Ligue on 2025-09-26
+2025-09-25 07:22:25,972 - INFO - Fetching matches for I-League (India, ID: 193) on 2025-09-26
+2025-09-25 07:22:27,624 - INFO - Fetching matches for Primera División (Costa Rica, ID: 121) on 2025-09-26
+2025-09-25 07:22:27,639 - WARNING - ⚠️ No matches found for I-League on 2025-09-26
+2025-09-25 07:22:28,657 - INFO - Fetching matches for Liga 1 (Indonesia, ID: 194) on 2025-09-26
+2025-09-25 07:22:29,052 - WARNING - ⚠️ No matches found for Primera División on 2025-09-26
+2025-09-25 07:22:30,060 - INFO - Fetching matches for LPF (Panama, ID: 406) on 2025-09-26
+2025-09-25 07:22:31,430 - INFO - Fetching matches for Botola Pro (Morocco, ID: 239) on 2025-09-26
+2025-09-25 07:22:31,634 - WARNING - ⚠️ No matches found for LPF on 2025-09-26
+2025-09-25 07:22:32,648 - INFO - Fetching matches for Damallsvenskan (Sweden, ID: 14) on 2025-09-26
+2025-09-25 07:22:34,144 - INFO - Fetching matches for Eerste Divisie (Netherlands, ID: 245) on 2025-09-26
+2025-09-25 07:22:34,254 - WARNING - ⚠️ No matches found for Damallsvenskan on 2025-09-26
+2025-09-25 07:22:35,268 - INFO - Fetching matches for CONMEBOL Libertadores (intl, ID: 18) on 2025-09-26
+2025-09-25 07:22:37,010 - INFO - Fetching matches for Segunda Liga (Portugal, ID: 267) on 2025-09-26
+2025-09-25 07:22:38,238 - INFO - Fetching matches for Liga Profesional Argentina (Argentina, ID: 44) on 2025-09-26
+2025-09-25 07:22:40,081 - INFO - Fetching matches for 1. SNL (Slovenia, ID: 296) on 2025-09-26
+2025-09-25 07:22:40,081 - WARNING - ⚠️ No matches found for Liga Profesional Argentina on 2025-09-26
+2025-09-25 07:22:41,098 - INFO - Fetching matches for A-League Men (Australia, ID: 49) on 2025-09-26
+2025-09-25 07:22:42,625 - WARNING - ⚠️ No matches found for A-League Men on 2025-09-26
+2025-09-25 07:22:43,203 - INFO - Fetching matches for PSL (South Africa, ID: 297) on 2025-09-26
+2025-09-25 07:22:43,639 - INFO - Fetching matches for Serie B (Brazil, ID: 75) on 2025-09-26
+2025-09-25 07:22:46,355 - WARNING - ⚠️ No matches found for PSL on 2025-09-26
+2025-09-25 07:22:46,565 - INFO - Fetching matches for Primera División (Chile, ID: 115) on 2025-09-26
+2025-09-25 07:22:47,363 - INFO - Fetching matches for Thai League 1 (Thailand, ID: 314) on 2025-09-26
+2025-09-25 07:22:48,393 - WARNING - ⚠️ No matches found for Primera División on 2025-09-26
+2025-09-25 07:22:49,401 - INFO - Fetching matches for League Two (England, ID: 145) on 2025-09-26
+2025-09-25 07:22:50,240 - INFO - Fetching matches for Taça da Liga (Portugal, ID: 476) on 2025-09-26
+2025-09-25 07:22:51,019 - WARNING - ⚠️ No matches found for League Two on 2025-09-26
+2025-09-25 07:22:52,036 - INFO - Fetching matches for Championship (England, ID: 153) on 2025-09-26
+2025-09-25 07:22:52,551 - WARNING - ⚠️ No matches found for Taça da Liga on 2025-09-26
+2025-09-25 07:22:53,560 - INFO - Fetching matches for Première Ligue (France, ID: 6) on 2025-09-26
+2025-09-25 07:22:54,749 - INFO - Fetching matches for League One (England, ID: 154) on 2025-09-26
+2025-09-25 07:22:56,097 - INFO - Fetching matches for Frauen Bundesliga (Germany, ID: 7) on 2025-09-26
+2025-09-25 07:22:56,552 - WARNING - ⚠️ No matches found for League One on 2025-09-26
+2025-09-25 07:22:57,558 - INFO - Fetching matches for Coupe de France (France, ID: 165) on 2025-09-26
+2025-09-25 07:22:57,827 - WARNING - ⚠️ No matches found for Frauen Bundesliga on 2025-09-26
+2025-09-25 07:22:58,834 - INFO - Fetching matches for ASEAN Championship (intl, ID: 12) on 2025-09-26
+2025-09-25 07:22:59,069 - WARNING - ⚠️ No matches found for Coupe de France on 2025-09-26
+2025-09-25 07:23:00,088 - INFO - Fetching matches for DFB Pokal (Germany, ID: 172) on 2025-09-26
+2025-09-25 07:23:00,389 - WARNING - ⚠️ No matches found for ASEAN Championship on 2025-09-26
+2025-09-25 07:23:01,406 - INFO - Fetching matches for Primera División Femenina (Spain, ID: 13) on 2025-09-26
+2025-09-25 07:23:01,672 - WARNING - ⚠️ No matches found for DFB Pokal on 2025-09-26
+2025-09-25 07:23:02,689 - INFO - Fetching matches for Coppa Italia (Italy, ID: 205) on 2025-09-26
+2025-09-25 07:23:02,939 - WARNING - ⚠️ No matches found for Primera División Femenina on 2025-09-26
+2025-09-25 07:23:03,956 - INFO - Fetching matches for Superliga (Albania, ID: 31) on 2025-09-26
+2025-09-25 07:23:04,356 - WARNING - ⚠️ No matches found for Coppa Italia on 2025-09-26
+2025-09-25 07:23:05,373 - INFO - Fetching matches for KNVB Beker (Netherlands, ID: 243) on 2025-09-26
+2025-09-25 07:23:05,482 - WARNING - ⚠️ No matches found for Superliga on 2025-09-26
+2025-09-25 07:23:06,490 - INFO - Fetching matches for 1st Division (Albania, ID: 32) on 2025-09-26
+2025-09-25 07:23:06,984 - WARNING - ⚠️ No matches found for KNVB Beker on 2025-09-26
+2025-09-25 07:23:07,998 - INFO - Fetching matches for Liga 1 (Peru, ID: 257) on 2025-09-26
+2025-09-25 07:23:09,128 - INFO - Fetching matches for 2nd Division (Albania, ID: 33) on 2025-09-26
+2025-09-25 07:23:10,494 - INFO - Fetching matches for Taça de Portugal (Portugal, ID: 265) on 2025-09-26
+2025-09-25 07:23:10,775 - WARNING - ⚠️ No matches found for 2nd Division on 2025-09-26
+2025-09-25 07:23:11,793 - INFO - Fetching matches for Ligue 1 (Algeria, ID: 34) on 2025-09-26
+2025-09-25 07:23:12,060 - WARNING - ⚠️ No matches found for Taça de Portugal on 2025-09-26
+2025-09-25 07:23:13,071 - INFO - Fetching matches for Community Shield (England, ID: 377) on 2025-09-26
+2025-09-25 07:23:13,383 - WARNING - ⚠️ No matches found for Ligue 1 on 2025-09-26
+2025-09-25 07:23:14,393 - INFO - Fetching matches for Ligue 2 (Algeria, ID: 35) on 2025-09-26
+2025-09-25 07:23:14,971 - WARNING - ⚠️ No matches found for Community Shield on 2025-09-26
+2025-09-25 07:23:15,980 - INFO - Fetching matches for CONMEBOL Sudamericana (intl, ID: 385) on 2025-09-26
+2025-09-25 07:23:17,010 - INFO - Fetching matches for 2a Divisió (Andorra, ID: 36) on 2025-09-26
+2025-09-25 07:23:18,999 - INFO - Fetching matches for Indian Super League (India, ID: 566) on 2025-09-26
+2025-09-25 07:23:19,108 - WARNING - ⚠️ No matches found for 2a Divisió on 2025-09-26
+2025-09-25 07:23:20,117 - INFO - Fetching matches for 1a Divisió (Andorra, ID: 37) on 2025-09-26
+2025-09-25 07:23:20,789 - WARNING - ⚠️ No matches found for Indian Super League on 2025-09-26
+2025-09-25 07:23:21,809 - INFO - Fetching matches for KNVB Beker (Netherlands, ID: 1194) on 2025-09-26
+2025-09-25 07:23:21,934 - WARNING - ⚠️ No matches found for 1a Divisió on 2025-09-26
+2025-09-25 07:23:22,948 - INFO - Fetching matches for Girabola (Angola, ID: 38) on 2025-09-26
+2025-09-25 07:23:23,479 - WARNING - ⚠️ No matches found for KNVB Beker on 2025-09-26
+2025-09-25 07:23:24,490 - INFO - Fetching matches for 2. Liga (Austria, ID: 53) on 2025-09-26
+2025-09-25 07:23:24,537 - WARNING - ⚠️ No matches found for Girabola on 2025-09-26
+2025-09-25 07:23:25,547 - INFO - Fetching matches for Torneo Federal A (Argentina, ID: 39) on 2025-09-26
+2025-09-25 07:23:27,029 - WARNING - ⚠️ No matches found for Torneo Federal A on 2025-09-26
+2025-09-25 07:23:27,437 - INFO - Fetching matches for Premier League (Belarus, ID: 61) on 2025-09-26
+2025-09-25 07:23:28,048 - INFO - Fetching matches for Prim B Metro (Argentina, ID: 40) on 2025-09-26
+2025-09-25 07:23:30,191 - WARNING - ⚠️ No matches found for Prim B Metro on 2025-09-26
+2025-09-25 07:23:31,044 - INFO - Fetching matches for Carioca Série A (Brazil, ID: 83) on 2025-09-26
+2025-09-25 07:23:31,197 - INFO - Fetching matches for Primera Nacional (Argentina, ID: 41) on 2025-09-26
+2025-09-25 07:23:32,867 - WARNING - ⚠️ No matches found for Carioca Série A on 2025-09-26
+2025-09-25 07:23:32,945 - WARNING - ⚠️ No matches found for Primera Nacional on 2025-09-26
+2025-09-25 07:23:33,881 - INFO - Fetching matches for Pernambucano 1 (Brazil, ID: 91) on 2025-09-26
+2025-09-25 07:23:33,964 - INFO - Fetching matches for Primera C (Argentina, ID: 42) on 2025-09-26
+2025-09-25 07:23:35,834 - WARNING - ⚠️ No matches found for Primera C on 2025-09-26
+2025-09-25 07:23:36,321 - WARNING - ⚠️ No matches found for Pernambucano 1 on 2025-09-26
+2025-09-25 07:23:36,841 - INFO - Fetching matches for Primera D (Argentina, ID: 43) on 2025-09-26
+2025-09-25 07:23:37,332 - INFO - Fetching matches for HNL (Croatia, ID: 124) on 2025-09-26
+2025-09-25 07:23:39,700 - WARNING - ⚠️ No matches found for Primera D on 2025-09-26
+2025-09-25 07:23:40,722 - INFO - Fetching matches for Premier League (Armenia, ID: 45) on 2025-09-26
+2025-09-25 07:23:40,722 - INFO - Fetching matches for Liga Pro (Ecuador, ID: 140) on 2025-09-26
+2025-09-25 07:23:42,675 - WARNING - ⚠️ No matches found for Liga Pro on 2025-09-26
+2025-09-25 07:23:43,674 - INFO - Fetching matches for First League (Armenia, ID: 46) on 2025-09-26
+2025-09-25 07:23:43,689 - INFO - Fetching matches for Premier League (Egypt, ID: 141) on 2025-09-26
+2025-09-25 07:23:45,617 - WARNING - ⚠️ No matches found for Premier League on 2025-09-26
+2025-09-25 07:23:45,944 - WARNING - ⚠️ No matches found for First League on 2025-09-26
+2025-09-25 07:23:46,635 - INFO - Fetching matches for Coupe de la Ligue (France, ID: 166) on 2025-09-26
+2025-09-25 07:23:46,952 - INFO - Fetching matches for Division di Honor (Aruba, ID: 47) on 2025-09-26
+2025-09-25 07:23:48,652 - WARNING - ⚠️ No matches found for Coupe de la Ligue on 2025-09-26
+2025-09-25 07:23:48,808 - WARNING - ⚠️ No matches found for Division di Honor on 2025-09-26
+2025-09-25 07:23:49,669 - INFO - Fetching matches for I-League (India, ID: 193) on 2025-09-26
+2025-09-25 07:23:49,825 - INFO - Fetching matches for South Australia NPL (Australia, ID: 48) on 2025-09-26
+2025-09-25 07:23:51,729 - WARNING - ⚠️ No matches found for South Australia NPL on 2025-09-26
+2025-09-25 07:23:52,260 - WARNING - ⚠️ No matches found for I-League on 2025-09-26
+2025-09-25 07:23:52,734 - INFO - Fetching matches for New South Wales NPL (Australia, ID: 50) on 2025-09-26
+2025-09-25 07:23:53,270 - INFO - Fetching matches for Liga 1 (Indonesia, ID: 194) on 2025-09-26
+2025-09-25 07:23:54,378 - WARNING - ⚠️ No matches found for New South Wales NPL on 2025-09-26
+2025-09-25 07:23:55,396 - INFO - Fetching matches for Western Australia NPL (Australia, ID: 51) on 2025-09-26
+2025-09-25 07:23:56,004 - INFO - Fetching matches for Botola Pro (Morocco, ID: 239) on 2025-09-26
+2025-09-25 07:23:57,004 - WARNING - ⚠️ No matches found for Western Australia NPL on 2025-09-26
+2025-09-25 07:23:58,014 - INFO - Fetching matches for Landesliga (Austria, ID: 52) on 2025-09-26
+2025-09-25 07:23:58,772 - INFO - Fetching matches for Eerste Divisie (Netherlands, ID: 245) on 2025-09-26
+2025-09-25 07:24:00,707 - INFO - Fetching matches for Regionalliga (Austria, ID: 55) on 2025-09-26
+2025-09-25 07:24:01,325 - INFO - Fetching matches for Segunda Liga (Portugal, ID: 267) on 2025-09-26
+2025-09-25 07:24:03,239 - INFO - Fetching matches for Birinci Dasta (Azerbaijan, ID: 58) on 2025-09-26
+2025-09-25 07:24:03,846 - INFO - Fetching matches for 1. SNL (Slovenia, ID: 296) on 2025-09-26
+2025-09-25 07:24:04,745 - WARNING - ⚠️ No matches found for Birinci Dasta on 2025-09-26
+2025-09-25 07:24:05,751 - INFO - Fetching matches for Premier League (Bahrain, ID: 59) on 2025-09-26
+2025-09-25 07:24:06,471 - INFO - Fetching matches for PSL (South Africa, ID: 297) on 2025-09-26
+2025-09-25 07:24:08,096 - WARNING - ⚠️ No matches found for PSL on 2025-09-26
+2025-09-25 07:24:08,401 - INFO - Fetching matches for Premier League (Bangladesh, ID: 60) on 2025-09-26
+2025-09-25 07:24:09,103 - INFO - Fetching matches for Thai League 1 (Thailand, ID: 314) on 2025-09-26
+2025-09-25 07:24:10,307 - WARNING - ⚠️ No matches found for Premier League on 2025-09-26
+2025-09-25 07:24:11,323 - INFO - Fetching matches for 1. Division (Belarus, ID: 62) on 2025-09-26
+2025-09-25 07:24:11,790 - INFO - Fetching matches for Taça da Liga (Portugal, ID: 476) on 2025-09-26
+2025-09-25 07:24:13,435 - WARNING - ⚠️ No matches found for Taça da Liga on 2025-09-26
+2025-09-25 07:24:13,529 - WARNING - ⚠️ No matches found for 1. Division on 2025-09-26
+2025-09-25 07:24:14,445 - INFO - Fetching matches for Première Ligue (France, ID: 6) on 2025-09-26
+2025-09-25 07:24:14,543 - INFO - Fetching matches for Challenger Pro League (Belgium, ID: 65) on 2025-09-26
+2025-09-25 07:24:17,320 - INFO - Fetching matches for Frauen Bundesliga (Germany, ID: 7) on 2025-09-26
+2025-09-25 07:24:17,491 - INFO - Fetching matches for Third Amateur Division (Belgium, ID: 66) on 2025-09-26
+2025-09-25 07:24:19,150 - WARNING - ⚠️ No matches found for Third Amateur Division on 2025-09-26
+2025-09-25 07:24:19,166 - WARNING - ⚠️ No matches found for Frauen Bundesliga on 2025-09-26
+2025-09-25 07:24:20,168 - INFO - Fetching matches for Second Amateur Division (Belgium, ID: 67) on 2025-09-26
+2025-09-25 07:24:20,178 - INFO - Fetching matches for ASEAN Championship (intl, ID: 12) on 2025-09-26
+2025-09-25 07:24:22,167 - WARNING - ⚠️ No matches found for Second Amateur Division on 2025-09-26
+2025-09-25 07:24:22,214 - WARNING - ⚠️ No matches found for ASEAN Championship on 2025-09-26
