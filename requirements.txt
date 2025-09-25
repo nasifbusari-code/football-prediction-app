@@ -15,3 +15,4 @@ paystackapi
 flask-login
 bcrypt
 flask-sqlalchemy
+apscheduler
