@@ -60,7 +60,7 @@ scaler = joblib.load('favour_v6_base_scaler.pkl')
 gb_model = joblib.load('favour_v6_gb_model.pkl')
 xgb_model = joblib.load('favour_v6_xgb_model.pkl')
 meta_scaler = joblib.load('favour_v6_meta_scaler.pkl')
-meta_model = joblib.load('favour_v6_meta_model.pkl')
+meta_model = joblib.load('hybrid_meta_model.pkl')
 logger.info(f"✅ Models and scalers loaded in {(datetime.now() - start_time).total_seconds():.2f} seconds")
 
 class User(UserMixin, db.Model):
