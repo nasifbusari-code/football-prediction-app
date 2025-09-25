@@ -128,6 +128,13 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     to_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
     from_date = '2024-08-01'
 
+    # FIX: Validate event_date format
+    try:
+        datetime.strptime(match_date, '%Y-%m-%d')
+    except (ValueError, TypeError):
+        logger.error(f"❌ Invalid match date format for {match_info}: {match_date}")
+        return None
+
     HomeGoalList, HomeConcededList, HomeBTTS = [], [], []
     home_red_cards = []
     try:
@@ -156,7 +163,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
             continue
         if is_team_match(match.get('event_home_team', ''), home_team_name):
             result = match.get('event_final_result', '')
-            if result and '-' in result:
+            # FIX: Validate event_final_result format
+            if result and '-' in result and len(result.split('-')) == 2:
                 try:
                     parts = result.replace(' ', '').split('-')
                     home_goals, away_goals = map(int, parts[:2])
@@ -170,6 +178,9 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         break
                 except (ValueError, TypeError):
                     continue
+            else:
+                logger.warning(f"⚠️ Invalid result format for home match {match.get('event_date')}: {result}")
+                continue
 
     if len(home_filtered) != 5:
         logger.error(f"❌ Skipping {match_info}: Only {len(home_filtered)} home matches found")
@@ -216,7 +227,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
             continue
         if is_team_match(match.get('event_away_team', ''), away_team_name):
             result = match.get('event_final_result', '')
-            if result and '-' in result:
+            # FIX: Validate event_final_result format
+            if result and '-' in result and len(result.split('-')) == 2:
                 try:
                     parts = result.replace(' ', '').split('-')
                     home_goals, away_goals = map(int, parts[:2])
@@ -230,6 +242,9 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         break
                 except (ValueError, TypeError):
                     continue
+            else:
+                logger.warning(f"⚠️ Invalid result format for away match {match.get('event_date')}: {result}")
+                continue
 
     if len(away_filtered) != 5:
         logger.error(f"❌ Skipping {match_info}: Only {len(away_filtered)} away matches found")
@@ -648,7 +663,7 @@ def main(date_from=None):
                       f"Meta-Model Under 3.5 Probability: {result['MetaUnderProb']:.1f}%\n"
                       f"Recommendation: {result['Recommendation']}\n"
                       f"Reason: {result['Reason']}\n"
-                      f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n{Bu}  f"{'='*50}")
+                      f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n" + f"{'='*50}")
             logger.info(output)
             f.write(output + "\n")
         if skipped_matches:
@@ -726,12 +741,13 @@ def paystack_callback():
     try:
         ps = Paystack(PAYSTACK_SECRET_KEY)
         data = ps.transaction.verify(ref)
-        if data['status'] and data['data']['status'] == 'success':
+        # FIX: Validate Paystack response structure
+        if data.get('status') and data.get('data', {}).get('status') == 'success':
             session['vip'] = True
-            logger.info'entruef"✅ Payment verified for ref: {ref}")
+            logger.info(f"✅ Payment verified for ref: {ref}")
             return redirect(url_for('vip'))
         else:
-            logger.error(f"❌ Payment verification failed for ref: {ref}")
+            logger.error(f"❌ Payment verification failed for ref: {ref}, response: {data}")
             return "Payment verification failed!"
     except Exception as e:
         logger.error(f"❌ Error verifying payment: {e}")
