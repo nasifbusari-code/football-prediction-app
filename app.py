@@ -561,15 +561,24 @@ def main(date_from=None):
         logger.error("❌ Aborting: No eligible leagues retrieved.")
         return
 
+    # Filter for Sweden Superettan only (replace 123 with actual league_key)
+    superettan_league_id = 329  # Replace with actual Superettan league_key
+    leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues 
+               if league_id == superettan_league_id or (league_name.lower() == 'superettan' and country_name.lower() == 'sweden')]
+    
+    if not leagues:
+        logger.error("❌ Aborting: Sweden Superettan league not found.")
+        return
+
     all_matches = []
-    logger.info(f"\nFetching matches for {date_from} across {len(leagues)} leagues...")
-    for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
+    logger.info(f"\nFetching matches for {date_from} for Sweden Superettan...")
+    for league_id, league_name, country_name in tqdm(leagues, desc="Processing Sweden Superettan"):
         matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)
         all_matches.extend(matches)
         time.sleep(1)
 
     if not all_matches:
-        logger.error(f"❌ No matches found across any league for {date_from}.")
+        logger.error(f"❌ No matches found for Sweden Superettan on {date_from}.")
         return
 
     logger.info(f"\nFound {len(all_matches)} matches for {date_from}:")
@@ -639,8 +648,7 @@ def main(date_from=None):
                       f"Meta-Model Under 3.5 Probability: {result['MetaUnderProb']:.1f}%\n"
                       f"Recommendation: {result['Recommendation']}\n"
                       f"Reason: {result['Reason']}\n"
-                      f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n"
-                      f"{'='*50}")
+                      f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n{Bu}  f"{'='*50}")
             logger.info(output)
             f.write(output + "\n")
         if skipped_matches:
@@ -720,7 +728,7 @@ def paystack_callback():
         data = ps.transaction.verify(ref)
         if data['status'] and data['data']['status'] == 'success':
             session['vip'] = True
-            logger.info(f"✅ Payment verified for ref: {ref}")
+            logger.info'entruef"✅ Payment verified for ref: {ref}")
             return redirect(url_for('vip'))
         else:
             logger.error(f"❌ Payment verification failed for ref: {ref}")
