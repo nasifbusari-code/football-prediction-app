@@ -672,7 +672,7 @@ def main(date_from=None):
 
 # === Flask App ===
 app = Flask(__name__)
-app.secret_key = 'super_secret_key_change_this_later'  # Change to a random string for security
+app.secret_key = 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5'  # Change to a random string for security
 
 # Paystack setup
 PAYSTACK_PUBLIC_KEY = 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5'  # Use test key
