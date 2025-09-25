@@ -13,10 +13,13 @@ import logging
 import sys
 import joblib
 from tqdm import tqdm
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 import json
 from paystackapi.paystack import Paystack
 import threading
+import bcrypt
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 # === Configure Logging ===
 logging.basicConfig(
@@ -30,7 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger()
 
 # === API Configuration ===
-API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a')  # Set in Render env vars
+API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a')
 API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
@@ -61,6 +64,46 @@ except FileNotFoundError as e:
 except Exception as e:
     logger.error(f"❌ Error loading models: {e}")
     sys.exit(1)
+
+# === Flask App Configuration ===
+app = Flask(__name__)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# Paystack setup
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5')
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
+
+# === Database Model ===
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
+    is_vip = db.Column(db.Boolean, default=False)
+    vip_expiry = db.Column(db.DateTime, nullable=True)
+
+    def set_password(self, password):
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+
+# Create database
+with app.app_context():
+    db.create_all()
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # === Confidence Function ===
 def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, AwayConcededList, HomeBTTS, AwayBTTS, poisson_prob):
@@ -561,7 +604,7 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
 # === Modified Main Function ===
 def main(date_from=None):
     if date_from is None:
-        date_from = datetime.now().strftime('%Y-%m-%d')  # Predict for today
+        date_from = datetime.now().strftime('%Y-%m-%d')
 
     season_id = SEASON_ID
     logger.info(f"Using Season ID: {season_id}")
@@ -571,7 +614,6 @@ def main(date_from=None):
         logger.error("❌ Aborting: No eligible leagues retrieved.")
         return
 
-    # Filter for Sweden Superettan only
     superettan_league_id = 305
     leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues 
                if league_id == superettan_league_id or (league_name.lower() == 'superettan' and country_name.lower() == 'sweden')]
@@ -664,15 +706,7 @@ def main(date_from=None):
             logger.info("\n=== Skipped Matches ===")
             f.write("\nSkipped Matches:\n" + "\n".join(skipped_matches) + "\n")
 
-# === Flask App ===
-app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())  # Secure random key
-
-# Paystack setup
-PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5')
-PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')  # Must be set in Render env vars
-
-# Load predictions from JSON
+# === Load Predictions ===
 def load_predictions():
     try:
         with open('predictions.json', 'r', encoding='utf-8') as f:
@@ -681,73 +715,126 @@ def load_predictions():
         logger.error(f"❌ Error loading predictions.json: {e}")
         return []
 
-# Run predictions daily at midnight
+# === Run Predictions Daily ===
 def run_predictions():
     while True:
         now = datetime.now()
-        if now.hour == 0 and now.minute == 0:  # Midnight
+        if now.hour == 0 and now.minute == 0:
             logger.info("Running daily predictions...")
             main()
-        time.sleep(3600)  # Check every hour
+        time.sleep(3600)
 
-# Start background thread for predictions
+# Start background thread
 threading.Thread(target=run_predictions, daemon=True).start()
 
-# Free page: Show all predictions, only the highest probability pick
+# === Routes ===
 @app.route('/')
 def home():
     if not os.path.exists('predictions.json'):
         logger.info("No predictions.json found, running predictions...")
-        main(date_from=datetime.now().strftime('%Y-%m-%d'))  # Run for today
+        main(date_from=datetime.now().strftime('%Y-%m-%d'))
     predictions = load_predictions()
     if not predictions:
         return render_template('home.html', predictions=[], error="No matches available for today.")
     free_preds = []
     for pred in predictions:
         high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
-        if high_prob > 50:  # Only show confident predictions
+        if high_prob > 50:
             pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
             free_preds.append({
                 'match': pred['Match'],
                 'pick': pred['Recommendation'] if pred['Recommendation'] != "NO BET" else "No Bet"
             })
-    return render_template('home.html', predictions=free_preds, error=None)
+    return render_template('home.html', predictions=free_preds, error=None, user=current_user)
 
-# VIP page: Show only recommended predictions
 @app.route('/vip')
+@login_required
 def vip():
-    if 'vip' not in session:
+    if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
+        current_user.is_vip = False
+        current_user.vip_expiry = None
+        db.session.commit()
+        flash('Your VIP subscription has expired. Please renew.', 'warning')
         return redirect(url_for('pay'))
     predictions = load_predictions()
     vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-    return render_template('vip.html', predictions=vip_preds)
+    return render_template('vip.html', predictions=vip_preds, user=current_user)
 
-# Payment page
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if not username or not password:
+            flash('Username and password are required.', 'danger')
+            return render_template('register.html')
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists.', 'danger')
+            return render_template('register.html')
+        user = User(username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            login_user(user)
+            flash('Logged in successfully!', 'success')
+            return redirect(url_for('home'))
+        flash('Invalid username or password.', 'danger')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out successfully.', 'success')
+    return redirect(url_for('home'))
+
 @app.route('/pay')
+@login_required
 def pay():
-    return render_template('pay.html', paystack_key=PAYSTACK_PUBLIC_KEY)
+    return render_template('pay.html', paystack_key=PAYSTACK_PUBLIC_KEY, user=current_user)
 
-# Paystack callback
 @app.route('/paystack/callback')
+@login_required
 def paystack_callback():
-    ref = request.args.get('reference')  # Paystack uses 'reference', not 'ref'
+    ref = request.args.get('reference')
     if not ref:
         logger.error("❌ No payment reference provided")
-        return "Payment failed!"
+        flash('Payment failed: No reference provided.', 'danger')
+        return redirect(url_for('pay'))
     try:
         ps = Paystack(PAYSTACK_SECRET_KEY)
         data = ps.transaction.verify(ref)
         logger.info(f"Paystack verification response: {data}")
         if data.get('status') and data.get('data', {}).get('status') == 'success':
-            session['vip'] = True
-            logger.info(f"✅ Payment verified for ref: {ref}")
+            current_user.is_vip = True
+            current_user.vip_expiry = datetime.utcnow() + timedelta(days=7)
+            db.session.commit()
+            logger.info(f"✅ Payment verified for ref: {ref}, VIP granted to {current_user.username} until {current_user.vip_expiry}")
+            flash('VIP subscription activated for 7 days!', 'success')
             return redirect(url_for('vip'))
         else:
             logger.error(f"❌ Payment verification failed for ref: {ref}, response: {data}")
-            return "Payment verification failed!"
+            flash('Payment verification failed.', 'danger')
+            return redirect(url_for('pay'))
     except Exception as e:
         logger.error(f"❌ Error verifying payment: {e}")
-        return "Payment issue – try again!"
+        flash('Payment issue – try again.', 'danger')
+        return redirect(url_for('pay'))
 
 if __name__ == '__main__':
-    app.run(debug=False)  # Disable debug mode for production
+    app.run(debug=False)
