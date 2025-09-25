@@ -40,7 +40,7 @@ SEASON_ID = "2024-2025"
 
 # === League Exclusion Rules ===
 EXCLUDED_KEYWORDS = [
-    'cup', 'copa', 'euro', 'uefa', 'champions league', 'europa league',
+    'cup', 'copa', 
     'conference league', 'trophy', 'supercup', 'super cup', 'women', 'ladies',
     'female', 'fa cup', 'league cup', 'playoff', 'play-off', 'knockout',
     'u21', 'u19', 'u18', 'u17', 'youth', 'reserve', 'esiliiga', 'ekstraliga women'
@@ -439,7 +439,7 @@ def make_prediction(data_dict, match_info):
         'btts_boost_flag', 'many_0_1_conceded_flag',
         'defensive_strength_flag', 'avoid_match_penalty_flag',
         'low_conceded_boost', 'defensive_threshold_flag',
-        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg',
+        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg,
         'home_wins', 'home_draws', 'home_losses', 'away_wins', 'away_draws', 'away_losses'
     ]
 
@@ -609,28 +609,36 @@ def main(date_from=None):
     season_id = SEASON_ID
     logger.info(f"Using Season ID: {season_id}")
 
+    # List of league IDs to include
+    target_league_ids = [
+        1, 683, 3, 152, 302, 207, 175, 168, 344, 266, 63, 244, 332, 99, 279, 56, 135, 308,
+        127, 178, 307, 118, 209, 253, 171, 164, 301, 219, 153, 154, 53, 141, 245, 117, 155,
+        156, 158, 160, 192, 211, 218, 250, 251, 282, 284, 285, 305, 319, 331, 329, 330, 353,
+        362, 363, 366, 614, 593
+    ]
+
     leagues = fetch_all_leagues()
     if not leagues:
         logger.error("❌ Aborting: No eligible leagues retrieved.")
         return
 
-    superettan_league_id = 305
-    leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues 
-               if league_id == superettan_league_id or (league_name.lower() == 'superettan' and country_name.lower() == 'sweden')]
-    
+    # Filter leagues to only those in target_league_ids, respecting exclusion rules
+    leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues
+               if league_id in target_league_ids]
+
     if not leagues:
-        logger.error("❌ Aborting: Sweden Superettan league not found.")
+        logger.error("❌ Aborting: No matching leagues found for provided IDs after filtering.")
         return
 
     all_matches = []
-    logger.info(f"\nFetching matches for {date_from} for Sweden Superettan...")
-    for league_id, league_name, country_name in tqdm(leagues, desc="Processing Sweden Superettan"):
+    logger.info(f"\nFetching matches for {date_from} for {len(leagues)} selected leagues...")
+    for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
         matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)
         all_matches.extend(matches)
         time.sleep(1)
 
     if not all_matches:
-        logger.error(f"❌ No matches found for Sweden Superettan on {date_from}.")
+        logger.error(f"❌ No matches found for selected leagues on {date_from}.")
         return
 
     logger.info(f"\nFound {len(all_matches)} matches for {date_from}:")
