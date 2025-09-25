@@ -20,6 +20,8 @@ import threading
 import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from apscheduler.schedulers.background import BackgroundScheduler
+import pytz
 
 # === Configure Logging ===
 logging.basicConfig(
@@ -603,11 +605,13 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
 
 # === Modified Main Function ===
 def main(date_from=None):
+    wat_tz = pytz.timezone('Africa/Lagos')
     if date_from is None:
-        date_from = datetime.now().strftime('%Y-%m-%d')
+        date_from = (datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d')
+        logger.info(f"No date provided, defaulting to next day: {date_from}")
 
     season_id = SEASON_ID
-    logger.info(f"Using Season ID: {season_id}")
+    logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
     # List of league IDs to include
     target_league_ids = [
@@ -720,27 +724,37 @@ def load_predictions():
         logger.error(f"❌ Error loading predictions.json: {e}")
         return []
 
-# === Run Predictions Daily ===
-def run_predictions():
-    while True:
-        now = datetime.now()
-        if now.hour == 0 and now.minute == 0:
-            logger.info("Running daily predictions...")
-            main()
-        time.sleep(3600)
+# === Schedule Predictions ===
+def schedule_predictions():
+    # Define WAT timezone
+    wat_tz = pytz.timezone('Africa/Lagos')
+    # Initialize scheduler
+    scheduler = BackgroundScheduler(timezone=wat_tz)
+    # Schedule main() to run every day at 10:30 PM WAT
+    scheduler.add_job(
+        main,
+        'cron',
+        hour=22,  # 10 PM
+        minute=30,
+        args=[(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d')],
+        timezone=wat_tz
+    )
+    logger.info("Scheduler started for 10:30 PM WAT daily predictions")
+    scheduler.start()
 
-# Start background thread
-threading.Thread(target=run_predictions, daemon=True).start()
+# Start the scheduler
+schedule_predictions()
 
 # === Routes ===
 @app.route('/')
 def home():
     if not os.path.exists('predictions.json'):
+        wat_tz = pytz.timezone('Africa/Lagos')
         logger.info("No predictions.json found, running predictions...")
-        main(date_from=datetime.now().strftime('%Y-%m-%d'))
+        main(date_from=(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d'))
     predictions = load_predictions()
     if not predictions:
-        return render_template('home.html', predictions=[], error="No matches available for today.")
+        return render_template('home.html', predictions=[], error="No matches available for tomorrow.")
     free_preds = []
     for pred in predictions:
         high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
