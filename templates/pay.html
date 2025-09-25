@@ -1,31 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Pay for VIP Access</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - VIP Access</title>
     <script src="https://js.paystack.co/v1/inline.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
-        h1 { color: #333; }
-        button { padding: 10px 20px; font-size: 18px; background-color: #28a745; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #218838; }
-    </style>
 </head>
 <body>
-    <h1>Pay ₦500 for VIP Access!</h1>
-    <button onclick="payNow()">Pay Now</button>
+    <h1>VIP Access Payment</h1>
+    <p>Unlock VIP predictions with a one-time payment.</p>
+    <form>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <button type="button" onclick="payWithPaystack()">Pay Now</button>
+    </form>
     <script>
-        function payNow() {
+        function payWithPaystack() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter a valid email address');
+                return;
+            }
             let handler = PaystackPop.setup({
-                key: '{{ paystack_key }}',
-                email: prompt("Please enter your email:"),
-                amount: 50000, // ₦500 in kobo
+                key: '{{ paystack_key }}', // Test public key
+                email: email,
+                amount: 10000, // Example: 100 NGN (in kobo)
                 currency: 'NGN',
-                ref: 'vip_' + Math.floor((Math.random() * 1000000000) + 1),
+                ref: 'VIP_' + Math.floor((Math.random() * 1000000) + 1),
                 callback: function(response) {
-                    window.location.href = '/paystack/callback?ref=' + response.reference;
+                    console.log('Payment successful, reference:', response.reference); // Debug
+                    window.location.href = '/paystack/callback?reference=' + response.reference;
                 },
                 onClose: function() {
-                    alert('Payment cancelled.');
+                    alert('Payment cancelled');
                 }
             });
             handler.openIframe();
