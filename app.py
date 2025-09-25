@@ -384,8 +384,8 @@ def make_prediction(data_dict, match_info):
         'home_conceded_list_avg': home_conceded_list_avg,
         'away_goals_list_avg': away_goals_list_avg,
         'away_conceded_list_avg': away_conceded_list_avg,
-        'home_form': home_form,  # Added
-        'away_form': away_form,  # Added
+        'home_form': home_form,
+        'away_form': away_form,
         'home_wins': home_wins,
         'home_draws': home_draws,
         'home_losses': home_losses,
@@ -566,7 +566,7 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
 # === Modified Main Function ===
 def main(date_from=None):
     if date_from is None:
-        date_from = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        date_from = datetime.now().strftime('%Y-%m-%d')  # Predict for today
 
     season_id = SEASON_ID
     logger.info(f"Using Season ID: {season_id}")
@@ -576,8 +576,8 @@ def main(date_from=None):
         logger.error("❌ Aborting: No eligible leagues retrieved.")
         return
 
-    # Filter for Sweden Superettan only (replace 123 with actual league_key)
-    superettan_league_id = 329  # Replace with actual Superettan league_key
+    # Filter for Sweden Superettan only
+    superettan_league_id = 305  # Corrected to Superettan league_key
     leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues 
                if league_id == superettan_league_id or (league_name.lower() == 'superettan' and country_name.lower() == 'sweden')]
     
@@ -704,8 +704,10 @@ threading.Thread(target=run_predictions, daemon=True).start()
 def home():
     if not os.path.exists('predictions.json'):
         logger.info("No predictions.json found, running predictions...")
-        main()  # Run predictions if file doesn't exist
+        main(date_from=datetime.now().strftime('%Y-%m-%d'))  # Run for today
     predictions = load_predictions()
+    if not predictions:
+        return render_template('home.html', predictions=[], error="No matches available for today.")
     free_preds = []
     for pred in predictions:
         high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
@@ -715,7 +717,7 @@ def home():
                 'match': pred['Match'],
                 'pick': pred['Recommendation'] if pred['Recommendation'] != "NO BET" else "No Bet"
             })
-    return render_template('home.html', predictions=free_preds)
+    return render_template('home.html', predictions=free_preds, error=None)
 
 # VIP page: Show only recommended predictions
 @app.route('/vip')
@@ -741,7 +743,6 @@ def paystack_callback():
     try:
         ps = Paystack(PAYSTACK_SECRET_KEY)
         data = ps.transaction.verify(ref)
-        # FIX: Validate Paystack response structure
         if data.get('status') and data.get('data', {}).get('status') == 'success':
             session['vip'] = True
             logger.info(f"✅ Payment verified for ref: {ref}")
