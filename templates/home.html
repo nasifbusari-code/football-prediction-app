@@ -1,23 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Free Football Predictions</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #333; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; font-size: 18px; }
-        a { color: blue; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-    </style>
-</head>
-<body>
-    <h1>Today's Free Football Picks</h1>
-    <ul>
-        {% for pred in predictions %}
-            <li>{{ pred.match }}: {{ pred.pick }}</li>
-        {% endfor %}
-    </ul>
-    <p><a href="/vip">Join VIP to see full predictions!</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+    <h1>Free Predictions</h1>
+    {% if error %}
+        <p class="text-danger">{{ error }}</p>
+    {% else %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Match</th>
+                    <th>Prediction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pred in predictions %}
+                    <tr>
+                        <td>{{ pred.match }}</td>
+                        <td>{{ pred.pick }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
