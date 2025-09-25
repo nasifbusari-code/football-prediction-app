@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger()
 
 # === API Configuration ===
-API_KEY = "4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a"
+API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a')  # Set in Render env vars
 API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
@@ -128,7 +128,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     to_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
     from_date = '2024-08-01'
 
-    # FIX: Validate event_date format
     try:
         datetime.strptime(match_date, '%Y-%m-%d')
     except (ValueError, TypeError):
@@ -163,7 +162,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
             continue
         if is_team_match(match.get('event_home_team', ''), home_team_name):
             result = match.get('event_final_result', '')
-            # FIX: Validate event_final_result format
             if result and '-' in result and len(result.split('-')) == 2:
                 try:
                     parts = result.replace(' ', '').split('-')
@@ -227,7 +225,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
             continue
         if is_team_match(match.get('event_away_team', ''), away_team_name):
             result = match.get('event_final_result', '')
-            # FIX: Validate event_final_result format
             if result and '-' in result and len(result.split('-')) == 2:
                 try:
                     parts = result.replace(' ', '').split('-')
@@ -341,7 +338,6 @@ def make_prediction(data_dict, match_info):
     away_goals_list_avg = np.mean(data_dict['AwayGoalList'])
     away_conceded_list_avg = np.mean(data_dict['AwayConcededList'])
 
-    # Add home_form and away_form
     def compute_form_str(goals, conceded):
         results = []
         for g, c in zip(goals, conceded):
@@ -356,7 +352,6 @@ def make_prediction(data_dict, match_info):
     home_form = compute_form_str(data_dict['HomeGoalList'], data_dict['HomeConcededList'])
     away_form = compute_form_str(data_dict['AwayGoalList'], data_dict['AwayConcededList'])
 
-    # Derive numerical features from form
     home_wins = home_form.count('w') if home_form != 'n/a' else 0
     home_draws = home_form.count('d') if home_form != 'n/a' else 0
     home_losses = len(home_form) - home_wins - home_draws if home_form != 'n/a' else 5
@@ -577,7 +572,7 @@ def main(date_from=None):
         return
 
     # Filter for Sweden Superettan only
-    superettan_league_id = 305  # Corrected to Superettan league_key
+    superettan_league_id = 305
     leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues 
                if league_id == superettan_league_id or (league_name.lower() == 'superettan' and country_name.lower() == 'sweden')]
     
@@ -633,7 +628,6 @@ def main(date_from=None):
         results.append(result)
         time.sleep(2)
 
-    # Save predictions as JSON
     predictions_data = [
         {
             'Match': r['Match'],
@@ -672,11 +666,11 @@ def main(date_from=None):
 
 # === Flask App ===
 app = Flask(__name__)
-app.secret_key = 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5'  # Change to a random string for security
+app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())  # Secure random key
 
 # Paystack setup
-PAYSTACK_PUBLIC_KEY = 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5'  # Use test key
-PAYSTACK_SECRET_KEY = 'sk_live_a83324537c3684ba0338ef48bb51d1efb17798a4'  # Get from Paystack dashboard
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5')
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')  # Must be set in Render env vars
 
 # Load predictions from JSON
 def load_predictions():
@@ -736,13 +730,14 @@ def pay():
 # Paystack callback
 @app.route('/paystack/callback')
 def paystack_callback():
-    ref = request.args.get('ref')
+    ref = request.args.get('reference')  # Paystack uses 'reference', not 'ref'
     if not ref:
         logger.error("❌ No payment reference provided")
         return "Payment failed!"
     try:
         ps = Paystack(PAYSTACK_SECRET_KEY)
         data = ps.transaction.verify(ref)
+        logger.info(f"Paystack verification response: {data}")
         if data.get('status') and data.get('data', {}).get('status') == 'success':
             session['vip'] = True
             logger.info(f"✅ Payment verified for ref: {ref}")
@@ -755,4 +750,4 @@ def paystack_callback():
         return "Payment issue – try again!"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)  # Disable debug mode for production
