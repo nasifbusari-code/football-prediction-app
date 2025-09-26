@@ -18,3 +18,4 @@ flask-sqlalchemy
 apscheduler
 apscheduler
 pytz
+psycopg2-binary
