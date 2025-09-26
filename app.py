@@ -22,10 +22,14 @@ import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 import pytz
 from urllib.parse import quote_plus
 from sqlalchemy.exc import OperationalError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+
+# === New: Define RUN_MODE ===
+RUN_MODE = os.getenv('RUN_MODE', 'web')  # 'web' for Flask, 'worker' for scheduler
 
 # === Configure Logging ===
 logging.basicConfig(
@@ -125,7 +129,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# Temporary route to initialize database tables
+# === Routes ===
 @app.route('/init_db', methods=['GET'])
 def init_db():
     with app.app_context():
@@ -133,7 +137,6 @@ def init_db():
     logger.info("✅ Database tables created")
     return "Database tables created!"
 
-# Ping route to keep database awake
 @app.route('/ping_db')
 def ping_db():
     try:
@@ -145,7 +148,12 @@ def ping_db():
         logger.error(f"❌ Database ping failed: {e}")
         return "Database ping failed", 500
 
-# Retry logic for user loading
+# New: Scheduler status route for debugging
+@app.route('/scheduler_status')
+def scheduler_status():
+    global scheduler
+    return jsonify({"scheduler_running": scheduler.running if 'scheduler' in globals() else False})
+
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 @login_manager.user_loader
 def load_user(user_id):
@@ -774,22 +782,40 @@ def load_predictions():
         return []
 
 # === Schedule Predictions ===
+scheduler = None  # Global for status route
 def schedule_predictions():
+    if RUN_MODE != 'worker':
+        logger.info("Skipping scheduler initialization in web mode")
+        return None
+
     wat_tz = pytz.timezone('Africa/Lagos')
     scheduler = BackgroundScheduler(timezone=wat_tz)
+
+    def job_wrapper():
+        try:
+            logger.info(f"Starting scheduled prediction job at {datetime.now(wat_tz)}")
+            main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
+            logger.info("Scheduled prediction job completed")
+        except Exception as e:
+            logger.error(f"Scheduled job failed: {e}")
+
     scheduler.add_job(
-        main,
+        job_wrapper,
         'cron',
         hour=0,
         minute=15,
-        args=[datetime.now(wat_tz).strftime('%Y-%m-%d')],
+        id='daily_prediction_job',
+        replace_existing=True,
+        misfire_grace_time=3600,  # 1 hour grace period
         timezone=wat_tz
     )
-    logger.info("Scheduler started for 10:30 PM WAT daily predictions")
+    scheduler.add_listener(
+        lambda event: logger.info(f"Job {event.job_id} executed") if not event.exception else logger.error(f"Job {event.job_id} failed: {event.exception}"),
+        EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
+    )
+    logger.info("Scheduler started for 12:15 AM WAT daily predictions")
     scheduler.start()
-
-# Start the scheduler
-schedule_predictions()
+    return scheduler
 
 # === Routes ===
 @app.route('/')
@@ -952,5 +978,26 @@ def paystack_callback():
         flash('Payment issue – try again.', 'danger')
         return redirect(url_for('pay'))
 
+# === CLI Command for Manual Testing ===
+@app.cli.command("run-predictions")
+def run_predictions():
+    """Run predictions manually or via cron."""
+    wat_tz = pytz.timezone('Africa/Lagos')
+    logger.info("Running predictions via CLI command")
+    main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
+
+# === Main Entry Point ===
 if __name__ == '__main__':
-    app.run(debug=False)
+    if RUN_MODE == 'worker':
+        logger.info("Starting in worker mode")
+        scheduler = schedule_predictions()
+        try:
+            while True:
+                time.sleep(60)  # Keep worker alive
+        except KeyboardInterrupt:
+            if scheduler:
+                scheduler.shutdown()
+                logger.info("Worker shutdown")
+    else:
+        logger.info("Starting in web mode")
+        app.run(debug=False)
