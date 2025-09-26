@@ -22,7 +22,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
-from urllib.parse import quote_plus  # NEW: Added for potential URL encoding needs
+from urllib.parse import quote_plus
+from sqlalchemy.exc import OperationalError
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type  # NEW: For retry logic
 
 # === Configure Logging ===
 logging.basicConfig(
@@ -70,21 +72,30 @@ except Exception as e:
 
 # === Flask App Configuration ===
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())
-# NEW: Updated database configuration for PostgreSQL
+app.secret_key = os.getenv('FLASK_SECRET_KEY')
+if not app.secret_key:
+    logger.error("❌ FLASK_SECRET_KEY not set")
+    sys.exit(1)
+
+# Configure PostgreSQL with connection pooling
 DATABASE_URL = os.getenv('DATABASE_URL')
 if not DATABASE_URL:
     logger.error("❌ DATABASE_URL environment variable not set")
     sys.exit(1)
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)  # SQLAlchemy requires 'postgresql://'
-# Enforce SSL for PostgreSQL connections
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 if '?' in DATABASE_URL:
     DATABASE_URL += '&sslmode=require'
 else:
     DATABASE_URL += '?sslmode=require'
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 5,  # Max connections
+    'max_overflow': 10,  # Allow extra connections
+    'pool_timeout': 30,  # Wait up to 30s for a connection
+    'pool_pre_ping': True,  # Check connection health before use
+}
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
@@ -112,13 +123,38 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# Create database (within app context)
-with app.app_context():
-    db.create_all()
+# Temporary route to initialize database tables (remove after running once)
+@app.route('/init_db', methods=['GET'])
+def init_db():
+    with app.app_context():
+        db.create_all()
+    logger.info("✅ Database tables created")
+    return "Database tables created!"
 
+# NEW: Ping route to keep database awake
+@app.route('/ping_db')
+def ping_db():
+    try:
+        with db.engine.connect() as conn:
+            conn.execute("SELECT 1")
+        logger.info("✅ Database ping successful")
+        return "Database ping successful"
+    except Exception as e:
+        logger.error(f"❌ Database ping failed: {e}")
+        return "Database ping failed", 500
+
+# NEW: Add retry logic to user loading
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    try:
+        return User.query.get(int(user_id))
+    except OperationalError as e:
+        logger.error(f"❌ Database error in load_user: {e}")
+        raise  # Let tenacity retry
+    except Exception as e:
+        logger.error(f"❌ Unexpected error in load_user: {e}")
+        return None
 
 # === Confidence Function ===
 def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, AwayConcededList, HomeBTTS, AwayBTTS, poisson_prob):
@@ -454,7 +490,7 @@ def make_prediction(data_dict, match_info):
         'btts_boost_flag', 'many_0_1_conceded_flag',
         'defensive_strength_flag', 'avoid_match_penalty_flag',
         'low_conceded_boost', 'defensive_threshold_flag',
-        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg',
+        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg,
         'home_wins', 'home_draws', 'home_losses', 'away_wins', 'away_draws', 'away_losses'
     ]
 
@@ -710,7 +746,9 @@ def main(date_from=None):
     logger.info("\n=== Prediction Results ===")
     with open('predictions.txt', 'w', encoding='utf-8') as f:
         if not results:
-            msg = f"❌ No valid predictions for {date_from}. Check prediction_log.txt."
+            msg = f"❌ No valid禁止
+
+System: valid predictions for {date_from}. Check prediction_log.txt."
             logger.error(msg)
             f.write(msg + "\n")
         for result in results:
@@ -739,11 +777,8 @@ def load_predictions():
 
 # === Schedule Predictions ===
 def schedule_predictions():
-    # Define WAT timezone
     wat_tz = pytz.timezone('Africa/Lagos')
-    # Initialize scheduler
     scheduler = BackgroundScheduler(timezone=wat_tz)
-    # Schedule main() to run every day at 10:30 PM WAT
     scheduler.add_job(
         main,
         'cron',
@@ -761,36 +796,50 @@ schedule_predictions()
 # === Routes ===
 @app.route('/')
 def home():
-    if not os.path.exists('predictions.json'):
-        wat_tz = pytz.timezone('Africa/Lagos')
-        logger.info("No predictions.json found, running predictions...")
-        main(date_from=(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d'))
-    predictions = load_predictions()
-    if not predictions:
-        return render_template('home.html', predictions=[], error="No matches available for tomorrow.")
-    free_preds = []
-    for pred in predictions:
-        high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
-        if high_prob > 50:
-            pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
-            free_preds.append({
-                'match': pred['Match'],
-                'pick': pred['Recommendation'] if pred['Recommendation'] != "NO BET" else "No Bet"
-            })
-    return render_template('home.html', predictions=free_preds, error=None, user=current_user)
+    try:
+        if not os.path.exists('predictions.json'):
+            wat_tz = pytz.timezone('Africa/Lagos')
+            logger.info("No predictions.json found, running predictions...")
+            main(date_from=(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d'))
+        predictions = load_predictions()
+        if not predictions:
+            return render_template('home.html', predictions=[], error="No matches available for tomorrow.", user=current_user)
+        free_preds = []
+        for pred in predictions:
+            high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
+            if high_prob > 50:
+                pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
+                free_preds.append({
+                    'match': pred['Match'],
+                    'pick': pred['Recommendation'] if pred['Recommendation'] != "NO BET" else "No Bet"
+                })
+        return render_template('home.html', predictions=free_preds, error=None, user=current_user)
+    except Exception as e:
+        logger.error(f"❌ Error rendering home: {e}")
+        flash('Server error. Please try again.', 'danger')
+        return render_template('home.html', predictions=[], error="Server error occurred.", user=current_user)
 
 @app.route('/vip')
 @login_required
 def vip():
-    if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
-        current_user.is_vip = False
-        current_user.vip_expiry = None
-        db.session.commit()
-        flash('Your VIP subscription has expired. Please renew.', 'warning')
-        return redirect(url_for('pay'))
-    predictions = load_predictions()
-    vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-    return render_template('vip.html', predictions=vip_preds, user=current_user)
+    try:
+        if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
+            current_user.is_vip = False
+            current_user.vip_expiry = None
+            db.session.commit()
+            flash('Your VIP subscription has expired. Please renew.', 'warning')
+            return redirect(url_for('pay'))
+        predictions = load_predictions()
+        vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
+        return render_template('vip.html', predictions=vip_preds, user=current_user)
+    except OperationalError as e:
+        logger.error(f"❌ Database error in vip route: {e}")
+        flash('Database connection issue. Please try again.', 'danger')
+        return redirect(url_for('home'))
+    except Exception as e:
+        logger.error(f"❌ Unexpected error in vip route: {e}")
+        flash('Server error. Please try again.', 'danger')
+        return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -802,15 +851,24 @@ def register():
         if not username or not password:
             flash('Username and password are required.', 'danger')
             return render_template('register.html')
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists.', 'danger')
+        try:
+            if User.query.filter_by(username=username).first():
+                flash('Username already exists.', 'danger')
+                return render_template('register.html')
+            user = User(username=username)
+            user.set_password(password)
+            db.session.add(user)
+            db.session.commit()
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+        except OperationalError as e:
+            logger.error(f"❌ Database error during register: {e}")
+            flash('Database connection issue. Please try again.', 'danger')
             return render_template('register.html')
-        user = User(username=username)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('login'))
+        except Exception as e:
+            logger.error(f"❌ Unexpected error during register: {e}")
+            flash('Server error. Please try again.', 'danger')
+            return render_template('register.html')
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -820,25 +878,51 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
-            login_user(user)
-            flash('Logged in successfully!', 'success')
-            return redirect(url_for('home'))
-        flash('Invalid username or password.', 'danger')
+        if not username or not password:
+            flash('Username and password are required.', 'danger')
+            return render_template('login.html')
+        try:
+            user = User.query.filter_by(username=username).first()
+            if user and user.check_password(password):
+                login_user(user)
+                flash('Logged in successfully!', 'success')
+                return redirect(url_for('home'))
+            flash('Invalid username or password.', 'danger')
+        except OperationalError as e:
+            logger.error(f"❌ Database error during login: {e}")
+            flash('Database connection issue. Please try again.', 'danger')
+            return render_template('login.html')
+        except Exception as e:
+            logger.error(f"❌ Unexpected error during login: {e}")
+            flash('Server error. Please try again.', 'danger')
+            return render_template('login.html')
     return render_template('login.html')
 
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user()
-    flash('Logged out successfully.', 'success')
-    return redirect(url_for('home'))
+    try:
+        logout_user()
+        flash('Logged out successfully.', 'success')
+        return redirect(url_for('home'))
+    except OperationalError as e:
+        logger.error(f"❌ Database error during logout: {e}")
+        flash('Database connection issue. Please try again.', 'danger')
+        return redirect(url_for('home'))
+    except Exception as e:
+        logger.error(f"❌ Unexpected error during logout: {e}")
+        flash('Server error. Please try again.', 'danger')
+        return redirect(url_for('home'))
 
 @app.route('/pay')
 @login_required
 def pay():
-    return render_template('pay.html', paystack_key=PAYSTACK_PUBLIC_KEY, user=current_user)
+    try:
+        return render_template('pay.html', paystack_key=PAYSTACK_PUBLIC_KEY, user=current_user)
+    except Exception as e:
+        logger.error(f"❌ Error rendering pay page: {e}")
+        flash('Server error. Please try again.', 'danger')
+        return redirect(url_for('home'))
 
 @app.route('/paystack/callback')
 @login_required
@@ -863,6 +947,10 @@ def paystack_callback():
             logger.error(f"❌ Payment verification failed for ref: {ref}, response: {data}")
             flash('Payment verification failed.', 'danger')
             return redirect(url_for('pay'))
+    except OperationalError as e:
+        logger.error(f"❌ Database error during paystack callback: {e}")
+        flash('Database connection issue. Please try again.', 'danger')
+        return redirect(url_for('pay'))
     except Exception as e:
         logger.error(f"❌ Error verifying payment: {e}")
         flash('Payment issue – try again.', 'danger')
