@@ -70,7 +70,7 @@ except Exception as e:
 # === Flask App Configuration ===
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///users.db')  # Use Supabase URI or fallback to SQLite
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
@@ -99,9 +99,20 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# Create database
+# Create database tables
 with app.app_context():
     db.create_all()
+
+# Helper route to verify database connection
+@app.route('/check_db')
+def check_db():
+    try:
+        # Test query to verify database connection
+        User.query.limit(1).all()
+        return jsonify({'status': 'success', 'message': 'Database connection successful'})
+    except Exception as e:
+        logger.error(f"❌ Database connection error: {e}")
+        return jsonify({'status': 'error', 'message': str(e)})
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -424,8 +435,6 @@ def make_prediction(data_dict, match_info):
         'home_conceded_list_avg': home_conceded_list_avg,
         'away_goals_list_avg': away_goals_list_avg,
         'away_conceded_list_avg': away_conceded_list_avg,
-        'home_form': home_form,
-        'away_form': away_form,
         'home_wins': home_wins,
         'home_draws': home_draws,
         'home_losses': home_losses,
@@ -441,7 +450,7 @@ def make_prediction(data_dict, match_info):
         'btts_boost_flag', 'many_0_1_conceded_flag',
         'defensive_strength_flag', 'avoid_match_penalty_flag',
         'low_conceded_boost', 'defensive_threshold_flag',
-        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg',
+        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg,
         'home_wins', 'home_draws', 'home_losses', 'away_wins', 'away_draws', 'away_losses'
     ]
 
