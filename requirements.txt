@@ -19,6 +19,7 @@ apscheduler
 apscheduler
 pytz
 psycopg2-binary
+tenacity
 
 
 
