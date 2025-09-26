@@ -70,7 +70,7 @@ except Exception as e:
 # === Flask App Configuration ===
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///users.db')  # Supabase URI or SQLite fallback
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
@@ -87,7 +87,6 @@ PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 
 # === Database Model ===
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'  # Explicitly set table name to avoid reserved keyword
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
@@ -100,139 +99,13 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# Create database tables
+# Create database
 with app.app_context():
     db.create_all()
-
-# Helper route to verify database connection
-@app.route('/check_db')
-def check_db():
-    try:
-        User.query.limit(1).all()
-        return jsonify({'status': 'success', 'message': 'Database connection successful'})
-    except Exception as e:
-        logger.error(f"❌ Database connection error: {e}")
-        return jsonify({'status': 'error', 'message': str(e)})
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-# === Routes ===
-@app.route('/')
-def home():
-    if not os.path.exists('predictions.json'):
-        wat_tz = pytz.timezone('Africa/Lagos')
-        logger.info("No predictions.json found, running predictions...")
-        main(date_from=(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d'))
-    predictions = load_predictions()
-    if not predictions:
-        return render_template('home.html', predictions=[], error="No matches available for tomorrow.")
-    free_preds = []
-    for pred in predictions:
-        high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
-        if high_prob > 50:
-            pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
-            free_preds.append({
-                'match': pred['Match'],
-                'pick': pred['Recommendation'] if pred['Recommendation'] != "NO BET" else "No Bet"
-            })
-    return render_template('home.html', predictions=free_preds, error=None, user=current_user)
-
-@app.route('/vip')
-@login_required
-def vip():
-    if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
-        current_user.is_vip = False
-        current_user.vip_expiry = None
-        db.session.commit()
-        flash('Your VIP subscription has expired. Please renew.', 'warning')
-        return redirect(url_for('pay'))
-    predictions = load_predictions()
-    vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-    return render_template('vip.html', predictions=vip_preds, user=current_user)
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if not username or not password:
-            flash('Username and password are required.', 'danger')
-            return render_template('register.html')
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists.', 'danger')
-            return render_template('register.html')
-        try:
-            user = User(username=username)
-            user.set_password(password)
-            db.session.add(user)
-            db.session.commit()
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('login'))
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Registration DB error: {e}")
-            flash(f'Registration failed: {str(e)}', 'danger')
-            return render_template('register.html')
-    return render_template('register.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
-            login_user(user)
-            flash('Logged in successfully!', 'success')
-            return redirect(url_for('home'))
-        flash('Invalid username or password.', 'danger')
-    return render_template('login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    flash('Logged out successfully.', 'success')
-    return redirect(url_for('home'))
-
-@app.route('/pay')
-@login_required
-def pay():
-    return render_template('pay.html', paystack_key=PAYSTACK_PUBLIC_KEY, user=current_user)
-
-@app.route('/paystack/callback')
-@login_required
-def paystack_callback():
-    ref = request.args.get('reference')
-    if not ref:
-        logger.error("❌ No payment reference provided")
-        flash('Payment failed: No reference provided.', 'danger')
-        return redirect(url_for('pay'))
-    try:
-        ps = Paystack(PAYSTACK_SECRET_KEY)
-        data = ps.transaction.verify(ref)
-        logger.info(f"Paystack verification response: {data}")
-        if data.get('status') and data.get('data', {}).get('status') == 'success':
-            current_user.is_vip = True
-            current_user.vip_expiry = datetime.utcnow() + timedelta(days=7)
-            db.session.commit()
-            logger.info(f"✅ Payment verified for ref: {ref}, VIP granted to {current_user.username} until {current_user.vip_expiry}")
-            flash('VIP subscription activated for 7 days!', 'success')
-            return redirect(url_for('vip'))
-        else:
-            logger.error(f"❌ Payment verification failed for ref: {ref}, response: {data}")
-            flash('Payment verification failed.', 'danger')
-            return redirect(url_for('pay'))
-    except Exception as e:
-        logger.error(f"❌ Error verifying payment: {e}")
-        flash('Payment issue – try again.', 'danger')
-        return redirect(url_for('pay'))
 
 # === Confidence Function ===
 def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, AwayConcededList, HomeBTTS, AwayBTTS, poisson_prob):
@@ -551,6 +424,8 @@ def make_prediction(data_dict, match_info):
         'home_conceded_list_avg': home_conceded_list_avg,
         'away_goals_list_avg': away_goals_list_avg,
         'away_conceded_list_avg': away_conceded_list_avg,
+        'home_form': home_form,
+        'away_form': away_form,
         'home_wins': home_wins,
         'home_draws': home_draws,
         'home_losses': home_losses,
@@ -869,6 +744,116 @@ def schedule_predictions():
 
 # Start the scheduler
 schedule_predictions()
+
+# === Routes ===
+@app.route('/')
+def home():
+    if not os.path.exists('predictions.json'):
+        wat_tz = pytz.timezone('Africa/Lagos')
+        logger.info("No predictions.json found, running predictions...")
+        main(date_from=(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d'))
+    predictions = load_predictions()
+    if not predictions:
+        return render_template('home.html', predictions=[], error="No matches available for tomorrow.")
+    free_preds = []
+    for pred in predictions:
+        high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
+        if high_prob > 50:
+            pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
+            free_preds.append({
+                'match': pred['Match'],
+                'pick': pred['Recommendation'] if pred['Recommendation'] != "NO BET" else "No Bet"
+            })
+    return render_template('home.html', predictions=free_preds, error=None, user=current_user)
+
+@app.route('/vip')
+@login_required
+def vip():
+    if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
+        current_user.is_vip = False
+        current_user.vip_expiry = None
+        db.session.commit()
+        flash('Your VIP subscription has expired. Please renew.', 'warning')
+        return redirect(url_for('pay'))
+    predictions = load_predictions()
+    vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
+    return render_template('vip.html', predictions=vip_preds, user=current_user)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if not username or not password:
+            flash('Username and password are required.', 'danger')
+            return render_template('register.html')
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists.', 'danger')
+            return render_template('register.html')
+        user = User(username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        flash('Registration successful! Please log in.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            login_user(user)
+            flash('Logged in successfully!', 'success')
+            return redirect(url_for('home'))
+        flash('Invalid username or password.', 'danger')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Logged out successfully.', 'success')
+    return redirect(url_for('home'))
+
+@app.route('/pay')
+@login_required
+def pay():
+    return render_template('pay.html', paystack_key=PAYSTACK_PUBLIC_KEY, user=current_user)
+
+@app.route('/paystack/callback')
+@login_required
+def paystack_callback():
+    ref = request.args.get('reference')
+    if not ref:
+        logger.error("❌ No payment reference provided")
+        flash('Payment failed: No reference provided.', 'danger')
+        return redirect(url_for('pay'))
+    try:
+        ps = Paystack(PAYSTACK_SECRET_KEY)
+        data = ps.transaction.verify(ref)
+        logger.info(f"Paystack verification response: {data}")
+        if data.get('status') and data.get('data', {}).get('status') == 'success':
+            current_user.is_vip = True
+            current_user.vip_expiry = datetime.utcnow() + timedelta(days=7)
+            db.session.commit()
+            logger.info(f"✅ Payment verified for ref: {ref}, VIP granted to {current_user.username} until {current_user.vip_expiry}")
+            flash('VIP subscription activated for 7 days!', 'success')
+            return redirect(url_for('vip'))
+        else:
+            logger.error(f"❌ Payment verification failed for ref: {ref}, response: {data}")
+            flash('Payment verification failed.', 'danger')
+            return redirect(url_for('pay'))
+    except Exception as e:
+        logger.error(f"❌ Error verifying payment: {e}")
+        flash('Payment issue – try again.', 'danger')
+        return redirect(url_for('pay'))
 
 if __name__ == '__main__':
     app.run(debug=False)
