@@ -22,6 +22,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
+from urllib.parse import quote_plus  # NEW: Added for potential URL encoding needs
 
 # === Configure Logging ===
 logging.basicConfig(
@@ -70,7 +71,19 @@ except Exception as e:
 # === Flask App Configuration ===
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24).hex())
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# NEW: Updated database configuration for PostgreSQL
+DATABASE_URL = os.getenv('DATABASE_URL')
+if not DATABASE_URL:
+    logger.error("❌ DATABASE_URL environment variable not set")
+    sys.exit(1)
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)  # SQLAlchemy requires 'postgresql://'
+# Enforce SSL for PostgreSQL connections
+if '?' in DATABASE_URL:
+    DATABASE_URL += '&sslmode=require'
+else:
+    DATABASE_URL += '?sslmode=require'
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize SQLAlchemy
@@ -99,7 +112,15 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# Create database
+# NEW: Temporary route to initialize database tables (remove after running once)
+@app.route('/init_db', methods=['GET'])
+def init_db():
+    with app.app_context():
+        db.create_all()
+    logger.info("✅ Database tables created")
+    return "Database tables created!"
+
+# Create database (within app context)
 with app.app_context():
     db.create_all()
 
@@ -441,7 +462,7 @@ def make_prediction(data_dict, match_info):
         'btts_boost_flag', 'many_0_1_conceded_flag',
         'defensive_strength_flag', 'avoid_match_penalty_flag',
         'low_conceded_boost', 'defensive_threshold_flag',
-        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg',
+        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg,
         'home_wins', 'home_draws', 'home_losses', 'away_wins', 'away_draws', 'away_losses'
     ]
 
