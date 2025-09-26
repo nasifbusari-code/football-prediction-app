@@ -24,7 +24,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import pytz
 from urllib.parse import quote_plus
 from sqlalchemy.exc import OperationalError
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type  # NEW: For retry logic
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 # === Configure Logging ===
 logging.basicConfig(
@@ -91,10 +91,10 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-    'pool_size': 5,  # Max connections
-    'max_overflow': 10,  # Allow extra connections
-    'pool_timeout': 30,  # Wait up to 30s for a connection
-    'pool_pre_ping': True,  # Check connection health before use
+    'pool_size': 5,
+    'max_overflow': 10,
+    'pool_timeout': 30,
+    'pool_pre_ping': True,
 }
 
 # Initialize SQLAlchemy
@@ -123,7 +123,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# Temporary route to initialize database tables (remove after running once)
+# Temporary route to initialize database tables
 @app.route('/init_db', methods=['GET'])
 def init_db():
     with app.app_context():
@@ -131,7 +131,7 @@ def init_db():
     logger.info("✅ Database tables created")
     return "Database tables created!"
 
-# NEW: Ping route to keep database awake
+# Ping route to keep database awake
 @app.route('/ping_db')
 def ping_db():
     try:
@@ -143,7 +143,7 @@ def ping_db():
         logger.error(f"❌ Database ping failed: {e}")
         return "Database ping failed", 500
 
-# NEW: Add retry logic to user loading
+# Retry logic for user loading
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 @login_manager.user_loader
 def load_user(user_id):
@@ -151,10 +151,28 @@ def load_user(user_id):
         return User.query.get(int(user_id))
     except OperationalError as e:
         logger.error(f"❌ Database error in load_user: {e}")
-        raise  # Let tenacity retry
+        raise
     except Exception as e:
         logger.error(f"❌ Unexpected error in load_user: {e}")
         return None
+
+# === Retry Logic for API Calls ===
+api_call_count = 0
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10), retry=retry_if_exception_type(requests.exceptions.RequestException))
+def fetch_with_retry(url):
+    global api_call_count
+    api_call_count += 1
+    logger.info(f"API Call #{api_call_count}: {url}")
+    response = requests.get(url, headers=HEADERS, timeout=30)
+    logger.info(f"Rate Limit Headers: {response.headers.get('X-Rate-Limit-Limit', 'N/A')}, "
+                f"Remaining: {response.headers.get('X-Rate-Limit-Remaining', 'N/A')}, "
+                f"Reset: {response.headers.get('X-Rate-Limit-Reset', 'N/A')}")
+    if response.status_code == 429:
+        retry_after = response.headers.get('Retry-After', 10)
+        logger.warning(f"Rate limit hit, suggested wait: {retry_after} seconds")
+    response.raise_for_status()
+    return response
 
 # === Confidence Function ===
 def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, AwayConcededList, HomeBTTS, AwayBTTS, poisson_prob):
@@ -216,6 +234,7 @@ def is_team_match(api_team_name, expected_team_name, threshold=75):
 
 # === Fetch Match Data ===
 def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_id, match_date, home_team_name, away_team_name):
+    global api_call_count
     match_info = f"{home_team_name} vs {away_team_name} ({match_date})"
     logger.info(f"Processing match: {match_info}, LeagueID: {league_id}, MatchID: {match_id}")
 
@@ -232,9 +251,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     home_red_cards = []
     try:
         recent_url = f"{API_BASE_URL}?met=Fixtures&teamId={home_team_key}&leagueId={league_id}&APIkey={API_KEY}&season={season_id}&from={from_date}&to={to_date}&limit=20"
-        response = requests.get(recent_url, headers=HEADERS, timeout=30)
+        response = fetch_with_retry(recent_url)
         response.encoding = 'utf-8'
-        response.raise_for_status()
         home_team_response = response.json()
         logger.debug(f"Home team {home_team_key} matches API response: {home_team_response}")
         if not home_team_response.get('success') == 1:
@@ -295,9 +313,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     away_red_cards = []
     try:
         recent_url = f"{API_BASE_URL}?met=Fixtures&teamId={away_team_key}&leagueId={league_id}&APIkey={API_KEY}&season={season_id}&from={from_date}&to={to_date}&limit=20"
-        response = requests.get(recent_url, headers=HEADERS, timeout=30)
+        response = fetch_with_retry(recent_url)
         response.encoding = 'utf-8'
-        response.raise_for_status()
         away_team_response = response.json()
         logger.debug(f"Away team {away_team_key} matches API response: {away_team_response}")
         if not away_team_response.get('success') == 1:
@@ -490,7 +507,7 @@ def make_prediction(data_dict, match_info):
         'btts_boost_flag', 'many_0_1_conceded_flag',
         'defensive_strength_flag', 'avoid_match_penalty_flag',
         'low_conceded_boost', 'defensive_threshold_flag',
-        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg',
+        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg,
         'home_wins', 'home_draws', 'home_losses', 'away_wins', 'away_draws', 'away_losses'
     ]
 
@@ -610,18 +627,26 @@ def filter_leagues(leagues):
 
 # === Fetch All Leagues ===
 def fetch_all_leagues():
+    global api_call_count
+    cache_file = 'leagues_cache.json'
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r', encoding='utf-8') as f:
+            leagues = json.load(f)
+            logger.info("Loaded leagues from cache")
+            return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
     logger.info("Fetching all leagues...")
     try:
         url = f"{API_BASE_URL}?met=Leagues&APIkey={API_KEY}"
-        response = requests.get(url, headers=HEADERS, timeout=30)
+        response = fetch_with_retry(url)
         response.encoding = 'utf-8'
-        response.raise_for_status()
         data = response.json()
         if data.get("success") != 1:
             logger.error(f"❌ API error fetching leagues: {data}")
             return []
         leagues = filter_leagues(data["result"])
-        logger.info(f"✅ Retrieved {len(leagues)} eligible leagues")
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(leagues, f)
+        logger.info(f"✅ Retrieved and cached {len(leagues)} eligible leagues")
         with open('leagues.txt', 'w', encoding='utf-8') as f:
             f.write("Filtered League List (Excluding Cups, Women's, and Youth Leagues):\n")
             for league in leagues:
@@ -633,12 +658,12 @@ def fetch_all_leagues():
 
 # === Fetch Upcoming Matches for a League ===
 def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from):
+    global api_call_count
     logger.info(f"Fetching matches for {league_name} ({country_name}, ID: {league_id}) on {date_from}")
     try:
         url = f"{API_BASE_URL}?met=Fixtures&leagueId={league_id}&APIkey={API_KEY}&season={season_id}&from={date_from}&to={date_from}"
-        response = requests.get(url, headers=HEADERS, timeout=30)
+        response = fetch_with_retry(url)
         response.encoding = 'utf-8'
-        response.raise_for_status()
         data = response.json()
         if data.get("success") != 1 or not data.get("result"):
             logger.warning(f"⚠️ No matches found for {league_name} on {date_from}")
@@ -654,6 +679,8 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
 
 # === Modified Main Function ===
 def main(date_from=None):
+    global api_call_count
+    api_call_count = 0
     wat_tz = pytz.timezone('Africa/Lagos')
     if date_from is None:
         date_from = (datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -662,7 +689,6 @@ def main(date_from=None):
     season_id = SEASON_ID
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
-    # List of league IDs to include
     target_league_ids = [
         250, 244, 245, 251, 223, 329, 330, 653, 7097
     ]
@@ -672,7 +698,6 @@ def main(date_from=None):
         logger.error("❌ Aborting: No eligible leagues retrieved.")
         return
 
-    # Filter leagues to only those in target_league_ids, respecting exclusion rules
     leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues
                if league_id in target_league_ids]
 
@@ -685,7 +710,7 @@ def main(date_from=None):
     for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
         matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)
         all_matches.extend(matches)
-        time.sleep(1)
+        time.sleep(0.5)
 
     if not all_matches:
         logger.error(f"❌ No matches found for selected leagues on {date_from}.")
@@ -726,8 +751,9 @@ def main(date_from=None):
             skipped_matches.append(match_info)
             continue
         results.append(result)
-        time.sleep(2)
+        time.sleep(0.5)
 
+    logger.info(f"Total API Calls Made: {api_call_count}")
     predictions_data = [
         {
             'Match': r['Match'],
@@ -780,7 +806,7 @@ def schedule_predictions():
     scheduler.add_job(
         main,
         'cron',
-        hour=22,  # 10 PM
+        hour=22,
         minute=30,
         args=[(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d')],
         timezone=wat_tz
