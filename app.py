@@ -444,7 +444,7 @@ def make_prediction(data_dict, match_info):
         'home_goals_list_avg': home_goals_list_avg,
         'home_conceded_list_avg': home_conceded_list_avg,
         'away_goals_list_avg': away_goals_list_avg,
-        'away_conceded_list_avg': away_conceded_list_avg,
+        'away_conceded_list_avg': away_conceded_list_avg',
         'home_form': home_form,
         'away_form': away_form,
         'home_wins': home_wins,
