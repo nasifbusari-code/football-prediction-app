@@ -683,8 +683,8 @@ def main(date_from=None):
     api_call_count = 0
     wat_tz = pytz.timezone('Africa/Lagos')
     if date_from is None:
-        date_from = (datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d')
-        logger.info(f"No date provided, defaulting to next day: {date_from}")
+        date_from = datetime.now(wat_tz).strftime('%Y-%m-%d')  # Changed to today
+        logger.info(f"No date provided, defaulting to today: {date_from}")
 
     season_id = SEASON_ID
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
@@ -808,7 +808,7 @@ def schedule_predictions():
         'cron',
         hour=22,
         minute=30,
-        args=[(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d')],
+        args=[datetime.now(wat_tz).strftime('%Y-%m-%d')],  # Changed to today
         timezone=wat_tz
     )
     logger.info("Scheduler started for 10:30 PM WAT daily predictions")
@@ -824,19 +824,17 @@ def home():
         if not os.path.exists('predictions.json'):
             wat_tz = pytz.timezone('Africa/Lagos')
             logger.info("No predictions.json found, running predictions...")
-            main(date_from=(datetime.now(wat_tz) + timedelta(days=1)).strftime('%Y-%m-%d'))
+            main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))  # Changed to today
         predictions = load_predictions()
         if not predictions:
-            return render_template('home.html', predictions=[], error="No matches available for tomorrow.", user=current_user)
+            return render_template('home.html', predictions=[], error="No matches available for today.", user=current_user)
         free_preds = []
         for pred in predictions:
-            high_prob = max(pred['MetaOverProb'], pred['MetaUnderProb'])
-            if high_prob > 50:
-                pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
-                free_preds.append({
-                    'match': pred['Match'],
-                    'pick': pred['Recommendation'] if pred['Recommendation'] != "NO BET" else "No Bet"
-                })
+            pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
+            free_preds.append({
+                'match': pred['Match'],
+                'pick': pick
+            })
         return render_template('home.html', predictions=free_preds, error=None, user=current_user)
     except Exception as e:
         logger.error(f"❌ Error rendering home: {e}")
