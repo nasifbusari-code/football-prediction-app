@@ -18,7 +18,7 @@ flask-sqlalchemy
 apscheduler
 apscheduler
 pytz
-psycopg[binary]==3.2.3
+
 
 
 
