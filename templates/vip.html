@@ -1,26 +1,146 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>VIP Predictions</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Match</th>
-                <th>Recommendation</th>
-                <th>Over 1.5 Prob</th>
-                <th>Under 3.5 Prob</th>
-                <th>Reason</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pred in predictions %}
-                <tr>
-                    <td>{{ pred.Match }}</td>
-                    <td>{{ pred.Recommendation }}</td>
-                    <td>{{ pred.MetaOverProb|round(1) }}%</td>
-                    <td>{{ pred.MetaUnderProb|round(1) }}%</td>
-                    <td>{{ pred.Reason }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Hero Section -->
+    <section class="hero text-center py-5 bg-dark text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold">VIP Predictions</h1>
+            <p class="lead">Exclusive, high-accuracy predictions tailored for our premium members.</p>
+            <p class="mb-0">Your VIP Membership: 
+                {% if current_user.vip_expiry %}
+                    Active until {{ current_user.vip_expiry.strftime('%Y-%m-%d') }}
+                    <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Extend VIP</a>
+                {% else %}
+                    Expired. <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Renew VIP</a>
+                {% endif %}
+            </p>
+        </div>
+    </section>
+
+    <!-- Predictions Section -->
+    <section class="predictions py-5">
+        <div class="container">
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% else %}
+                {% if predictions %}
+                    <h2 class="mb-4 text-center">Today's VIP Predictions</h2>
+                    <div class="mb-4 text-center">
+                        <button class="btn btn-outline-primary me-2" onclick="filterPredictions('all')">All</button>
+                        <button class="btn btn-outline-success me-2" onclick="filterPredictions('Over 1.5')">Over 1.5</button>
+                        <button class="btn btn-outline-info" onclick="filterPredictions('Under 3.5')">Under 3.5</button>
+                    </div>
+                    <div class="row" id="predictionsContainer">
+                        {% for pred in predictions %}
+                            <div class="col-md-6 col-lg-4 mb-4 prediction-card" 
+                                 data-recommendation="{{ pred.Recommendation }}">
+                                <div class="card h-100 shadow-sm animate__animated animate__fadeIn">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-soccer-ball me-2"></i>{{ pred.Match }}
+                                        </h5>
+                                        <p class="card-text">
+                                            <strong>Recommendation:</strong> 
+                                            <span class="badge bg-{% if pred.Recommendation == 'Over 1.5' %}success{% elif pred.Recommendation == 'Under 3.5' %}info{% else %}secondary{% endif %}">
+                                                {{ pred.Recommendation }}
+                                            </span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Over 1.5 Probability:</strong> 
+                                            <span class="text-success" data-bs-toggle="tooltip" 
+                                                  title="Probability of 2+ goals based on our hybrid AI model">
+                                                {{ pred.MetaOverProb|round(1) }}%
+                                            </span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Under 3.5 Probability:</strong> 
+                                            <span class="text-info" data-bs-toggle="tooltip" 
+                                                  title="Probability of fewer than 4 goals based on our hybrid AI model">
+                                                {{ pred.MetaUnderProb|round(1) }}%
+                                            </span>
+                                        </p>
+                                        <button class="btn btn-outline-primary btn-sm" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#details-{{ loop.index }}"
+                                                aria-expanded="false">
+                                            View Details
+                                        </button>
+                                        <div class="collapse mt-3" id="details-{{ loop.index }}">
+                                            <div class="card card-body">
+                                                <p><strong>Reason:</strong> {{ pred.Reason }}</p>
+                                                <p><strong>Over Confidence:</strong> {{ pred.OverConfidence|round(1) }}%</p>
+                                                <p><strong>Under Confidence:</strong> {{ pred.UnderConfidence|round(1) }}%</p>
+                                                <p><strong>Triggered Rules:</strong></p>
+                                                <ul>
+                                                    {% for rule in pred.TriggeredRules %}
+                                                        <li>{{ rule }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        No VIP predictions available for today. Check back tomorrow or contact support.
+                        <br>
+                        <a href="{{ url_for('pay') }}" class="btn btn-warning mt-3">Extend VIP Membership</a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner d-none" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Call-to-Action Section -->
+    <section class="cta text-center py-5 bg-light">
+        <div class="container">
+            <h2 class="mb-3">Maximize Your Wins!</h2>
+            <p class="lead">Stay with VIP for exclusive predictions, detailed analytics, and higher accuracy.</p>
+            <a href="{{ url_for('pay') }}" class="btn btn-primary btn-lg">Extend Your VIP Membership</a>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Filter predictions
+        function filterPredictions(type) {
+            const cards = document.querySelectorAll('.prediction-card');
+            cards.forEach(card => {
+                if (type === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    const recommendation = card.getAttribute('data-recommendation');
+                    card.style.display = (recommendation === type) ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Show loading spinner on page load (optional, if fetching predictions)
+        document.addEventListener('DOMContentLoaded', function() {
+            const spinner = document.getElementById('loadingSpinner');
+            // Simulate loading (remove if predictions are pre-loaded)
+            setTimeout(() => {
+                spinner.classList.add('d-none');
+            }, 1000);
+        });
+    </script>
 {% endblock %}
