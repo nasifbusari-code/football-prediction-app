@@ -507,7 +507,7 @@ def make_prediction(data_dict, match_info):
         'btts_boost_flag', 'many_0_1_conceded_flag',
         'defensive_strength_flag', 'avoid_match_penalty_flag',
         'low_conceded_boost', 'defensive_threshold_flag',
-        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg,
+        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg',
         'home_wins', 'home_draws', 'home_losses', 'away_wins', 'away_draws', 'away_losses'
     ]
 
