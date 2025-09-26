@@ -1,35 +1,155 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Become a VIP</h1>
-    <p>Unlock VIP predictions for 7 days!</p>
-    <form id="paymentForm">
-        <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" class="form-control" id="email-address" required />
+    <!-- Hero Section -->
+    <section class="hero text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Become a VIP Member</h1>
+            <p class="lead">Unlock exclusive soccer predictions and premium analytics for just ₦1,000!</p>
+            <p class="mb-0">Already a VIP? <a href="{{ url_for('vip') }}" class="text-warning fw-bold">View VIP Predictions</a></p>
         </div>
-        <div class="form-group">
-            <label for="amount">Amount (NGN)</label>
-            <input type="number" class="form-control" id="amount" value="1000" readonly />
+    </section>
+
+    <!-- Payment Form Section -->
+    <section class="payment py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-sm animate__animated animate__fadeIn">
+                        <div class="card-body">
+                            <h2 class="text-center mb-4">Unlock 7 Days of VIP Access</h2>
+                            {% if error %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endif %}
+                            <form id="paymentForm" novalidate>
+                                <div class="mb-3">
+                                    <label for="email-address" class="form-label">
+                                        <i class="bi bi-envelope-fill me-2"></i>Email Address
+                                    </label>
+                                    <input type="email" class="form-control" id="email-address" name="email" required
+                                           placeholder="Enter your email"
+                                           data-bs-toggle="tooltip" title="We'll use this email for payment confirmation">
+                                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="amount" class="form-label">
+                                        <i class="bi bi-currency-exchange me-2"></i>Amount (NGN)
+                                    </label>
+                                    <input type="number" class="form-control" id="amount" value="1000" readonly
+                                           data-bs-toggle="tooltip" title="Fixed price for 7 days of VIP access">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="payButton">
+                                    <i class="bi bi-credit-card me-2"></i>Pay Now
+                                </button>
+                            </form>
+                            <p class="text-center mt-3">
+                                Secured by <a href="https://paystack.com" target="_blank" class="text-primary">Paystack</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Benefits Section -->
+            <div class="row mt-5">
+                <div class="col-md-4 text-center">
+                    <i class="bi bi-trophy-fill text-primary" style="font-size: 2.5rem;"></i>
+                    <h5 class="mt-2">High-Accuracy Predictions</h5>
+                    <p>Access our AI-driven predictions with detailed analytics.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="bi bi-star-fill text-primary" style="font-size: 2.5rem;"></i>
+                    <h5 class="mt-2">Exclusive Insights</h5>
+                    <p>Get in-depth match analysis available only to VIPs.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="bi bi-shield-lock-fill text-primary" style="font-size: 2.5rem;"></i>
+                    <h5 class="mt-2">Secure Payments</h5>
+                    <p>Pay safely with Paystack’s trusted platform.</p>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary" onclick="payWithPaystack()">Pay Now</button>
-    </form>
+    </section>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner d-none" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Call-to-Action Section -->
+    <section class="cta text-center py-5 bg-light">
+        <div class="container">
+            <h2 class="mb-3">Don’t Miss Out!</h2>
+            <p class="lead">Join thousands of VIP members and start winning with our premium predictions today.</p>
+            <button class="btn btn-primary btn-lg" onclick="document.getElementById('paymentForm').dispatchEvent(new Event('submit'))">
+                Get VIP Now
+            </button>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
-        function payWithPaystack() {
-            event.preventDefault();
-            let handler = PaystackPop.setup({
-                key: '{{ paystack_key }}',
-                email: document.getElementById('email-address').value,
-                amount: document.getElementById('amount').value * 100,
-                currency: 'NGN',
-                callback: function(response) {
-                    window.location.href = '/paystack/callback?reference=' + response.reference;
-                },
-                onClose: function() {
-                    alert('Payment cancelled.');
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Form validation and Paystack integration
+        (function () {
+            'use strict';
+            var form = document.getElementById('paymentForm');
+            var payButton = document.getElementById('payButton');
+            var spinner = document.getElementById('loadingSpinner');
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                if (!form.checkValidity()) {
+                    event.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
+                }
+                form.classList.add('was-validated');
+
+                // Show loading spinner
+                spinner.classList.remove('d-none');
+                payButton.disabled = true;
+                payButton.innerHTML = '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Processing...';
+
+                // Initialize Paystack
+                let handler = PaystackPop.setup({
+                    key: '{{ paystack_key }}',
+                    email: document.getElementById('email-address').value,
+                    amount: document.getElementById('amount').value * 100,
+                    currency: 'NGN',
+                    callback: function(response) {
+                        window.location.href = '/paystack/callback?reference=' + response.reference;
+                    },
+                    onClose: function() {
+                        spinner.classList.add('d-none');
+                        payButton.disabled = false;
+                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i>Pay Now';
+                        alert('Payment cancelled.');
+                    }
+                });
+                handler.openIframe();
+            }, false);
+
+            // Real-time email validation
+            document.getElementById('email-address').addEventListener('input', function () {
+                const email = this.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    this.setCustomValidity('Please enter a valid email address.');
+                } else {
+                    this.setCustomValidity('');
                 }
             });
-            handler.openIframe();
-        }
+        })();
     </script>
 {% endblock %}
