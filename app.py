@@ -112,14 +112,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# NEW: Temporary route to initialize database tables (remove after running once)
-@app.route('/init_db', methods=['GET'])
-def init_db():
-    with app.app_context():
-        db.create_all()
-    logger.info("✅ Database tables created")
-    return "Database tables created!"
-
 # Create database (within app context)
 with app.app_context():
     db.create_all()
