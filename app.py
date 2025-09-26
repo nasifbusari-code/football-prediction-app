@@ -780,8 +780,8 @@ def schedule_predictions():
     scheduler.add_job(
         main,
         'cron',
-        hour=22,
-        minute=30,
+        hour=0,
+        minute=15,
         args=[datetime.now(wat_tz).strftime('%Y-%m-%d')],
         timezone=wat_tz
     )
