@@ -746,9 +746,7 @@ def main(date_from=None):
     logger.info("\n=== Prediction Results ===")
     with open('predictions.txt', 'w', encoding='utf-8') as f:
         if not results:
-            msg = f"❌ No valid
-
-System: valid predictions for {date_from}. Check prediction_log.txt."
+            msg = f"❌ No valid predictions for {date_from}. Check prediction_log.txt."
             logger.error(msg)
             f.write(msg + "\n")
         for result in results:
