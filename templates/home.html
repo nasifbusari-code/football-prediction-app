@@ -1,24 +1,112 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Free Predictions</h1>
-    {% if error %}
-        <p class="text-danger">{{ error }}</p>
-    {% else %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Match</th>
-                    <th>Prediction</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for pred in predictions %}
-                    <tr>
-                        <td>{{ pred.match }}</td>
-                        <td>{{ pred.pick }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+    <!-- Hero Section -->
+    <section class="hero text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Free Soccer Predictions</h1>
+            <p class="lead">Get expert predictions for today's matches. Unlock premium insights with a VIP subscription!</p>
+            {% if current_user.is_authenticated %}
+                {% if current_user.is_vip %}
+                    <a href="{{ url_for('vip') }}" class="btn btn-success btn-lg mt-3">View VIP Predictions</a>
+                {% else %}
+                    <a href="{{ url_for('pay') }}" class="btn btn-warning btn-lg mt-3">Upgrade to VIP</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-lg mt-3 ms-2">Logout</a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-light btn-lg mt-3">Register Now</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg mt-3 ms-2">Login</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Predictions Section -->
+    <section class="predictions py-5">
+        <div class="container">
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% else %}
+                {% if predictions %}
+                    <h2 class="mb-4 text-center">Today's Free Predictions</h2>
+                    <div class="row">
+                        {% for pred in predictions %}
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                <div class="card h-100 shadow-sm animate__animated animate__fadeIn">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-soccer-ball me-2"></i>{{ pred.match }}
+                                        </h5>
+                                        <p class="card-text">
+                                            <strong>Prediction:</strong> 
+                                            <span class="badge bg-{% if pred.pick == 'Over 1.5' %}success{% else %}info{% endif %}">
+                                                {{ pred.pick }}
+                                            </span>
+                                            <i class="bi bi-info-circle ms-2" data-bs-toggle="tooltip" 
+                                               title="Our AI predicts {{ pred.pick }} based on recent team performance. Upgrade to VIP for detailed analysis!"></i>
+                                        </p>
+                                        <button class="btn btn-outline-primary btn-sm" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#details-{{ loop.index }}"
+                                                aria-expanded="false">
+                                            View Details
+                                        </button>
+                                        <div class="collapse mt-3" id="details-{{ loop.index }}">
+                                            <div class="card card-body">
+                                                <p>Match: {{ pred.match }}</p>
+                                                <p>Prediction Confidence: Coming soon in VIP!</p>
+                                                <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm">Unlock VIP Insights</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        No predictions available for today. Check back tomorrow or explore our VIP section for premium insights!
+                        <br>
+                        <a href="{{ url_for('pay') }}" class="btn btn-warning mt-3">Go VIP</a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Loading Spinner (shown during prediction fetch) -->
+    <div class="loading-spinner d-none" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Call-to-Action Section -->
+    <section class="cta text-center py-5 bg-light">
+        <div class="container">
+            <h2 class="mb-3">Want More Accurate Predictions?</h2>
+            <p class="lead">Join our VIP membership for exclusive predictions, detailed analytics, and higher accuracy.</p>
+            <a href="{{ url_for('pay') }}" class="btn btn-primary btn-lg">Become a VIP Member</a>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Show loading spinner on page load (optional, if fetching predictions)
+        document.addEventListener('DOMContentLoaded', function() {
+            const spinner = document.getElementById('loadingSpinner');
+            // Simulate loading (remove if predictions are pre-loaded)
+            setTimeout(() => {
+                spinner.classList.add('d-none');
+            }, 1000);
+        });
+    </script>
 {% endblock %}
