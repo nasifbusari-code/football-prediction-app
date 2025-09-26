@@ -664,7 +664,7 @@ def main(date_from=None):
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
     target_league_ids = [
-        250, 244, 245, 251, 223, 329, 330, 653, 7097
+        250, 244, 245, 251, 223, 329, 330, 653, 7097, 171, 175, 152, 302, 207, 168, 63, 322, 279, 308, 118, 253, 141
     ]
 
     leagues = fetch_all_leagues()
