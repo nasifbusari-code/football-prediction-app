@@ -3,7 +3,8 @@ import numpy as np
 from scipy.stats import poisson
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, ExtraTreesClassifier
-import xgboost as xgb
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
 import requests
 import os
 import time
@@ -56,10 +57,11 @@ logger.info("Loading models...")
 start_time = time.time()
 try:
     scaler_base = joblib.load("favour_v6_base_scaler.pkl")
+    logistic_model = joblib.load("favour_v6_logistic_model.pkl")
     gb_model = joblib.load("favour_v6_gb_model.pkl")
     rf_model = joblib.load("favour_v6_rf_model.pkl")
+    nb_model = joblib.load("favour_v6_nb_model.pkl")
     et_model = joblib.load("favour_v6_et_model.pkl")
-    xgb_model = joblib.load("favour_v6_xgb_model.pkl")
     scaler_meta = joblib.load("favour_v6_meta_scaler.pkl")
     meta_model = joblib.load("hybrid_meta_model.pkl")
     logger.info(f"✅ Models and scalers loaded in {time.time() - start_time:.2f} seconds")
@@ -210,9 +212,9 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if avg_conceded >= 1.5 and high_goal_count >= 8:
         base_score += 10
         triggered_rules.append("Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)")
-    if high_goal_count <= 9 and zero_count <= 5:
+    if high_goal_count <= 9 and zero_count <= 6:  # Aligned with prediction1
         base_score -= 25
-        triggered_rules.append("Rule 2: -25 to base_score (high goal/conceded count <= 9 and zero count <= 5)")
+        triggered_rules.append("Rule 2: -25 to base_score (high goal/conceded count <= 9 and zero count <= 6)")
     if high_goal_count >= 8 and zero_count >= 7:
         base_score += 15
         triggered_rules.append("Rule 3: +15 to base_score (high goal/conceded count >= 8 and zero count >= 7)")
@@ -449,27 +451,6 @@ def make_prediction(data_dict, match_info):
     away_goals_list_avg = np.mean(data_dict['AwayGoalList'])
     away_conceded_list_avg = np.mean(data_dict['AwayConcededList'])
 
-    def compute_form_str(goals, conceded):
-        results = []
-        for g, c in zip(goals, conceded):
-            if g > c:
-                results.append('w')
-            elif g == c:
-                results.append('d')
-            else:
-                results.append('l')
-        return ''.join(results)
-
-    home_form = compute_form_str(data_dict['HomeGoalList'], data_dict['HomeConcededList'])
-    away_form = compute_form_str(data_dict['AwayGoalList'], data_dict['AwayConcededList'])
-
-    home_wins = home_form.count('w') if home_form != 'n/a' else 0
-    home_draws = home_form.count('d') if home_form != 'n/a' else 0
-    home_losses = len(home_form) - home_wins - home_draws if home_form != 'n/a' else 5
-    away_wins = away_form.count('w') if away_form != 'n/a' else 0
-    away_draws = away_form.count('d') if away_form != 'n/a' else 0
-    away_losses = len(away_form) - away_wins - away_draws if away_form != 'n/a' else 5
-
     data = pd.DataFrame([{
         'avg_home_scored': avg_home_scored,
         'avg_home_conceded': avg_home_conceded,
@@ -489,15 +470,7 @@ def make_prediction(data_dict, match_info):
         'home_goals_list_avg': home_goals_list_avg,
         'home_conceded_list_avg': home_conceded_list_avg,
         'away_goals_list_avg': away_goals_list_avg,
-        'away_conceded_list_avg': away_conceded_list_avg,
-        'home_form': home_form,
-        'away_form': away_form,
-        'home_wins': home_wins,
-        'home_draws': home_draws,
-        'home_losses': home_losses,
-        'away_wins': away_wins,
-        'away_draws': away_draws,
-        'away_losses': away_losses
+        'away_conceded_list_avg': away_conceded_list_avg
     }])
 
     feature_columns = [
@@ -507,8 +480,7 @@ def make_prediction(data_dict, match_info):
         'btts_boost_flag', 'many_0_1_conceded_flag',
         'defensive_strength_flag', 'avoid_match_penalty_flag',
         'low_conceded_boost', 'defensive_threshold_flag',
-        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg',
-        'home_wins', 'home_draws', 'home_losses', 'away_wins', 'away_draws', 'away_losses'
+        'home_goals_list_avg', 'home_conceded_list_avg', 'away_goals_list_avg', 'away_conceded_list_avg'
     ]
 
     try:
@@ -521,34 +493,36 @@ def make_prediction(data_dict, match_info):
         logger.error(f"❌ Base scaler error for {match_info}: {e}")
         return {"error": f"Base scaler error: {e}"}
 
+    # Poisson Model (aligned with prediction1)
     league_avg_goals = (data_dict['TotalHomeGoals'] + data_dict['TotalHomeConceded'] +
                         data_dict['TotalAwayGoals'] + data_dict['TotalAwayConceded']) / 10
     if league_avg_goals == 0:
         league_avg_goals = 1.0
-    home_strength = avg_home_scored / league_avg_goals
-    away_strength = avg_away_scored / league_avg_goals
-    home_defense = avg_away_conceded / league_avg_goals
-    away_defense = avg_home_conceded / league_avg_goals
-    lambda_h = max(0.5, (avg_home_scored * home_strength) * (avg_away_conceded * away_defense) / league_avg_goals)
-    lambda_a = max(0.5, (avg_away_scored * away_strength) * (avg_home_conceded * home_defense) / league_avg_goals)
-    poisson_prob = sum(
-        poisson.pmf(h, lambda_h) * poisson.pmf(a, lambda_a) * (1 - 0.1 if h == 0 and a == 0 else 1)
-        for h in range(6) for a in range(6) if h + a >= 2
-    )
+    lambda_h = max(0.5, avg_home_scored * avg_away_conceded / league_avg_goals)
+    lambda_a = max(0.5, avg_away_scored * avg_home_conceded / league_avg_goals)
+    poisson_prob = 0
+    for h in range(6):
+        for a in range(6):
+            prob_h = poisson.pmf(h, lambda_h)
+            prob_a = poisson.pmf(a, lambda_a)
+            if h + a >= 2:
+                poisson_prob += prob_h * prob_a
 
     try:
+        logistic_prob = logistic_model.predict_proba(data_scaled)[0, 1]
         gb_prob = gb_model.predict_proba(data_scaled)[0, 1]
         rf_prob = rf_model.predict_proba(data_scaled)[0, 1]
+        nb_prob = nb_model.predict_proba(data_scaled)[0, 1]
         et_prob = et_model.predict_proba(data_scaled)[0, 1]
-        xgb_prob = xgb_model.predict_proba(data_scaled)[0, 1]
     except Exception as e:
         logger.error(f"❌ Prediction error for {match_info}: {e}")
         return {"error": f"Prediction error: {e}"}
 
+    data['LogisticProb'] = logistic_prob
     data['GBProb'] = gb_prob
     data['RFProb'] = rf_prob
+    data['NBProb'] = nb_prob
     data['ETProb'] = et_prob
-    data['XGBProb'] = xgb_prob
     data['PoissonProb'] = poisson_prob
 
     over_conf, under_conf, triggered_rules = favour_v6_confidence(
@@ -558,16 +532,17 @@ def make_prediction(data_dict, match_info):
     )
 
     meta_feature_columns = [
-        'RuleOverConfidence', 'RuleUnderConfidence', 'GBProb', 'RFProb',
-        'ETProb', 'XGBProb', 'PoissonProb'
+        'RuleOverConfidence', 'RuleUnderConfidence', 'LogisticProb', 'GBProb',
+        'RFProb', 'NBProb', 'ETProb', 'PoissonProb'
     ]
     meta_data = pd.DataFrame([{
         'RuleOverConfidence': over_conf,
         'RuleUnderConfidence': under_conf,
+        'LogisticProb': logistic_prob,
         'GBProb': gb_prob,
         'RFProb': rf_prob,
+        'NBProb': nb_prob,
         'ETProb': et_prob,
-        'XGBProb': xgb_prob,
         'PoissonProb': poisson_prob
     }], columns=meta_feature_columns)
 
@@ -590,17 +565,16 @@ def make_prediction(data_dict, match_info):
     meta_under_prob = meta_probs[0] * 100
 
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
+        recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
-        logger.error(f"❌ {reason}")
-    elif meta_over_prob >= 70 and meta_over_prob <= 90 and over_conf > under_conf:
+    elif meta_over_prob >= 75:
         recommendation = "Over 1.5"
-        reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) in [70, 90] and OverConfidence ({over_conf:.1f}%) > UnderConfidence ({under_conf:.1f}%)."
-    elif meta_under_prob >= 70 and meta_under_prob <= 90 and under_conf > over_conf:
+        reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) exceeds 75% threshold."
+    elif meta_under_prob >= 75:
         recommendation = "Under 3.5"
-        reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) in [70, 90] and UnderConfidence ({under_conf:.1f}%) > OverConfidence ({over_conf:.1f}%)."
+        reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold."
     else:
-        reason = f"No bet: Meta-Over ({meta_over_prob:.1f}%) or Meta-Under ({meta_under_prob:.1f}%) outside [70, 90] or confidence mismatch (OverConf: {over_conf:.1f}%, UnderConf: {under_conf:.1f}%)."
-        logger.warning(f"⚠️ {reason}")
+        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold. No bet recommended."
 
     return {
         'Match': match_info,
@@ -683,7 +657,7 @@ def main(date_from=None):
     api_call_count = 0
     wat_tz = pytz.timezone('Africa/Lagos')
     if date_from is None:
-        date_from = datetime.now(wat_tz).strftime('%Y-%m-%d')  # Changed to today
+        date_from = datetime.now(wat_tz).strftime('%Y-%m-%d')
         logger.info(f"No date provided, defaulting to today: {date_from}")
 
     season_id = SEASON_ID
@@ -808,7 +782,7 @@ def schedule_predictions():
         'cron',
         hour=22,
         minute=30,
-        args=[datetime.now(wat_tz).strftime('%Y-%m-%d')],  # Changed to today
+        args=[datetime.now(wat_tz).strftime('%Y-%m-%d')],
         timezone=wat_tz
     )
     logger.info("Scheduler started for 10:30 PM WAT daily predictions")
@@ -824,7 +798,7 @@ def home():
         if not os.path.exists('predictions.json'):
             wat_tz = pytz.timezone('Africa/Lagos')
             logger.info("No predictions.json found, running predictions...")
-            main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))  # Changed to today
+            main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
         predictions = load_predictions()
         if not predictions:
             return render_template('home.html', predictions=[], error="No matches available for today.", user=current_user)
