@@ -1,15 +1,116 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Register</h1>
-    <form method="POST">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+    <!-- Hero Section -->
+    <section class="hero text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Join the Soccer Predictions Community</h1>
+            <p class="lead">Register now to access free predictions and unlock exclusive VIP insights!</p>
+            <p>Already have an account? <a href="{{ url_for('login') }}" class="text-warning fw-bold">Login here</a></p>
         </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
+    </section>
+
+    <!-- Register Form Section -->
+    <section class="register py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-sm animate__animated animate__fadeIn">
+                        <div class="card-body">
+                            <h2 class="text-center mb-4">Create Your Account</h2>
+                            {% if error %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endif %}
+                            <form method="POST" id="registerForm" novalidate>
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">
+                                        <i class="bi bi-person-fill me-2"></i>Username
+                                    </label>
+                                    <input type="text" class="form-control" id="username" name="username" required
+                                           placeholder="Enter your username"
+                                           data-bs-toggle="tooltip" title="Choose a unique username">
+                                    <div class="invalid-feedback">Please enter a valid username.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">
+                                        <i class="bi bi-lock-fill me-2"></i>Password
+                                    </label>
+                                    <input type="password" class="form-control" id="password" name="password" required
+                                           placeholder="Enter your password"
+                                           data-bs-toggle="tooltip" title="Password must be at least 6 characters">
+                                    <div class="invalid-feedback">Please enter a password (minimum 6 characters).</div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Register
+                                </button>
+                            </form>
+                            <p class="text-center mt-3">
+                                By registering, you agree to our <a href="#" class="text-primary">Terms of Service</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
+    </section>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner d-none" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Call-to-Action Section -->
+    <section class="cta text-center py-5 bg-light">
+        <div class="container">
+            <h2 class="mb-3">Ready to Win Big?</h2>
+            <p class="lead">Sign up now to start with free predictions and upgrade to VIP for premium insights!</p>
+            <a href="{{ url_for('pay') }}" class="btn btn-warning btn-lg">Explore VIP Membership</a>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Form validation
+        (function () {
+            'use strict';
+            var form = document.getElementById('registerForm');
+            var submitBtn = document.getElementById('submitBtn');
+            var spinner = document.getElementById('loadingSpinner');
+
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    // Show loading spinner
+                    spinner.classList.remove('d-none');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Registering...';
+                }
+                form.classList.add('was-validated');
+            }, false);
+
+            // Real-time validation feedback
+            form.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', function () {
+                    if (input.id === 'password' && input.value.length < 6) {
+                        input.setCustomValidity('Password must be at least 6 characters.');
+                    } else {
+                        input.setCustomValidity('');
+                    }
+                });
+            });
+        })();
+    </script>
 {% endblock %}
