@@ -1,15 +1,105 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Login</h1>
-    <form method="POST">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+    <!-- Hero Section -->
+    <section class="hero text-center py-5 bg-primary text-white">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Welcome Back!</h1>
+            <p class="lead">Log in to access your free and VIP soccer predictions.</p>
+            <p class="mb-0">New here? <a href="{{ url_for('register') }}" class="text-warning fw-bold">Create an account</a></p>
         </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
+    </section>
+
+    <!-- Login Form Section -->
+    <section class="login py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card shadow-sm animate__animated animate__fadeIn">
+                        <div class="card-body">
+                            <h2 class="text-center mb-4">Sign In</h2>
+                            {% if error %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endif %}
+                            <form method="POST" id="loginForm" novalidate>
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">
+                                        <i class="bi bi-person-fill me-2"></i>Username
+                                    </label>
+                                    <input type="text" class="form-control" id="username" name="username" required
+                                           placeholder="Enter your username"
+                                           data-bs-toggle="tooltip" title="Enter your registered username">
+                                    <div class="invalid-feedback">Please enter your username.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">
+                                        <i class="bi bi-lock-fill me-2"></i>Password
+                                    </label>
+                                    <input type="password" class="form-control" id="password" name="password" required
+                                           placeholder="Enter your password"
+                                           data-bs-toggle="tooltip" title="Enter your password">
+                                    <div class="invalid-feedback">Please enter your password.</div>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                                </button>
+                            </form>
+                            <p class="text-center mt-3">
+                                Forgot your password? <a href="#" class="text-primary">Contact support</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
+    </section>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner d-none" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Call-to-Action Section -->
+    <section class="cta text-center py-5 bg-light">
+        <div class="container">
+            <h2 class="mb-3">Unlock Premium Predictions</h2>
+            <p class="lead">Log in to access free predictions or upgrade to VIP for exclusive insights.</p>
+            <a href="{{ url_for('pay') }}" class="btn btn-warning btn-lg">Go VIP</a>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Form validation
+        (function () {
+            'use strict';
+            var form = document.getElementById('loginForm');
+            var submitBtn = document.getElementById('submitBtn');
+            var spinner = document.getElementById('loadingSpinner');
+
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    // Show loading spinner
+                    spinner.classList.remove('d-none');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span> Logging in...';
+                }
+                form.classList.add('was-validated');
+            }, false);
+        })();
+    </script>
 {% endblock %}
