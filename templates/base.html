@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#212529"> <!-- Matches bg-dark -->
     <title>Over2.5 Lord - {% block title %}Football Predictions{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
 </head>
 <body>
     <!-- Navbar -->
@@ -66,6 +69,14 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Install Prompt -->
+    <div class="container mt-3">
+        <div class="alert alert-info alert-dismissible fade show d-none" id="install-prompt" role="alert">
+            Install Over2.5 Lord: Tap "Add to Home Screen" in your browser!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-4 mt-5">
         <div class="container">
@@ -93,6 +104,31 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
+    {% block scripts %}
+        <script>
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
+                        .then(reg => console.log('Service Worker registered'))
+                        .catch(err => console.error('Service Worker error:', err));
+                });
+            }
+
+            // Handle Install Prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('install-prompt').classList.remove('d-none');
+            });
+
+            // Handle App Installed
+            window.addEventListener('appinstalled', () => {
+                console.log('PWA installed');
+                document.getElementById('install-prompt').classList.add('d-none');
+            });
+        </script>
+    {% endblock %}
 </body>
 </html>
