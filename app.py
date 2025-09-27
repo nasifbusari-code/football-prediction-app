@@ -103,6 +103,14 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
 }
 
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)  # Keep sessions alive for 30 days
+app.config['SESSION_COOKIE_SECURE'] = True  # Use with HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Prevent cookie issues on mobile
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)  # Match session lifetime
+
+
+
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
