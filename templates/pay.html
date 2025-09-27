@@ -30,6 +30,7 @@
                                     </label>
                                     <input type="email" class="form-control" id="email-address" name="email" required
                                            placeholder="Enter your email"
+                                           value="{{ current_user.email if current_user.is_authenticated else '' }}"
                                            data-bs-toggle="tooltip" title="We'll use this email for payment confirmation">
                                     <div class="invalid-feedback">Please enter a valid email address.</div>
                                 </div>
@@ -128,7 +129,7 @@
                     amount: document.getElementById('amount').value * 100,
                     currency: 'NGN',
                     callback: function(response) {
-                        window.location.href = '/paystack/callback?reference=' + response.reference;
+                        window.location.href = '{{ url_for("paystack_callback") }}?reference=' + response.reference;
                     },
                     onClose: function() {
                         spinner.classList.add('d-none');
