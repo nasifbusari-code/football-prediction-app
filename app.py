@@ -28,7 +28,7 @@ from urllib.parse import quote_plus
 from sqlalchemy.exc import OperationalError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
-# === Define RUN_MODE ===
+# === New: Define RUN_MODE ===
 RUN_MODE = os.getenv('RUN_MODE', 'web')  # 'web' for Flask, 'worker' for scheduler
 
 # === Configure Logging ===
@@ -47,6 +47,14 @@ API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece2
 API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
+
+# === League Exclusion Rules ===
+EXCLUDED_KEYWORDS = [
+    'cup', 'copa', 
+    'conference league', 'trophy', 'supercup', 'super cup', 'women', 'ladies',
+    'female', 'fa cup', 'league cup', 'playoff', 'play-off', 'knockout',
+    'u21', 'u19', 'u18', 'u17', 'youth', 'reserve', 'esiliiga', 'ekstraliga women'
+]
 
 # === Load Models and Scalers ===
 logger.info("Loading models...")
@@ -95,12 +103,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
 }
 
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)  # Keep sessions alive for 30 days
-app.config['SESSION_COOKIE_SECURE'] = True  # Use with HTTPS
-app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Prevent cookie issues on mobile
-app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)  # Match session lifetime
-
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
@@ -146,7 +148,7 @@ def ping_db():
         logger.error(f"❌ Database ping failed: {e}")
         return "Database ping failed", 500
 
-# Scheduler status route for debugging
+# New: Scheduler status route for debugging
 @app.route('/scheduler_status')
 def scheduler_status():
     global scheduler
@@ -218,7 +220,7 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if avg_conceded >= 1.5 and high_goal_count >= 8:
         base_score += 10
         triggered_rules.append("Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)")
-    if high_goal_count <= 9 and zero_count <= 6:
+    if high_goal_count <= 9 and zero_count <= 6:  # Aligned with prediction1
         base_score -= 25
         triggered_rules.append("Rule 2: -25 to base_score (high goal/conceded count <= 9 and zero count <= 6)")
     if high_goal_count >= 8 and zero_count >= 7:
@@ -521,7 +523,7 @@ def make_prediction(data_dict, match_info):
         logger.error(f"❌ Base scaler error for {match_info}: {e}")
         return {"error": f"Base scaler error: {e}"}
 
-    # Poisson Model
+    # Poisson Model (aligned with prediction1)
     league_avg_goals = (data_dict['TotalHomeGoals'] + data_dict['TotalHomeConceded'] +
                         data_dict['TotalAwayGoals'] + data_dict['TotalAwayConceded']) / 10
     if league_avg_goals == 0:
@@ -615,6 +617,49 @@ def make_prediction(data_dict, match_info):
         'TriggeredRules': triggered_rules
     }
 
+# === Filter Leagues ===
+def filter_leagues(leagues):
+    filtered = []
+    for league in leagues:
+        league_name = league['league_name'].lower()
+        if any(keyword.lower() in league_name for keyword in EXCLUDED_KEYWORDS):
+            logger.debug(f"Excluding league: {league['league_name']} (ID: {league['league_key']})")
+            continue
+        filtered.append(league)
+    logger.info(f"Filtered {len(leagues)} leagues to {len(filtered)} after excluding cups, women's, and youth leagues")
+    return filtered
+
+# === Fetch All Leagues ===
+def fetch_all_leagues():
+    global api_call_count
+    cache_file = 'leagues_cache.json'
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r', encoding='utf-8') as f:
+            leagues = json.load(f)
+            logger.info("Loaded leagues from cache")
+            return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
+    logger.info("Fetching all leagues...")
+    try:
+        url = f"{API_BASE_URL}?met=Leagues&APIkey={API_KEY}"
+        response = fetch_with_retry(url)
+        response.encoding = 'utf-8'
+        data = response.json()
+        if data.get("success") != 1:
+            logger.error(f"❌ API error fetching leagues: {data}")
+            return []
+        leagues = filter_leagues(data["result"])
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(leagues, f)
+        logger.info(f"✅ Retrieved and cached {len(leagues)} eligible leagues")
+        with open('leagues.txt', 'w', encoding='utf-8') as f:
+            f.write("Filtered League List (Excluding Cups, Women's, and Youth Leagues):\n")
+            for league in leagues:
+                f.write(f"ID: {league['league_key']}, Name: {league['league_name']}, Country: {league.get('country_name', 'Unknown')}\n")
+        return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
+    except Exception as e:
+        logger.error(f"❌ Error fetching leagues: {e}")
+        return []
+
 # === Fetch Upcoming Matches for a League ===
 def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from):
     global api_call_count
@@ -636,7 +681,7 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
         logger.error(f"❌ Error fetching matches for {league_name}: {e}")
         return []
 
-# === Main Function ===
+# === Modified Main Function ===
 def main(date_from=None):
     global api_call_count
     api_call_count = 0
@@ -648,42 +693,26 @@ def main(date_from=None):
     season_id = SEASON_ID
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
-    # Hardcoded league IDs with their names and countries
-    target_leagues = [
-        (211, "Premier League", "England"),
-        (156, "Championship", "England"),
-        (155, "League One", "England"),
-        (250, "Eredivisie", "Netherlands"),
-        (244, "Eerste Divisie", "Netherlands"),
-        (245, "Primeira Liga", "Portugal"),
-        (251, "Segunda Liga", "Portugal"),
-        (223, "Bundesliga", "Germany"),
-        (329, "2. Bundesliga", "Germany"),
-        (330, "3. Liga", "Germany"),
-        (653, "Regionalliga", "Germany"),
-        (7097, "Oberliga", "Germany"),
-        (171, "Serie A", "Italy"),
-        (175, "Serie B", "Italy"),
-        (152, "La Liga", "Spain"),
-        (302, "Segunda División", "Spain"),
-        (207, "Ligue 1", "France"),
-        (168, "Ligue 2", "France"),
-        (308, "J1 League", "Japan"),
-        (118, "Pro League", "Belgium"),
-        (253, "Super League", "Switzerland"),
-        (141, "Süper Lig", "Turkey"),
-        (593, "Premiership", "Scotland"),
-        (614, "Championship", "Scotland"),
-        (352, "A League", "Australia"),
-        (353, "National League", "England"),
-        (362, "Superliga", "Denmark"),
-        (331, "Allsvenskan", "Sweden"),
-        (329, "Superettan", "Sweden")
+    target_league_ids = [
+        211, 156, 155, 250, 244, 245, 251, 223, 329, 330, 653, 7097, 171, 175, 152, 302, 207, 168,
+        308, 118, 253, 141, 593, 614, 352, 353, 362, 331, 329
     ]
 
+    leagues = fetch_all_leagues()
+    if not leagues:
+        logger.error("❌ Aborting: No eligible leagues retrieved.")
+        return
+
+    leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues
+               if league_id in target_league_ids]
+
+    if not leagues:
+        logger.error("❌ Aborting: No matching leagues found for provided IDs after filtering.")
+        return
+
     all_matches = []
-    logger.info(f"\nFetching matches for {date_from} for {len(target_leagues)} selected leagues...")
-    for league_id, league_name, country_name in tqdm(target_leagues, desc="Processing leagues"):
+    logger.info(f"\nFetching matches for {date_from} for {len(leagues)} selected leagues...")
+    for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
         matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)
         all_matches.extend(matches)
         time.sleep(0.5)
