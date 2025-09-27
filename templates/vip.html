@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <!-- Hero Section -->
-    <section class="hero text-center py-5 bg-dark text-white">
+    <section class="hero text-center py-5 bg-primary text-white">
         <div class="container">
             <h1 class="display-4 fw-bold">VIP Predictions</h1>
             <p class="lead">Exclusive, high-accuracy predictions tailored for our premium members.</p>
@@ -137,7 +137,6 @@
         // Show loading spinner on page load (optional, if fetching predictions)
         document.addEventListener('DOMContentLoaded', function() {
             const spinner = document.getElementById('loadingSpinner');
-            // Simulate loading (remove if predictions are pre-loaded)
             setTimeout(() => {
                 spinner.classList.add('d-none');
             }, 1000);
