@@ -34,6 +34,15 @@
                                     <div class="invalid-feedback">Please enter a valid username.</div>
                                 </div>
                                 <div class="mb-3">
+                                    <label for="email" class="form-label">
+                                        <i class="bi bi-envelope-fill me-2"></i>Email
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" required
+                                           placeholder="Enter your email"
+                                           data-bs-toggle="tooltip" title="Enter a valid email address">
+                                    <div class="invalid-feedback">Please enter a valid email.</div>
+                                </div>
+                                <div class="mb-3">
                                     <label for="password" class="form-label">
                                         <i class="bi bi-lock-fill me-2"></i>Password
                                     </label>
@@ -101,15 +110,31 @@
                 form.classList.add('was-validated');
             }, false);
 
-            // Real-time validation feedback
-            form.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', function () {
-                    if (input.id === 'password' && input.value.length < 6) {
-                        input.setCustomValidity('Password must be at least 6 characters.');
-                    } else {
-                        input.setCustomValidity('');
-                    }
-                });
+            // Real-time validation
+            document.getElementById('username').addEventListener('input', function () {
+                if (this.value.length < 3) {
+                    this.setCustomValidity('Username must be at least 3 characters.');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            document.getElementById('email').addEventListener('input', function () {
+                const email = this.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    this.setCustomValidity('Please enter a valid email address.');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            document.getElementById('password').addEventListener('input', function () {
+                if (this.value.length < 6) {
+                    this.setCustomValidity('Password must be at least 6 characters.');
+                } else {
+                    this.setCustomValidity('');
+                }
             });
         })();
     </script>
