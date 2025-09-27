@@ -129,27 +129,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# New: Prediction model
-class Prediction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    match = db.Column(db.String(200), nullable=False)
-    meta_over_prob = db.Column(db.Float)
-    meta_under_prob = db.Column(db.Float)
-    recommendation = db.Column(db.String(50))
-    over_confidence = db.Column(db.Float)
-    under_confidence = db.Column(db.Float)
-    reason = db.Column(db.Text)
-    triggered_rules = db.Column(db.Text)  # Store as JSON string
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-# New: LeagueCache model
-class LeagueCache(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    league_key = db.Column(db.Integer, nullable=False)
-    league_name = db.Column(db.String(100), nullable=False)
-    country_name = db.Column(db.String(100), default='Unknown')
-    cached_at = db.Column(db.DateTime, default=datetime.utcnow)
-
 # === Routes ===
 @app.route('/init_db', methods=['GET'])
 def init_db():
@@ -628,17 +607,15 @@ def filter_leagues(leagues):
     logger.info(f"Filtered {len(leagues)} leagues to {len(filtered)} after excluding cups, women's, and youth leagues")
     return filtered
 
+# === Fetch All Leagues ===
 def fetch_all_leagues():
     global api_call_count
-    # Check database cache
-    try:
-        cached_leagues = LeagueCache.query.all()
-        if cached_leagues:
-            logger.info("Loaded leagues from database cache")
-            return [(league.league_key, league.league_name, league.country_name) for league in cached_leagues]
-    except Exception as e:
-        logger.error(f"❌ Error loading leagues from database cache: {e}")
-
+    cache_file = 'leagues_cache.json'
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r', encoding='utf-8') as f:
+            leagues = json.load(f)
+            logger.info("Loaded leagues from cache")
+            return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
     logger.info("Fetching all leagues...")
     try:
         url = f"{API_BASE_URL}?met=Leagues&APIkey={API_KEY}"
@@ -649,26 +626,13 @@ def fetch_all_leagues():
             logger.error(f"❌ API error fetching leagues: {data}")
             return []
         leagues = filter_leagues(data["result"])
-        # Save to database
-        try:
-            # Clear old cache
-            db.session.query(LeagueCache).delete()
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(leagues, f)
+        logger.info(f"✅ Retrieved and cached {len(leagues)} eligible leagues")
+        with open('leagues.txt', 'w', encoding='utf-8') as f:
+            f.write("Filtered League List (Excluding Cups, Women's, and Youth Leagues):\n")
             for league in leagues:
-                cached_league = LeagueCache(
-                    league_key=league['league_key'],
-                    league_name=league['league_name'],
-                    country_name=league.get('country_name', 'Unknown')
-                )
-                db.session.add(cached_league)
-            db.session.commit()
-            logger.info(f"✅ Retrieved and cached {len(leagues)} eligible leagues in database")
-            # Log to prediction_log.txt instead of leagues.txt
-            logger.info("Filtered League List (Excluding Cups, Women's, and Youth Leagues):")
-            for league in leagues:
-                logger.info(f"ID: {league['league_key']}, Name: {league['league_name']}, Country: {league.get('country_name', 'Unknown')}")
-        except Exception as e:
-            logger.error(f"❌ Error saving leagues to database: {e}")
-            db.session.rollback()
+                f.write(f"ID: {league['league_key']}, Name: {league['league_name']}, Country: {league.get('country_name', 'Unknown')}\n")
         return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
     except Exception as e:
         logger.error(f"❌ Error fetching leagues: {e}")
@@ -708,7 +672,8 @@ def main(date_from=None):
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
     target_league_ids = [
-        211, 250, 244, 245
+        211, 156, 155, 250, 244, 245, 251, 223, 329, 330, 653, 7097, 171, 175, 152, 302, 207, 168,
+        308, 118, 253, 141, 593, 614, 352, 353, 362, 331, 329
     ]
 
     leagues = fetch_all_leagues()
@@ -772,64 +737,49 @@ def main(date_from=None):
         time.sleep(0.5)
 
     logger.info(f"Total API Calls Made: {api_call_count}")
+    predictions_data = [
+        {
+            'Match': r['Match'],
+            'MetaOverProb': r['MetaOverProb'],
+            'MetaUnderProb': r['MetaUnderProb'],
+            'Recommendation': r['Recommendation'],
+            'OverConfidence': r['OverConfidence'],
+            'UnderConfidence': r['UnderConfidence'],
+            'Reason': r['Reason'],
+            'TriggeredRules': r['TriggeredRules']
+        } for r in results
+    ]
+    with open('predictions.json', 'w', encoding='utf-8') as f:
+        json.dump(predictions_data, f)
 
-    # New: Save predictions to database
-    try:
-        # Clear old predictions (e.g., older than 1 day)
-        db.session.query(Prediction).filter(Prediction.created_at < datetime.utcnow() - timedelta(days=1)).delete()
-        for result in results:
-            prediction = Prediction(
-                match=result['Match'],
-                meta_over_prob=result['MetaOverProb'],
-                meta_under_prob=result['MetaUnderProb'],
-                recommendation=result['Recommendation'],
-                over_confidence=result['OverConfidence'],
-                under_confidence=result['UnderConfidence'],
-                reason=result['Reason'],
-                triggered_rules=json.dumps(result['TriggeredRules'])
-            )
-            db.session.add(prediction)
-        db.session.commit()
-        logger.info("✅ Predictions saved to database")
-    except Exception as e:
-        logger.error(f"❌ Error saving predictions to database: {e}")
-        db.session.rollback()
-
-    # New: Log predictions to prediction_log.txt (instead of predictions.txt)
     logger.info("\n=== Prediction Results ===")
-    if not results:
-        msg = f"❌ No valid predictions for {date_from}. Check prediction_log.txt."
-        logger.error(msg)
-    for result in results:
-        output = (f"\nMatch: {result['Match']}\n"
-                  f"Over 1.5 Confidence: {result['OverConfidence']:.1f}%\n"
-                  f"Under 3.5 Confidence: {result['UnderConfidence']:.1f}%\n"
-                  f"Meta-Model Over 1.5 Probability: {result['MetaOverProb']:.1f}%\n"
-                  f"Meta-Model Under 3.5 Probability: {result['MetaUnderProb']:.1f}%\n"
-                  f"Recommendation: {result['Recommendation']}\n"
-                  f"Reason: {result['Reason']}\n"
-                  f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n" + f"{'='*50}")
-        logger.info(output)
-    if skipped_matches:
-        logger.info("\n=== Skipped Matches ===")
-        logger.info("\n".join(skipped_matches))
+    with open('predictions.txt', 'w', encoding='utf-8') as f:
+        if not results:
+            msg = f"❌ No valid predictions for {date_from}. Check prediction_log.txt."
+            logger.error(msg)
+            f.write(msg + "\n")
+        for result in results:
+            output = (f"\nMatch: {result['Match']}\n"
+                      f"Over 1.5 Confidence: {result['OverConfidence']:.1f}%\n"
+                      f"Under 3.5 Confidence: {result['UnderConfidence']:.1f}%\n"
+                      f"Meta-Model Over 1.5 Probability: {result['MetaOverProb']:.1f}%\n"
+                      f"Meta-Model Under 3.5 Probability: {result['MetaUnderProb']:.1f}%\n"
+                      f"Recommendation: {result['Recommendation']}\n"
+                      f"Reason: {result['Reason']}\n"
+                      f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n" + f"{'='*50}")
+            logger.info(output)
+            f.write(output + "\n")
+        if skipped_matches:
+            logger.info("\n=== Skipped Matches ===")
+            f.write("\nSkipped Matches:\n" + "\n".join(skipped_matches) + "\n")
 
+# === Load Predictions ===
 def load_predictions():
     try:
-        predictions = Prediction.query.filter(Prediction.created_at >= datetime.utcnow() - timedelta(days=1)).all()
-        logger.info(f"Loaded {len(predictions)} predictions from database")
-        return [{
-            'Match': p.match,
-            'MetaOverProb': p.meta_over_prob,
-            'MetaUnderProb': p.meta_under_prob,
-            'Recommendation': p.recommendation,
-            'OverConfidence': p.over_confidence,
-            'UnderConfidence': p.under_confidence,
-            'Reason': p.reason,
-            'TriggeredRules': json.loads(p.triggered_rules)
-        } for p in predictions]
+        with open('predictions.json', 'r', encoding='utf-8') as f:
+            return json.load(f)
     except Exception as e:
-        logger.error(f"❌ Error loading predictions from database: {e}")
+        logger.error(f"❌ Error loading predictions.json: {e}")
         return []
 
 # === Schedule Predictions ===
@@ -872,13 +822,11 @@ def schedule_predictions():
 @app.route('/')
 def home():
     try:
-        # Check if predictions exist for today
-        predictions = load_predictions()
-        if not predictions:
+        if not os.path.exists('predictions.json'):
             wat_tz = pytz.timezone('Africa/Lagos')
-            logger.info("No predictions found in database, running predictions...")
+            logger.info("No predictions.json found, running predictions...")
             main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
-            predictions = load_predictions()
+        predictions = load_predictions()
         if not predictions:
             return render_template('home.html', predictions=[], error="No matches available for today.", user=current_user)
         free_preds = []
