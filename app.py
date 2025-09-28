@@ -308,6 +308,12 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         base_score += 15
         triggered_rules.append("Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])")
 
+    # New Rule: Decrease base_score by 10% if count of 1s in all lists >= 9
+    one_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g == 1)
+    if one_count >= 9:
+        base_score *= 0.9
+        triggered_rules.append("New Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)")
+
     base_score = max(0, min(base_score, 100))
     over_conf = max(0, min(base_score, 90))
     under_conf = max(0, min(100 - base_score, 90))
