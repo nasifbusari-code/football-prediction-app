@@ -21,6 +21,7 @@ pytz
 psycopg2-binary
 tenacity
 flask_migrate
+python-dotenv
 
 
 
