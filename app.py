@@ -27,17 +27,17 @@ import pytz
 from urllib.parse import quote_plus
 from sqlalchemy.exc import OperationalError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from dotenv import load_dotenv  # Added for environment variable loading
+from dotenv import load_dotenv
 
-# === Load Environment Variables ===
+# Load environment variables
 load_dotenv()
 
-# === Define RUN_MODE ===
+# === New: Define RUN_MODE ===
 RUN_MODE = os.getenv('RUN_MODE', 'web')  # 'web' for Flask, 'worker' for scheduler
 
 # === Configure Logging ===
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,  # Changed to DEBUG for detailed logging
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler('prediction_log.txt', encoding='utf-8'),
@@ -45,6 +45,7 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger()
+logger.info("Starting Flask application...")
 
 # === API Configuration ===
 API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a')
@@ -54,8 +55,7 @@ SEASON_ID = "2024-2025"
 
 # === League Exclusion Rules ===
 EXCLUDED_KEYWORDS = [
-    'cup', 'copa', 
-    'conference league', 'trophy', 'supercup', 'super cup', 'women', 'ladies',
+    'cup', 'copa', 'conference league', 'trophy', 'supercup', 'super cup', 'women', 'ladies',
     'female', 'fa cup', 'league cup', 'playoff', 'play-off', 'knockout',
     'u21', 'u19', 'u18', 'u17', 'youth', 'reserve', 'esiliiga', 'ekstraliga women'
 ]
@@ -95,9 +95,9 @@ if not DATABASE_URL:
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 if '?' in DATABASE_URL:
-    DATABASE_URL += '&sslmode=require'
+    DATABASE_URL += '&sslmode=prefer'  # Changed to prefer for compatibility
 else:
-    DATABASE_URL += '?sslmode=require'
+    DATABASE_URL += '?sslmode=prefer'
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
@@ -106,8 +106,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_timeout': 30,
     'pool_pre_ping': True,
 }
-
-# Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
 # Initialize Flask-Login
@@ -126,7 +124,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(120), nullable=False)
     is_vip = db.Column(db.Boolean, default=False)
     vip_expiry = db.Column(db.DateTime, nullable=True)
-    is_admin = db.Column(db.Boolean, default=False)  # New column for admin status
+    is_admin = db.Column(db.Boolean, default=False)  # Added is_admin column
 
     def set_password(self, password):
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -134,42 +132,55 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
-# === Create Admin User ===
+# === Admin User Creation ===
 def create_admin_user():
-    with app.app_context():
-        admin_username = os.getenv('ADMIN_USERNAME', 'admin')
-        admin_password = os.getenv('ADMIN_PASSWORD', 'securepassword123')  # Set via .env file
-        if not User.query.filter_by(username=admin_username).first():
-            admin = User(username=admin_username, is_admin=True, is_vip=True)
-            admin.set_password(admin_password)
-            db.session.add(admin)
-            db.session.commit()
-            logger.info(f"Admin user '{admin_username}' created with VIP access")
-        else:
-            logger.info(f"Admin user '{admin_username}' already exists")
+    admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+    admin_password = os.getenv('ADMIN_PASSWORD')
+    if not admin_password:
+        logger.error("❌ ADMIN_PASSWORD not set")
+        return
+    try:
+        with app.app_context():
+            admin_user = User.query.filter_by(username=admin_username).first()
+            if not admin_user:
+                admin_user = User(username=admin_username, is_admin=True, is_vip=True)
+                admin_user.set_password(admin_password)
+                db.session.add(admin_user)
+                db.session.commit()
+                logger.info(f"✅ Admin user '{admin_username}' created")
+            else:
+                logger.info(f"Admin user '{admin_username}' already exists")
+    except Exception as e:
+        logger.error(f"❌ Error creating admin user: {e}")
 
 # === Routes ===
 @app.route('/init_db', methods=['GET'])
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def init_db():
-    with app.app_context():
-        db.create_all()
-        create_admin_user()  # Create admin user after table creation
-    logger.info("✅ Database tables created and admin user ensured")
-    return "Database tables created!"
+    try:
+        with app.app_context():
+            db.create_all()
+        logger.info("✅ Database tables created")
+        return "Database tables created!"
+    except Exception as e:
+        logger.error(f"❌ Error initializing database: {e}")
+        return f"Error: {str(e)}", 500
 
 @app.route('/update_db', methods=['GET'])
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def update_db():
     try:
         with app.app_context():
-            db.create_all()  # Updates schema to include is_admin
-            create_admin_user()  # Ensure admin user exists
-            logger.info("✅ Database schema updated")
+            db.create_all()
+            create_admin_user()
+            logger.info("✅ Database schema updated and admin user created")
             return "Database schema updated and admin user created!"
     except Exception as e:
         logger.error(f"❌ Error updating database schema: {e}")
         return f"Error: {str(e)}", 500
 
 @app.route('/ping_db')
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def ping_db():
     try:
         with db.engine.connect() as conn:
@@ -177,8 +188,8 @@ def ping_db():
         logger.info("✅ Database ping successful")
         return "Database ping successful"
     except Exception as e:
-        logger.error(f"❌ Database ping failed: {e}")
-        return "Database ping failed", 500
+        logger.error(f"❅ Database ping failed: {e}")
+        return f"Database ping failed: {str(e)}", 500
 
 @app.route('/scheduler_status')
 def scheduler_status():
@@ -191,10 +202,10 @@ def load_user(user_id):
     try:
         return User.query.get(int(user_id))
     except OperationalError as e:
-        logger.error(f"❌ Database error in load_user: {e}")
+        logger.error(f"❅ Database error in load_user: {e}")
         raise
     except Exception as e:
-        logger.error(f"❌ Unexpected error in load_user: {e}")
+        logger.error(f"❅ Unexpected error in load_user: {e}")
         return None
 
 # === Retry Logic for API Calls ===
@@ -285,7 +296,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     try:
         datetime.strptime(match_date, '%Y-%m-%d')
     except (ValueError, TypeError):
-        logger.error(f"❌ Invalid match date format for {match_info}: {match_date}")
+        logger.error(f"❅ Invalid match date format for {match_info}: {match_date}")
         return None
 
     HomeGoalList, HomeConcededList, HomeBTTS = [], [], []
@@ -302,7 +313,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
         if not isinstance(home_matches, list):
             raise ValueError(f"Incomplete response for home team {home_team_key}")
     except Exception as e:
-        logger.error(f"❌ Error fetching home team {home_team_key} matches: {e}")
+        logger.error(f"❅ Error fetching home team {home_team_key} matches: {e}")
         return None
 
     home_filtered = []
@@ -329,7 +340,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                             time_str = card.get('time', '0')
                             minute = int(time_str.split('+')[0]) if '+' in time_str else int(time_str)
                             if minute <= 70:
-                                logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
+                                logger.error(f"❅ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
                                 return None
                         except (ValueError, TypeError):
                             logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
@@ -344,7 +355,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                 continue
 
     if len(home_filtered) != 5:
-        logger.error(f"❌ Skipping {match_info}: Only {len(home_filtered)} home matches found")
+        logger.error(f"❅ Skipping {match_info}: Only {len(home_filtered)} home matches found")
         return None
 
     for item in home_filtered:
@@ -374,7 +385,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
         if not isinstance(away_matches, list):
             raise ValueError(f"Incomplete response for away team {away_team_key}")
     except Exception as e:
-        logger.error(f"❌ Error fetching away team {away_team_key} matches: {e}")
+        logger.error(f"❅ Error fetching away team {away_team_key} matches: {e}")
         return None
 
     away_filtered = []
@@ -401,7 +412,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                             time_str = card.get('time', '0')
                             minute = int(time_str.split('+')[0]) if '+' in time_str else int(time_str)
                             if minute <= 70:
-                                logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
+                                logger.error(f"❅ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
                                 return None
                         except (ValueError, TypeError):
                             logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
@@ -416,7 +427,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                 continue
 
     if len(away_filtered) != 5:
-        logger.error(f"❌ Skipping {match_info}: Only {len(away_filtered)} away matches found")
+        logger.error(f"❅ Skipping {match_info}: Only {len(away_filtered)} away matches found")
         return None
 
     for item in away_filtered:
@@ -434,7 +445,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
 
     total_red_cards = len(home_red_cards) + len(away_red_cards)
     if total_red_cards > 2:
-        logger.error(f"❌ Skipping {match_info}: Total red cards ({total_red_cards}) exceeds 2")
+        logger.error(f"❅ Skipping {match_info}: Total red cards ({total_red_cards}) exceeds 2")
         return None
     elif total_red_cards == 2:
         for item in home_filtered + away_filtered:
@@ -452,14 +463,14 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         return None
                 red_card_times.sort()
                 if len(red_card_times) != 2 or red_card_times[1] <= 75:
-                    logger.error(f"❌ Skipping {match_info}: Second red card at {red_card_times[1]} minutes")
+                    logger.error(f"❅ Skipping {match_info}: Second red card at {red_card_times[1]} minutes")
                     return None
                 result = match.get('event_final_result', '')
                 if result and '-' in result:
                     try:
                         home_goals, away_goals = map(int, result.replace(' ', '').split('-')[:2])
                         if home_goals != 0 or away_goals != 0:
-                            logger.error(f"❌ Skipping {match_info}: Match with 2 red cards has goals ({result})")
+                            logger.error(f"❅ Skipping {match_info}: Match with 2 red cards has goals ({result})")
                             return None
                     except (ValueError, TypeError):
                         logger.warning(f"⚠️ Invalid result format in match {match.get('event_date')}: {result}")
@@ -487,7 +498,7 @@ def make_prediction(data_dict, match_info):
         data_dict['HomeBTTS'], data_dict['AwayBTTS']
     ]
     if any(len(lst) != required_length for lst in lists):
-        logger.error(f"❌ Skipping {match_info}: Lists have incorrect lengths: {[len(lst) for lst in lists]}")
+        logger.error(f"❅ Skipping {match_info}: Lists have incorrect lengths: {[len(lst) for lst in lists]}")
         return {"error": "Incorrect list lengths"}
 
     avg_home_scored = data_dict['TotalHomeGoals'] / required_length
@@ -549,7 +560,7 @@ def make_prediction(data_dict, match_info):
             index=data.index
         )
     except Exception as e:
-        logger.error(f"❌ Base scaler error for {match_info}: {e}")
+        logger.error(f"❅ Base scaler error for {match_info}: {e}")
         return {"error": f"Base scaler error: {e}"}
 
     league_avg_goals = (data_dict['TotalHomeGoals'] + data_dict['TotalHomeConceded'] +
@@ -573,7 +584,7 @@ def make_prediction(data_dict, match_info):
         nb_prob = nb_model.predict_proba(data_scaled)[0, 1]
         et_prob = et_model.predict_proba(data_scaled)[0, 1]
     except Exception as e:
-        logger.error(f"❌ Prediction error for {match_info}: {e}")
+        logger.error(f"❅ Prediction error for {match_info}: {e}")
         return {"error": f"Prediction error: {e}"}
 
     data['LogisticProb'] = logistic_prob
@@ -612,7 +623,7 @@ def make_prediction(data_dict, match_info):
         )
         meta_probs = meta_model.predict_proba(meta_data_scaled)[0]
     except Exception as e:
-        logger.error(f"❌ Meta-model prediction error for {match_info}: {e}")
+        logger.error(f"❅ Meta-model prediction error for {match_info}: {e}")
         return {"error": f"Meta-model prediction error: {e}"}
 
     zero_count = sum(1 for g in data_dict['HomeGoalList'] + data_dict['AwayGoalList'] +
@@ -673,7 +684,7 @@ def fetch_all_leagues():
         response.encoding = 'utf-8'
         data = response.json()
         if data.get("success") != 1:
-            logger.error(f"❌ API error fetching leagues: {data}")
+            logger.error(f"❅ API error fetching leagues: {data}")
             return []
         leagues = filter_leagues(data["result"])
         with open(cache_file, 'w', encoding='utf-8') as f:
@@ -685,7 +696,7 @@ def fetch_all_leagues():
                 f.write(f"ID: {league['league_key']}, Name: {league['league_name']}, Country: {league.get('country_name', 'Unknown')}\n")
         return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
     except Exception as e:
-        logger.error(f"❌ Error fetching leagues: {e}")
+        logger.error(f"❅ Error fetching leagues: {e}")
         return []
 
 # === Fetch Upcoming Matches for a League ===
@@ -706,7 +717,7 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
             match['country_name'] = country_name
         return matches
     except Exception as e:
-        logger.error(f"❌ Error fetching matches for {league_name}: {e}")
+        logger.error(f"❅ Error fetching matches for {league_name}: {e}")
         return []
 
 # === Modified Main Function ===
@@ -728,14 +739,14 @@ def main(date_from=None):
 
     leagues = fetch_all_leagues()
     if not leagues:
-        logger.error("❌ Aborting: No eligible leagues retrieved.")
+        logger.error("❅ Aborting: No eligible leagues retrieved.")
         return
 
     leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues
                if league_id in target_league_ids]
 
     if not leagues:
-        logger.error("❌ Aborting: No matching leagues found for provided IDs after filtering.")
+        logger.error("❅ Aborting: No matching leagues found for provided IDs after filtering.")
         return
 
     all_matches = []
@@ -746,7 +757,7 @@ def main(date_from=None):
         time.sleep(0.5)
 
     if not all_matches:
-        logger.error(f"❌ No matches found for selected leagues on {date_from}.")
+        logger.error(f"❅ No matches found for selected leagues on {date_from}.")
         return
 
     logger.info(f"\nFound {len(all_matches)} matches for {date_from}:")
@@ -770,7 +781,7 @@ def main(date_from=None):
         match_info = f"{home_team_name} vs {away_team_name} ({match_date}, {league_name}, {country_name})"
 
         if not home_team_key or not away_team_key:
-            logger.error(f"❌ Skipping {match_info}: Missing team key(s)")
+            logger.error(f"❅ Skipping {match_info}: Missing team key(s)")
             skipped_matches.append(match_info)
             continue
 
@@ -805,7 +816,7 @@ def main(date_from=None):
     logger.info("\n=== Prediction Results ===")
     with open('predictions.txt', 'w', encoding='utf-8') as f:
         if not results:
-            msg = f"❌ No valid predictions for {date_from}. Check prediction_log.txt."
+            msg = f"❅ No valid predictions for {date_from}. Check prediction_log.txt."
             logger.error(msg)
             f.write(msg + "\n")
         for result in results:
@@ -829,7 +840,7 @@ def load_predictions():
         with open('predictions.json', 'r', encoding='utf-8') as f:
             return json.load(f)
     except Exception as e:
-        logger.error(f"❌ Error loading predictions.json: {e}")
+        logger.error(f"❅ Error loading predictions.json: {e}")
         return []
 
 # === Schedule Predictions ===
@@ -888,7 +899,7 @@ def home():
             })
         return render_template('home.html', predictions=free_preds, error=None, user=current_user)
     except Exception as e:
-        logger.error(f"❌ Error rendering home: {e}")
+        logger.error(f"❅ Error rendering home: {e}")
         flash('Server error. Please try again.', 'danger')
         return render_template('home.html', predictions=[], error="Server error occurred.", user=current_user)
 
@@ -896,28 +907,25 @@ def home():
 @login_required
 def vip():
     try:
-        # Allow access if user is admin or has valid VIP status
         if current_user.is_admin:
             predictions = load_predictions()
             vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-            return render_template('vip.html', predictions=vip_preds, user=current_user)
-        
+            return render_template('vip.html', predictions=vip_preds, user=current_user, admin_message="Admin Access: Full VIP privileges")
         if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
             current_user.is_vip = False
             current_user.vip_expiry = None
             db.session.commit()
             flash('Your VIP subscription has expired. Please renew.', 'warning')
             return redirect(url_for('pay'))
-        
         predictions = load_predictions()
         vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
         return render_template('vip.html', predictions=vip_preds, user=current_user)
     except OperationalError as e:
-        logger.error(f"❌ Database error in vip route: {e}")
+        logger.error(f"❅ Database error in vip route: {e}")
         flash('Database connection issue. Please try again.', 'danger')
         return redirect(url_for('home'))
     except Exception as e:
-        logger.error(f"❌ Unexpected error in vip route: {e}")
+        logger.error(f"❅ Unexpected error in vip route: {e}")
         flash('Server error. Please try again.', 'danger')
         return redirect(url_for('home'))
 
@@ -942,11 +950,11 @@ def register():
             flash('Registration successful! Please log in.', 'success')
             return redirect(url_for('login'))
         except OperationalError as e:
-            logger.error(f"❌ Database error during register: {e}")
+            logger.error(f"❅ Database error during register: {e}")
             flash('Database connection issue. Please try again.', 'danger')
             return render_template('register.html')
         except Exception as e:
-            logger.error(f"❌ Unexpected error during register: {e}")
+            logger.error(f"❅ Unexpected error during register: {e}")
             flash('Server error. Please try again.', 'danger')
             return render_template('register.html')
     return render_template('register.html')
@@ -969,11 +977,11 @@ def login():
                 return redirect(url_for('home'))
             flash('Invalid username or password.', 'danger')
         except OperationalError as e:
-            logger.error(f"❌ Database error during login: {e}")
+            logger.error(f"❅ Database error during login: {e}")
             flash('Database connection issue. Please try again.', 'danger')
             return render_template('login.html')
         except Exception as e:
-            logger.error(f"❌ Unexpected error during login: {e}")
+            logger.error(f"❅ Unexpected error during login: {e}")
             flash('Server error. Please try again.', 'danger')
             return render_template('login.html')
     return render_template('login.html')
@@ -986,11 +994,11 @@ def logout():
         flash('Logged out successfully.', 'success')
         return redirect(url_for('home'))
     except OperationalError as e:
-        logger.error(f"❌ Database error during logout: {e}")
+        logger.error(f"❅ Database error during logout: {e}")
         flash('Database connection issue. Please try again.', 'danger')
         return redirect(url_for('home'))
     except Exception as e:
-        logger.error(f"❌ Unexpected error during logout: {e}")
+        logger.error(f"❅ Unexpected error during logout: {e}")
         flash('Server error. Please try again.', 'danger')
         return redirect(url_for('home'))
 
@@ -1000,7 +1008,7 @@ def pay():
     try:
         return render_template('pay.html', paystack_key=PAYSTACK_PUBLIC_KEY, user=current_user)
     except Exception as e:
-        logger.error(f"❌ Error rendering pay page: {e}")
+        logger.error(f"❅ Error rendering pay page: {e}")
         flash('Server error. Please try again.', 'danger')
         return redirect(url_for('home'))
 
@@ -1009,7 +1017,7 @@ def pay():
 def paystack_callback():
     ref = request.args.get('reference')
     if not ref:
-        logger.error("❌ No payment reference provided")
+        logger.error("❅ No payment reference provided")
         flash('Payment failed: No reference provided.', 'danger')
         return redirect(url_for('pay'))
     try:
@@ -1024,22 +1032,21 @@ def paystack_callback():
             flash('VIP subscription activated for 7 days!', 'success')
             return redirect(url_for('vip'))
         else:
-            logger.error(f"❌ Payment verification failed for ref: {ref}, response: {data}")
+            logger.error(f"❅ Payment verification failed for ref: {ref}, response: {data}")
             flash('Payment verification failed.', 'danger')
             return redirect(url_for('pay'))
     except OperationalError as e:
-        logger.error(f"❌ Database error during paystack callback: {e}")
+        logger.error(f"❅ Database error during paystack callback: {e}")
         flash('Database connection issue. Please try again.', 'danger')
         return redirect(url_for('pay'))
     except Exception as e:
-        logger.error(f"❌ Error verifying payment: {e}")
+        logger.error(f"❅ Error verifying payment: {e}")
         flash('Payment issue – try again.', 'danger')
         return redirect(url_for('pay'))
 
 # === CLI Command for Manual Testing ===
 @app.cli.command("run-predictions")
 def run_predictions():
-    """Run predictions manually or via cron."""
     wat_tz = pytz.timezone('Africa/Lagos')
     logger.info("Running predictions via CLI command")
     main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
@@ -1058,7 +1065,4 @@ if __name__ == '__main__':
                 logger.info("Worker shutdown")
     else:
         logger.info("Starting in web mode")
-        with app.app_context():
-            db.create_all()  # Ensure tables are created
-            create_admin_user()  # Create admin user on startup
         app.run(debug=False)
