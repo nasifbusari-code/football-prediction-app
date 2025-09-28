@@ -5,16 +5,20 @@
         <div class="container">
             <h1 class="display-4 fw-bold">VIP Predictions</h1>
             <p class="lead">Exclusive, high-accuracy predictions tailored for our premium members.</p>
-            <p class="mb-0">Your VIP Membership: 
-                {% if current_user.vip_expiry %}
-                    Active until {{ current_user.vip_expiry.strftime('%Y-%m-%d') }}
-                    <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Extend VIP</a>
-                {% else %}
-                    Expired. <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Renew VIP</a>
+            {% if not current_user.is_admin %}
+                <p class="mb-0">Your VIP Membership: 
+                    {% if current_user.vip_expiry %}
+                        Active until {{ current_user.vip_expiry.strftime('%Y-%m-%d') }}
+                        <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Extend VIP</a>
+                    {% else %}
+                        Expired. <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Renew VIP</a>
+                    {% endif %}
+                </p>
+                {% if vip_days_left and vip_days_left < 1 %}
+                    <p class="alert alert-warning mt-3">Your VIP subscription expires in {{ vip_days_left | round(1) }} days. <a href="{{ url_for('pay') }}" class="text-primary">Renew now</a>.</p>
                 {% endif %}
-            </p>
-            {% if vip_days_left and vip_days_left < 1 %}
-                <p class="alert alert-warning mt-3">Your VIP subscription expires in {{ vip_days_left | round(1) }} days. <a href="{{ url_for('pay') }}" class="text-primary">Renew now</a>.</p>
+            {% else %}
+                <p class="mb-0">Admin Access: Full VIP privileges</p>
             {% endif %}
             {% if session_days_left and session_days_left < 2 %}
                 <p class="alert alert-warning mt-3">Your session will expire in {{ session_days_left | round(1) }} days. Log in again to refresh.</p>
@@ -43,7 +47,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>X5A9DG</td> <!-- Replace with your daily code -->
+                                    <td>X5A9DG</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -58,7 +62,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>YYYY-YYYY-YYYY</td> <!-- Replace with your daily code -->
+                                    <td>YYYY-YYYY-YYYY</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -130,7 +134,9 @@
                     <div class="alert alert-info text-center">
                         No VIP predictions available for today. Check back tomorrow or contact support.
                         <br>
-                        <a href="{{ url_for('pay') }}" class="btn btn-warning mt-3">Extend VIP Membership</a>
+                        {% if not current_user.is_admin %}
+                            <a href="{{ url_for('pay') }}" class="btn btn-warning mt-3">Extend VIP Membership</a>
+                        {% endif %}
                     </div>
                 {% endif %}
             {% endif %}
@@ -149,7 +155,9 @@
         <div class="container">
             <h2 class="mb-3">Maximize Your Wins!</h2>
             <p class="lead">Stay with VIP for exclusive predictions, detailed analytics, and higher accuracy.</p>
-            <a href="{{ url_for('pay') }}" class="btn btn-primary btn-lg">Extend Your VIP Membership</a>
+            {% if not current_user.is_admin %}
+                <a href="{{ url_for('pay') }}" class="btn btn-primary btn-lg">Extend Your VIP Membership</a>
+            {% endif %}
         </div>
     </section>
 {% endblock %}
@@ -175,7 +183,7 @@
             });
         }
 
-        // Show loading spinner on page load (optional, if fetching predictions)
+        // Show loading spinner on page load
         document.addEventListener('DOMContentLoaded', function() {
             const spinner = document.getElementById('loadingSpinner');
             setTimeout(() => {
