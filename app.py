@@ -27,8 +27,12 @@ import pytz
 from urllib.parse import quote_plus
 from sqlalchemy.exc import OperationalError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from dotenv import load_dotenv  # Added for environment variable loading
 
-# === New: Define RUN_MODE ===
+# === Load Environment Variables ===
+load_dotenv()
+
+# === Define RUN_MODE ===
 RUN_MODE = os.getenv('RUN_MODE', 'web')  # 'web' for Flask, 'worker' for scheduler
 
 # === Configure Logging ===
@@ -122,6 +126,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(120), nullable=False)
     is_vip = db.Column(db.Boolean, default=False)
     vip_expiry = db.Column(db.DateTime, nullable=True)
+    is_admin = db.Column(db.Boolean, default=False)  # New column for admin status
 
     def set_password(self, password):
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -129,13 +134,40 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
 
+# === Create Admin User ===
+def create_admin_user():
+    with app.app_context():
+        admin_username = os.getenv('ADMIN_USERNAME', 'admin')
+        admin_password = os.getenv('ADMIN_PASSWORD', 'securepassword123')  # Set via .env file
+        if not User.query.filter_by(username=admin_username).first():
+            admin = User(username=admin_username, is_admin=True, is_vip=True)
+            admin.set_password(admin_password)
+            db.session.add(admin)
+            db.session.commit()
+            logger.info(f"Admin user '{admin_username}' created with VIP access")
+        else:
+            logger.info(f"Admin user '{admin_username}' already exists")
+
 # === Routes ===
 @app.route('/init_db', methods=['GET'])
 def init_db():
     with app.app_context():
         db.create_all()
-    logger.info("✅ Database tables created")
+        create_admin_user()  # Create admin user after table creation
+    logger.info("✅ Database tables created and admin user ensured")
     return "Database tables created!"
+
+@app.route('/update_db', methods=['GET'])
+def update_db():
+    try:
+        with app.app_context():
+            db.create_all()  # Updates schema to include is_admin
+            create_admin_user()  # Ensure admin user exists
+            logger.info("✅ Database schema updated")
+            return "Database schema updated and admin user created!"
+    except Exception as e:
+        logger.error(f"❌ Error updating database schema: {e}")
+        return f"Error: {str(e)}", 500
 
 @app.route('/ping_db')
 def ping_db():
@@ -148,7 +180,6 @@ def ping_db():
         logger.error(f"❌ Database ping failed: {e}")
         return "Database ping failed", 500
 
-# New: Scheduler status route for debugging
 @app.route('/scheduler_status')
 def scheduler_status():
     global scheduler
@@ -220,7 +251,7 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if avg_conceded >= 1.5 and high_goal_count >= 8:
         base_score += 10
         triggered_rules.append("Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)")
-    if high_goal_count <= 9 and zero_count <= 6:  # Aligned with prediction1
+    if high_goal_count <= 9 and zero_count <= 6:
         base_score -= 25
         triggered_rules.append("Rule 2: -25 to base_score (high goal/conceded count <= 9 and zero count <= 6)")
     if high_goal_count >= 8 and zero_count >= 7:
@@ -293,7 +324,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
-                    # Check for early red cards (0-70 minutes)
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -366,7 +396,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
-                    # Check for early red cards (0-70 minutes)
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -523,7 +552,6 @@ def make_prediction(data_dict, match_info):
         logger.error(f"❌ Base scaler error for {match_info}: {e}")
         return {"error": f"Base scaler error: {e}"}
 
-    # Poisson Model (aligned with prediction1)
     league_avg_goals = (data_dict['TotalHomeGoals'] + data_dict['TotalHomeConceded'] +
                         data_dict['TotalAwayGoals'] + data_dict['TotalAwayConceded']) / 10
     if league_avg_goals == 0:
@@ -805,7 +833,7 @@ def load_predictions():
         return []
 
 # === Schedule Predictions ===
-scheduler = None  # Global for status route
+scheduler = None
 def schedule_predictions():
     if RUN_MODE != 'worker':
         logger.info("Skipping scheduler initialization in web mode")
@@ -829,7 +857,7 @@ def schedule_predictions():
         minute=15,
         id='daily_prediction_job',
         replace_existing=True,
-        misfire_grace_time=3600,  # 1 hour grace period
+        misfire_grace_time=3600,
         timezone=wat_tz
     )
     scheduler.add_listener(
@@ -868,12 +896,19 @@ def home():
 @login_required
 def vip():
     try:
+        # Allow access if user is admin or has valid VIP status
+        if current_user.is_admin:
+            predictions = load_predictions()
+            vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
+            return render_template('vip.html', predictions=vip_preds, user=current_user)
+        
         if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
             current_user.is_vip = False
             current_user.vip_expiry = None
             db.session.commit()
             flash('Your VIP subscription has expired. Please renew.', 'warning')
             return redirect(url_for('pay'))
+        
         predictions = load_predictions()
         vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
         return render_template('vip.html', predictions=vip_preds, user=current_user)
@@ -1016,11 +1051,14 @@ if __name__ == '__main__':
         scheduler = schedule_predictions()
         try:
             while True:
-                time.sleep(60)  # Keep worker alive
+                time.sleep(60)
         except KeyboardInterrupt:
             if scheduler:
                 scheduler.shutdown()
                 logger.info("Worker shutdown")
     else:
         logger.info("Starting in web mode")
+        with app.app_context():
+            db.create_all()  # Ensure tables are created
+            create_admin_user()  # Create admin user on startup
         app.run(debug=False)
