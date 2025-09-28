@@ -21,16 +21,14 @@ import threading
 import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 import pytz
 from urllib.parse import quote_plus
 from sqlalchemy.exc import OperationalError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from functools import wraps
 
-# === Define RUN_MODE ===
+# === New: Define RUN_MODE ===
 RUN_MODE = os.getenv('RUN_MODE', 'web')  # 'web' for Flask, 'worker' for scheduler
 
 # === Configure Logging ===
@@ -105,9 +103,8 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
 }
 
-# Initialize SQLAlchemy and Migrate
+# Initialize SQLAlchemy
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -118,28 +115,6 @@ login_manager.login_view = 'login'
 PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5')
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 
-# File to store betting codes
-CODES_FILE = 'betting_codes.json'
-
-# Load betting codes
-def load_codes():
-    if os.path.exists(CODES_FILE):
-        try:
-            with open(CODES_FILE, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"❌ Error loading betting codes: {e}")
-            return {'rollover_code': '', 'million_naira_code': ''}
-    return {'rollover_code': '', 'million_naira_code': ''}
-
-# Save betting codes
-def save_codes(codes):
-    try:
-        with open(CODES_FILE, 'w') as f:
-            json.dump(codes, f, indent=4)
-    except Exception as e:
-        logger.error(f"❌ Error saving betting codes: {e}")
-
 # === Database Model ===
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -147,23 +122,12 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(120), nullable=False)
     is_vip = db.Column(db.Boolean, default=False)
     vip_expiry = db.Column(db.DateTime, nullable=True)
-    is_admin = db.Column(db.Boolean, default=False)  # Added is_admin field
 
     def set_password(self, password):
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
-
-# === Admin-Only Decorator ===
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.is_admin:
-            flash('Access denied: Admins only', 'danger')
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 # === Routes ===
 @app.route('/init_db', methods=['GET'])
@@ -184,6 +148,7 @@ def ping_db():
         logger.error(f"❌ Database ping failed: {e}")
         return "Database ping failed", 500
 
+# New: Scheduler status route for debugging
 @app.route('/scheduler_status')
 def scheduler_status():
     global scheduler
@@ -255,7 +220,7 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if avg_conceded >= 1.5 and high_goal_count >= 8:
         base_score += 10
         triggered_rules.append("Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)")
-    if high_goal_count <= 9 and zero_count <= 6:
+    if high_goal_count <= 9 and zero_count <= 6:  # Aligned with prediction1
         base_score -= 25
         triggered_rules.append("Rule 2: -25 to base_score (high goal/conceded count <= 9 and zero count <= 6)")
     if high_goal_count >= 8 and zero_count >= 7:
@@ -328,6 +293,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
+                    # Check for early red cards (0-70 minutes)
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -400,6 +366,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
+                    # Check for early red cards (0-70 minutes)
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -556,6 +523,7 @@ def make_prediction(data_dict, match_info):
         logger.error(f"❌ Base scaler error for {match_info}: {e}")
         return {"error": f"Base scaler error: {e}"}
 
+    # Poisson Model (aligned with prediction1)
     league_avg_goals = (data_dict['TotalHomeGoals'] + data_dict['TotalHomeConceded'] +
                         data_dict['TotalAwayGoals'] + data_dict['TotalAwayConceded']) / 10
     if league_avg_goals == 0:
@@ -837,7 +805,7 @@ def load_predictions():
         return []
 
 # === Schedule Predictions ===
-scheduler = None
+scheduler = None  # Global for status route
 def schedule_predictions():
     if RUN_MODE != 'worker':
         logger.info("Skipping scheduler initialization in web mode")
@@ -861,7 +829,7 @@ def schedule_predictions():
         minute=15,
         id='daily_prediction_job',
         replace_existing=True,
-        misfire_grace_time=3600,
+        misfire_grace_time=3600,  # 1 hour grace period
         timezone=wat_tz
     )
     scheduler.add_listener(
@@ -907,77 +875,14 @@ def vip():
             flash('Your VIP subscription has expired. Please renew.', 'warning')
             return redirect(url_for('pay'))
         predictions = load_predictions()
-        codes = load_codes()
         vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-        
-        # Calculate days left for VIP and session
-        vip_days_left = None
-        if current_user.vip_expiry:
-            vip_days_left = (current_user.vip_expiry - datetime.utcnow()).days
-        session_days_left = None  # Implement session expiry logic if needed
-        
-        return render_template(
-            'vip.html',
-            predictions=vip_preds,
-            vip_days_left=vip_days_left,
-            session_days_left=session_days_left,
-            rollover_code=codes['rollover_code'],
-            million_naira_code=codes['million_naira_code'],
-            user=current_user
-        )
+        return render_template('vip.html', predictions=vip_preds, user=current_user)
     except OperationalError as e:
         logger.error(f"❌ Database error in vip route: {e}")
         flash('Database connection issue. Please try again.', 'danger')
         return redirect(url_for('home'))
     except Exception as e:
         logger.error(f"❌ Unexpected error in vip route: {e}")
-        flash('Server error. Please try again.', 'danger')
-        return redirect(url_for('home'))
-
-@app.route('/update_codes', methods=['POST'])
-@login_required
-@admin_required
-def update_codes():
-    try:
-        codes = load_codes()
-        codes['rollover_code'] = request.form.get('rollover_code', '').strip()
-        codes['million_naira_code'] = request.form.get('million_naira_code', '').strip()
-        
-        # Validate inputs
-        if not codes['rollover_code'] or not codes['million_naira_code']:
-            flash('Both codes are required', 'danger')
-            return redirect(url_for('vip'))
-        
-        save_codes(codes)
-        flash('Betting codes updated successfully', 'success')
-        return redirect(url_for('vip'))
-    except Exception as e:
-        logger.error(f"❌ Error updating betting codes: {e}")
-        flash('Error updating codes. Please try again.', 'danger')
-        return redirect(url_for('vip'))
-
-@app.route('/admin/users', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def admin_users():
-    try:
-        if request.method == 'POST':
-            user_id = request.form.get('user_id')
-            new_status = request.form.get('is_admin') == 'true'
-            user = User.query.get(user_id)
-            if user:
-                user.is_admin = new_status
-                db.session.commit()
-                flash('Admin status updated', 'success')
-        
-        users = User.query.all()
-        return render_template('admin_users.html', users=users)
-    except OperationalError as e:
-        logger.error(f"❌ Database error in admin_users: {e}")
-        flash('Database connection issue. Please try again.', 'danger')
-        return redirect(url_for('home'))
-    except Exception as e:
-        logger.error(f"❌ Unexpected error in admin_users: {e}")
         flash('Server error. Please try again.', 'danger')
         return redirect(url_for('home'))
 
@@ -1111,12 +1016,11 @@ if __name__ == '__main__':
         scheduler = schedule_predictions()
         try:
             while True:
-                time.sleep(60)
+                time.sleep(60)  # Keep worker alive
         except KeyboardInterrupt:
             if scheduler:
                 scheduler.shutdown()
                 logger.info("Worker shutdown")
     else:
         logger.info("Starting in web mode")
-        port = int(os.environ.get('PORT', 10000))  # Render uses PORT env var
-        app.run(host='0.0.0.0', port=port, debug=False)
+        app.run(debug=False)
