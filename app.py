@@ -29,37 +29,6 @@ from sqlalchemy.exc import OperationalError
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from dotenv import load_dotenv
 
-from sqlalchemy.sql import text  # Ensure this is imported at the top
-
-@app.route('/update_db', methods=['GET'])
-@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def update_db():
-    try:
-        with app.app_context():
-            # Create tables if needed
-            db.create_all()
-            # Check and add is_admin column if missing
-            with db.engine.connect() as conn:
-                result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'user' AND column_name = 'is_admin'"))
-                if not result.fetchone():
-                    logger.info("Adding is_admin column to user table")
-                    conn.execute(text("ALTER TABLE \"user\" ADD COLUMN is_admin BOOLEAN DEFAULT FALSE"))
-                    conn.commit()  # Commit the schema change
-                    logger.info("✅ is_admin column added")
-                else:
-                    logger.info("is_admin column already exists")
-            # Create or update admin user
-            success = create_admin_user()
-            if success:
-                logger.info("✅ Database schema updated and admin user created/updated")
-                return "Database schema updated and admin user created!"
-            else:
-                logger.error("❌ Admin user creation failed, but schema updated")
-                return "Database schema updated, but admin user creation failed", 500
-    except Exception as e:
-        logger.error(f"❌ Error updating database schema: {e}")
-        return f"Error: {str(e)}", 500
-
 # Load environment variables
 load_dotenv()
 
