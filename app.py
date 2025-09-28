@@ -355,7 +355,6 @@ def is_team_match(api_team_name, expected_team_name, threshold=75):
     logger.debug(f"is_team_match: Comparing '{api_team_name}' vs '{expected_team_name}', Score: {score}, Threshold: {threshold}")
     return score >= threshold
 
-# === Fetch Match Data ===
 def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_id, match_date, home_team_name, away_team_name):
     global api_call_count
     match_info = f"{home_team_name} vs {away_team_name} ({match_date})"
@@ -406,6 +405,14 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
+                    # Fetch goal events (assuming API provides goal event data)
+                    event_url = f"{API_BASE_URL}?met=Events&match_id={match.get('event_key')}&APIkey={API_KEY}"
+                    event_response = fetch_with_retry(event_url)
+                    event_data = event_response.json()
+                    goal_events = [
+                        {'time': event.get('time', '0'), 'team': event.get('team')}
+                        for event in event_data.get('result', []) if event.get('type') == 'goal'
+                    ]
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -413,8 +420,16 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                             if minute <= 70:
                                 logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
                                 return None
+                            # Check for two or more goals within 15 minutes after the red card
+                            goals_after_red = [
+                                g for g in goal_events
+                                if g['time'] and (minute <= int(g['time'].split('+')[0]) <= minute + 15)
+                            ]
+                            if len(goals_after_red) >= 2:
+                                logger.error(f"❌ Skipping {match_info}: {len(goals_after_red)} goals within 15 minutes after red card at {minute} minutes in match {match.get('event_date')}")
+                                return None
                         except (ValueError, TypeError):
-                            logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
+                            logger.warning(f"⚠️ Invalid red card or goal time in match {match.get('event_date')}: {time_str}")
                             return None
                     home_filtered.append({'match': match, 'red_cards': match_red_cards})
                     if len(home_filtered) == 5:
@@ -478,6 +493,14 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
+                    # Fetch goal events for away team match
+                    event_url = f"{API_BASE_URL}?met=Events&match_id={match.get('event_key')}&APIkey={API_KEY}"
+                    event_response = fetch_with_retry(event_url)
+                    event_data = event_response.json()
+                    goal_events = [
+                        {'time': event.get('time', '0'), 'team': event.get('team')}
+                        for event in event_data.get('result', []) if event.get('type') == 'goal'
+                    ]
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -485,8 +508,16 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                             if minute <= 70:
                                 logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
                                 return None
+                            # Check for two or more goals within 15 minutes after the red card
+                            goals_after_red = [
+                                g for g in goal_events
+                                if g['time'] and (minute <= int(g['time'].split('+')[0]) <= minute + 15)
+                            ]
+                            if len(goals_after_red) >= 2:
+                                logger.error(f"❌ Skipping {match_info}: {len(goals_after_red)} goals within 15 minutes after red card at {minute} minutes in match {match.get('event_date')}")
+                                return None
                         except (ValueError, TypeError):
-                            logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
+                            logger.warning(f"⚠️ Invalid red card or goal time in match {match.get('event_date')}: {time_str}")
                             return None
                     away_filtered.append({'match': match, 'red_cards': match_red_cards})
                     if len(away_filtered) == 5:
