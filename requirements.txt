@@ -20,8 +20,7 @@ apscheduler
 pytz
 psycopg2-binary
 tenacity
-sqlalchemy
-functools
+
 
 
 
