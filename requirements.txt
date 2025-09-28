@@ -22,7 +22,7 @@ psycopg2-binary
 tenacity
 sqlalchemy
 functools
-urllib.parse
+
 
 
 
