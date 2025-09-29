@@ -274,30 +274,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         logger.warning(f"⚠️ Missing required columns in row: {missing_cols}")
         return 0.0, 100.0, []
 
-    # Calculate match outcomes
-    home_outcomes = []
-    for h_goals, h_conceded in zip(HomeGoalList, HomeConcededList):
-        if h_goals > h_conceded:
-            home_outcomes.append('w')
-        elif h_goals == h_conceded:
-            home_outcomes.append('d')
-        else:
-            home_outcomes.append('l')
-
-    away_outcomes = []
-    for a_goals, a_conceded in zip(AwayGoalList, AwayConcededList):
-        if a_goals > a_conceded:
-            away_outcomes.append('w')
-        elif a_goals == a_conceded:
-            away_outcomes.append('d')
-        else:
-            away_outcomes.append('l')
-
-    # Count wins and draws
-    total_wins = home_outcomes.count('w') + away_outcomes.count('w')
-    total_draws = home_outcomes.count('d') + away_outcomes.count('d')
-    wins_plus_draws = total_wins + total_draws
-
     base_score = poisson_prob * 100
     triggered_rules = ["Poisson: Base score set to Poisson model probability"]
 
@@ -330,11 +306,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if one_count >= 9:
         base_score *= 0.9
         triggered_rules.append("Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)")
-
-    # Updated Rule: Decrease base_score by 20 if wins + draws >= 7 and avg conceded <= 1.5
-    if wins_plus_draws >= 7 and avg_conceded <= 1.5:
-        base_score -= 15
-        triggered_rules.append(f"Updated Rule: -15 to base_score (wins + draws = {wins_plus_draws} >= 7 and avg conceded = {avg_conceded:.2f} <= 1.5)")
 
     base_score = max(0, min(base_score, 100))
     over_conf = max(0, min(base_score, 90))
