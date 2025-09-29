@@ -50,13 +50,6 @@ API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
 
-# === League Exclusion Rules ===
-EXCLUDED_KEYWORDS = [
-    'cup', 'copa', 'conference league', 'trophy', 'supercup', 'super cup', 'women', 'ladies',
-    'female', 'fa cup', 'league cup', 'playoff', 'play-off', 'knockout',
-    'u21', 'u19', 'u18', 'u17', 'youth', 'reserve', 'esiliiga', 'ekstraliga women'
-]
-
 # === Load Models and Scalers ===
 logger.info("Loading models...")
 start_time = time.time()
@@ -281,6 +274,30 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         logger.warning(f"⚠️ Missing required columns in row: {missing_cols}")
         return 0.0, 100.0, []
 
+    # Calculate match outcomes
+    home_outcomes = []
+    for h_goals, h_conceded in zip(HomeGoalList, HomeConcededList):
+        if h_goals > h_conceded:
+            home_outcomes.append('w')
+        elif h_goals == h_conceded:
+            home_outcomes.append('d')
+        else:
+            home_outcomes.append('l')
+
+    away_outcomes = []
+    for a_goals, a_conceded in zip(AwayGoalList, AwayConcededList):
+        if a_goals > a_conceded:
+            away_outcomes.append('w')
+        elif a_goals == a_conceded:
+            away_outcomes.append('d')
+        else:
+            away_outcomes.append('l')
+
+    # Count wins and draws
+    total_wins = home_outcomes.count('w') + away_outcomes.count('w')
+    total_draws = home_outcomes.count('d') + away_outcomes.count('d')
+    wins_plus_draws = total_wins + total_draws
+
     base_score = poisson_prob * 100
     triggered_rules = ["Poisson: Base score set to Poisson model probability"]
 
@@ -313,6 +330,11 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if one_count >= 9:
         base_score *= 0.9
         triggered_rules.append("Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)")
+
+    # Updated Rule: Decrease base_score by 20 if wins + draws >= 7 and avg conceded <= 1.5
+    if wins_plus_draws >= 7 and avg_conceded <= 1.5:
+        base_score -= 15
+        triggered_rules.append(f"Updated Rule: -15 to base_score (wins + draws = {wins_plus_draws} >= 7 and avg conceded = {avg_conceded:.2f} <= 1.5)")
 
     base_score = max(0, min(base_score, 100))
     over_conf = max(0, min(base_score, 90))
@@ -698,18 +720,6 @@ def make_prediction(data_dict, match_info):
         'TriggeredRules': triggered_rules
     }
 
-# === Filter Leagues ===
-def filter_leagues(leagues):
-    filtered = []
-    for league in leagues:
-        league_name = league['league_name'].lower()
-        if any(keyword.lower() in league_name for keyword in EXCLUDED_KEYWORDS):
-            logger.debug(f"Excluding league: {league['league_name']} (ID: {league['league_key']})")
-            continue
-        filtered.append(league)
-    logger.info(f"Filtered {len(leagues)} leagues to {len(filtered)} after excluding cups, women's, and youth leagues")
-    return filtered
-
 # === Fetch All Leagues ===
 def fetch_all_leagues():
     global api_call_count
@@ -728,12 +738,12 @@ def fetch_all_leagues():
         if data.get("success") != 1:
             logger.error(f"❌ API error fetching leagues: {data}")
             return []
-        leagues = filter_leagues(data["result"])
+        leagues = data["result"]
         with open(cache_file, 'w', encoding='utf-8') as f:
             json.dump(leagues, f)
-        logger.info(f"✅ Retrieved and cached {len(leagues)} eligible leagues")
+        logger.info(f"✅ Retrieved and cached {len(leagues)} leagues")
         with open('leagues.txt', 'w', encoding='utf-8') as f:
-            f.write("Filtered League List (Excluding Cups, Women's, and Youth Leagues):\n")
+            f.write("League List:\n")
             for league in leagues:
                 f.write(f"ID: {league['league_key']}, Name: {league['league_name']}, Country: {league.get('country_name', 'Unknown')}\n")
         return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
@@ -781,14 +791,14 @@ def main(date_from=None):
 
     leagues = fetch_all_leagues()
     if not leagues:
-        logger.error("❌ Aborting: No eligible leagues retrieved.")
+        logger.error("❌ Aborting: No leagues retrieved.")
         return
 
     leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues
                if league_id in target_league_ids]
 
     if not leagues:
-        logger.error("❌ Aborting: No matching leagues found for provided IDs after filtering.")
+        logger.error("❌ Aborting: No matching leagues found for provided IDs.")
         return
 
     all_matches = []
