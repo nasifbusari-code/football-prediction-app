@@ -281,30 +281,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         logger.warning(f"⚠️ Missing required columns in row: {missing_cols}")
         return 0.0, 100.0, []
 
-    # Calculate match outcomes
-    home_outcomes = []
-    for h_goals, h_conceded in zip(HomeGoalList, HomeConcededList):
-        if h_goals > h_conceded:
-            home_outcomes.append('w')
-        elif h_goals == h_conceded:
-            home_outcomes.append('d')
-        else:
-            home_outcomes.append('l')
-
-    away_outcomes = []
-    for a_goals, a_conceded in zip(AwayGoalList, AwayConcededList):
-        if a_goals > a_conceded:
-            away_outcomes.append('w')
-        elif a_goals == a_conceded:
-            away_outcomes.append('d')
-        else:
-            away_outcomes.append('l')
-
-    # Count wins and draws
-    total_wins = home_outcomes.count('w') + away_outcomes.count('w')
-    total_draws = home_outcomes.count('d') + away_outcomes.count('d')
-    wins_plus_draws = total_wins + total_draws
-
     base_score = poisson_prob * 100
     triggered_rules = ["Poisson: Base score set to Poisson model probability"]
 
@@ -338,11 +314,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         base_score *= 0.9
         triggered_rules.append("Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)")
 
-    # New Rule: Decrease base_score by 15% if wins + draws >= 7 and avg conceded <= 1.5
-    if wins_plus_draws >= 7 and avg_conceded <= 1.5:
-        base_score *= 0.85
-        triggered_rules.append(f"New Rule: -15% to base_score (wins + draws = {wins_plus_draws} >= 7 and avg conceded = {avg_conceded:.2f} <= 1.5)")
-
     base_score = max(0, min(base_score, 100))
     over_conf = max(0, min(base_score, 90))
     under_conf = max(0, min(100 - base_score, 90))
@@ -355,6 +326,7 @@ def is_team_match(api_team_name, expected_team_name, threshold=75):
     logger.debug(f"is_team_match: Comparing '{api_team_name}' vs '{expected_team_name}', Score: {score}, Threshold: {threshold}")
     return score >= threshold
 
+# === Fetch Match Data ===
 def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_id, match_date, home_team_name, away_team_name):
     global api_call_count
     match_info = f"{home_team_name} vs {away_team_name} ({match_date})"
@@ -405,14 +377,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
-                    # Fetch goal events (assuming API provides goal event data)
-                    event_url = f"{API_BASE_URL}?met=Events&match_id={match.get('event_key')}&APIkey={API_KEY}"
-                    event_response = fetch_with_retry(event_url)
-                    event_data = event_response.json()
-                    goal_events = [
-                        {'time': event.get('time', '0'), 'team': event.get('team')}
-                        for event in event_data.get('result', []) if event.get('type') == 'goal'
-                    ]
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -420,16 +384,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                             if minute <= 70:
                                 logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
                                 return None
-                            # Check for two or more goals within 15 minutes after the red card
-                            goals_after_red = [
-                                g for g in goal_events
-                                if g['time'] and (minute <= int(g['time'].split('+')[0]) <= minute + 15)
-                            ]
-                            if len(goals_after_red) >= 2:
-                                logger.error(f"❌ Skipping {match_info}: {len(goals_after_red)} goals within 15 minutes after red card at {minute} minutes in match {match.get('event_date')}")
-                                return None
                         except (ValueError, TypeError):
-                            logger.warning(f"⚠️ Invalid red card or goal time in match {match.get('event_date')}: {time_str}")
+                            logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
                             return None
                     home_filtered.append({'match': match, 'red_cards': match_red_cards})
                     if len(home_filtered) == 5:
@@ -493,14 +449,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         {'time': card.get('time', '0'), 'card': card.get('card')}
                         for card in cards if card.get('card') == 'red card'
                     ]
-                    # Fetch goal events for away team match
-                    event_url = f"{API_BASE_URL}?met=Events&match_id={match.get('event_key')}&APIkey={API_KEY}"
-                    event_response = fetch_with_retry(event_url)
-                    event_data = event_response.json()
-                    goal_events = [
-                        {'time': event.get('time', '0'), 'team': event.get('team')}
-                        for event in event_data.get('result', []) if event.get('type') == 'goal'
-                    ]
                     for card in match_red_cards:
                         try:
                             time_str = card.get('time', '0')
@@ -508,16 +456,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                             if minute <= 70:
                                 logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
                                 return None
-                            # Check for two or more goals within 15 minutes after the red card
-                            goals_after_red = [
-                                g for g in goal_events
-                                if g['time'] and (minute <= int(g['time'].split('+')[0]) <= minute + 15)
-                            ]
-                            if len(goals_after_red) >= 2:
-                                logger.error(f"❌ Skipping {match_info}: {len(goals_after_red)} goals within 15 minutes after red card at {minute} minutes in match {match.get('event_date')}")
-                                return None
                         except (ValueError, TypeError):
-                            logger.warning(f"⚠️ Invalid red card or goal time in match {match.get('event_date')}: {time_str}")
+                            logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
                             return None
                     away_filtered.append({'match': match, 'red_cards': match_red_cards})
                     if len(away_filtered) == 5:
@@ -835,7 +775,8 @@ def main(date_from=None):
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
     target_league_ids = [
-        156, 155, 250, 244
+        156, 155, 250, 244, 245, 251, 223, 329, 330, 7097, 171, 175, 152, 302, 207, 168,
+        308, 118, 253, 593, 614, 352, 353, 362, 307, 329, 209, 212, 363, 322, 157
     ]
 
     leagues = fetch_all_leagues()
