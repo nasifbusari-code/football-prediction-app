@@ -784,20 +784,32 @@ def main(date_from=None):
     season_id = SEASON_ID
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
+    target_league_ids = [
+        156, 155, 250, 244, 245, 251, 223, 329, 330, 7097, 171, 175, 152, 302, 207, 168,
+        308, 118, 253, 593, 614, 352, 353, 362, 307, 329, 209, 212, 363, 322, 157
+    ]
+
     leagues = fetch_all_leagues()
     if not leagues:
         logger.error("❌ Aborting: No leagues retrieved.")
         return
 
+    leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues
+               if league_id in target_league_ids]
+
+    if not leagues:
+        logger.error("❌ Aborting: No matching leagues found for provided IDs.")
+        return
+
     all_matches = []
-    logger.info(f"\nFetching matches for {date_from} for {len(leagues)} leagues...")
+    logger.info(f"\nFetching matches for {date_from} for {len(leagues)} selected leagues...")
     for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
         matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)
         all_matches.extend(matches)
         time.sleep(0.5)
 
     if not all_matches:
-        logger.error(f"❌ No matches found for leagues on {date_from}.")
+        logger.error(f"❌ No matches found for selected leagues on {date_from}.")
         return
 
     logger.info(f"\nFound {len(all_matches)} matches for {date_from}:")
