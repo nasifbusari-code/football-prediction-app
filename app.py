@@ -28,7 +28,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql import text
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from dotenv import load_dotenv
-from flask_migrate import Migrate
+from flask_migrate import Migrate  # Already included, kept for clarity
 
 # Load environment variables
 load_dotenv()
@@ -96,7 +96,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
 }
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db)  # Initialize Flask-Migrate
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -206,10 +206,48 @@ def init_db():
         logger.error(f"❌ Error initializing database: {e}")
         return f"Error: {str(e)}", 500
 
-@app.route('/debug_predictions')
+@app.route('/migrate_db', methods=['GET'])
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+def migrate_db():
+    try:
+        from flask_migrate import upgrade
+        with app.app_context():
+            upgrade()
+        logger.info("✅ Database migration applied successfully")
+        return "Database migration applied successfully!"
+    except Exception as e:
+        logger.error(f"❌ Migration failed: {str(e)}")
+        return f"Migration failed: {str(e)}", 500
+
+@app.route('/run_predictions', methods=['GET'])
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+def run_predictions_route():
+    try:
+        wat_tz = pytz.timezone('Africa/Lagos')
+        main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
+        logger.info("✅ Predictions generated successfully")
+        return "Predictions generated!"
+    except Exception as e:
+        logger.error(f"❌ Failed to generate predictions: {str(e)}")
+        return f"Failed: {str(e)}", 500
+
+@app.route('/verify_predictions', methods=['GET'])
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+def verify_predictions_route():
+    try:
+        verify_past_predictions()
+        logger.info("✅ Predictions verified successfully")
+        return "Predictions verified!"
+    except Exception as e:
+        logger.error(f"❌ Verification failed: {str(e)}")
+        return f"Verification failed: {str(e)}", 500
+
+@app.route('/debug_predictions', methods=['GET'])
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def debug_predictions():
     try:
         predictions = Prediction.query.filter(Prediction.is_correct.isnot(None)).limit(5).all()
+        logger.info("✅ Fetched up to 5 verified predictions for debugging")
         return jsonify([{
             'match': p.match,
             'prediction_date': p.prediction_date.isoformat(),
@@ -217,7 +255,39 @@ def debug_predictions():
             'actual_result': p.actual_result
         } for p in predictions])
     except Exception as e:
+        logger.error(f"❌ Error fetching debug predictions: {str(e)}")
         return f"Error: {str(e)}", 500
+
+@app.route('/add_test_prediction', methods=['GET'])
+@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+def add_test_prediction():
+    try:
+        test_pred = Prediction(
+            match="Test Match",
+            recommendation="Over 1.5",
+            meta_over_prob=0.75,
+            meta_under_prob=0.25,
+            over_confidence=0.8,
+            under_confidence=0.2,
+            reason="Test prediction",
+            triggered_rules="[]",
+            prediction_date=date.today(),
+            match_id="123",
+            league_id="456",
+            home_team="Team A",
+            away_team="Team B",
+            match_date=date.today(),
+            is_correct=True,
+            actual_result="3-1",
+            verified_date=date.today()
+        )
+        db.session.add(test_pred)
+        db.session.commit()
+        logger.info("✅ Test prediction added successfully")
+        return "Test prediction added!"
+    except Exception as e:
+        logger.error(f"❌ Failed to add test prediction: {str(e)}")
+        return f"Failed: {str(e)}", 500
 
 @app.route('/update_db', methods=['GET'])
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
@@ -1329,4 +1399,18 @@ def paystack_callback():
 @app.cli.command("run-predictions")
 def run_predictions():
     wat_tz = pytz.timezone('Africa/Lagos')
-   
+    try:
+        main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
+        logger.info("✅ CLI run-predictions completed")
+    except Exception as e:
+        logger.error(f"❌ CLI run-predictions failed: {e}")
+
+# === Initialize Scheduler ===
+if __name__ == '__main__':
+    scheduler = schedule_predictions()
+    try:
+        app.run(debug=True)
+    except Exception as e:
+        logger.error(f"❌ Error starting Flask app: {e}")
+        if scheduler:
+            scheduler.shutdown()
