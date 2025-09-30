@@ -700,15 +700,27 @@ def make_prediction(data_dict, match_info):
     meta_over_prob = meta_probs[1] * 100
     meta_under_prob = meta_probs[0] * 100
 
+    # Check confidence gap
+    confidence_gap = over_conf - under_conf
+    min_confidence_gap = 15.0  # Minimum gap of 15% required
+
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
         recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
     elif meta_over_prob >= 75:
-        recommendation = "Over 1.5"
-        reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) exceeds 75% threshold."
+        if confidence_gap >= min_confidence_gap:
+            recommendation = "Over 1.5"
+            reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) exceeds 75% threshold and Over confidence ({over_conf:.1f}%) is at least 15% higher than Under confidence ({under_conf:.1f}%)."
+        else:
+            recommendation = "NO BET"
+            reason = f"Match rejected: Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) exceeds 75%, but confidence gap ({confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
     elif meta_under_prob >= 75:
-        recommendation = "Under 3.5"
-        reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold."
+        if -confidence_gap >= min_confidence_gap:  # Under_conf must be at least 15% higher than over_conf
+            recommendation = "Under 3.5"
+            reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold and Under confidence ({under_conf:.1f}%) is at least 15% higher than Over confidence ({over_conf:.1f}%)."
+        else:
+            recommendation = "NO BET"
+            reason = f"Match rejected: Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75%, but confidence gap ({-confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
     else:
         reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold. No bet recommended."
 
