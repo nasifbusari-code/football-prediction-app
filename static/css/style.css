@@ -1,0 +1,86 @@
+/* Basic Site Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+}
+
+.hero {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+    border-radius: 25px;
+    padding: 10px 20px;
+    font-weight: bold;
+}
+
+.badge {
+    font-size: 0.9em;
+}
+
+/* Marquee Styles for Past VIP Predictions (Flashy Scrolling Effect) */
+.past-predictions {
+    background: #212529;
+    color: white;
+}
+
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+    background: #333;
+    padding: 15px 0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.marquee {
+    display: inline-block;
+    animation: marquee 25s linear infinite; /* Adjust speed with '25s' */
+}
+
+.marquee-item {
+    display: inline-block;
+    font-size: 1.1rem;
+    padding: 0 30px;
+    border-right: 2px solid #555;
+    text-align: center;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* Pause animation on hover for better UX */
+.marquee-container:hover .marquee {
+    animation-play-state: paused;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .marquee-item {
+        font-size: 1rem;
+        padding: 0 15px;
+    }
+}
+
+/* Additional flashy elements */
+.animate__bounceIn {
+    animation-duration: 1s;
+}
+
+.cta {
+    background-color: #e9ecef;
+}
