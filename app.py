@@ -28,7 +28,6 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql import text
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from dotenv import load_dotenv
-from flask_migrate import Migrate  # Already included, kept for clarity
 
 # Load environment variables
 load_dotenv()
@@ -96,7 +95,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
 }
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)  # Initialize Flask-Migrate
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -107,7 +105,7 @@ login_manager.login_view = 'login'
 PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5')
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 
-# === Database Models ===
+# === Database Model ===
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -132,29 +130,6 @@ class User(UserMixin, db.Model):
         except Exception as e:
             logger.error(f"❌ Error checking password for {self.username}: {e}")
             return False
-
-class Prediction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    match = db.Column(db.String(200), nullable=False)
-    recommendation = db.Column(db.String(50), nullable=False)  # e.g., "Over 1.5", "Under 3.5"
-    meta_over_prob = db.Column(db.Float, nullable=False)
-    meta_under_prob = db.Column(db.Float, nullable=False)
-    over_confidence = db.Column(db.Float, nullable=False)
-    under_confidence = db.Column(db.Float, nullable=False)
-    reason = db.Column(db.Text, nullable=True)
-    triggered_rules = db.Column(db.Text, nullable=True)  # Store as JSON string
-    prediction_date = db.Column(db.Date, nullable=False)  # Date of prediction
-    match_id = db.Column(db.String(50), nullable=False)  # Store match_id for API lookup
-    league_id = db.Column(db.String(50), nullable=False)  # Store league_id for API lookup
-    home_team = db.Column(db.String(100), nullable=False)
-    away_team = db.Column(db.String(100), nullable=False)
-    match_date = db.Column(db.Date, nullable=False)  # Date of the match
-    is_correct = db.Column(db.Boolean, nullable=True)  # Null until verified
-    actual_result = db.Column(db.String(50), nullable=True)  # e.g., "2-1"
-    verified_date = db.Column(db.Date, nullable=True)  # Date when result was verified
-
-    def __repr__(self):
-        return f"<Prediction {self.match} - {self.recommendation} - {self.prediction_date}>"
 
 # === Admin User Creation ===
 def create_admin_user():
@@ -199,95 +174,11 @@ def init_db():
     try:
         with app.app_context():
             db.create_all()
-            create_admin_user()
-        logger.info("✅ Database tables created, including Prediction table")
+        logger.info("✅ Database tables created")
         return "Database tables created!"
     except Exception as e:
         logger.error(f"❌ Error initializing database: {e}")
         return f"Error: {str(e)}", 500
-
-@app.route('/migrate_db', methods=['GET'])
-@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def migrate_db():
-    try:
-        from flask_migrate import upgrade
-        with app.app_context():
-            upgrade()
-        logger.info("✅ Database migration applied successfully")
-        return "Database migration applied successfully!"
-    except Exception as e:
-        logger.error(f"❌ Migration failed: {str(e)}")
-        return f"Migration failed: {str(e)}", 500
-
-@app.route('/run_predictions', methods=['GET'])
-@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def run_predictions_route():
-    try:
-        wat_tz = pytz.timezone('Africa/Lagos')
-        main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
-        logger.info("✅ Predictions generated successfully")
-        return "Predictions generated!"
-    except Exception as e:
-        logger.error(f"❌ Failed to generate predictions: {str(e)}")
-        return f"Failed: {str(e)}", 500
-
-@app.route('/verify_predictions', methods=['GET'])
-@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def verify_predictions_route():
-    try:
-        verify_past_predictions()
-        logger.info("✅ Predictions verified successfully")
-        return "Predictions verified!"
-    except Exception as e:
-        logger.error(f"❌ Verification failed: {str(e)}")
-        return f"Verification failed: {str(e)}", 500
-
-@app.route('/debug_predictions', methods=['GET'])
-@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def debug_predictions():
-    try:
-        predictions = Prediction.query.filter(Prediction.is_correct.isnot(None)).limit(5).all()
-        logger.info("✅ Fetched up to 5 verified predictions for debugging")
-        return jsonify([{
-            'match': p.match,
-            'prediction_date': p.prediction_date.isoformat(),
-            'is_correct': p.is_correct,
-            'actual_result': p.actual_result
-        } for p in predictions])
-    except Exception as e:
-        logger.error(f"❌ Error fetching debug predictions: {str(e)}")
-        return f"Error: {str(e)}", 500
-
-@app.route('/add_test_prediction', methods=['GET'])
-@retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
-def add_test_prediction():
-    try:
-        test_pred = Prediction(
-            match="Test Match",
-            recommendation="Over 1.5",
-            meta_over_prob=0.75,
-            meta_under_prob=0.25,
-            over_confidence=0.8,
-            under_confidence=0.2,
-            reason="Test prediction",
-            triggered_rules="[]",
-            prediction_date=date.today(),
-            match_id="123",
-            league_id="456",
-            home_team="Team A",
-            away_team="Team B",
-            match_date=date.today(),
-            is_correct=True,
-            actual_result="3-1",
-            verified_date=date.today()
-        )
-        db.session.add(test_pred)
-        db.session.commit()
-        logger.info("✅ Test prediction added successfully")
-        return "Test prediction added!"
-    except Exception as e:
-        logger.error(f"❌ Failed to add test prediction: {str(e)}")
-        return f"Failed: {str(e)}", 500
 
 @app.route('/update_db', methods=['GET'])
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
@@ -824,7 +715,7 @@ def make_prediction(data_dict, match_info):
             recommendation = "NO BET"
             reason = f"Match rejected: Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) exceeds 75%, but confidence gap ({confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
     elif meta_under_prob >= 75:
-        if -confidence_gap >= min_confidence_gap:
+        if -confidence_gap >= min_confidence_gap:  # Under_conf must be at least 15% higher than over_conf
             recommendation = "Under 3.5"
             reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold and Under confidence ({under_conf:.1f}%) is at least 15% higher than Over confidence ({over_conf:.1f}%)."
         else:
@@ -895,53 +786,6 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
     except Exception as e:
         logger.error(f"❌ Error fetching matches for {league_name}: {e}")
         return []
-
-# === Verify Past Predictions ===
-def verify_past_predictions():
-    wat_tz = pytz.timezone('Africa/Lagos')
-    today = datetime.now(wat_tz).date()
-    yesterday = today - timedelta(days=1)
-    logger.info(f"Verifying predictions for {yesterday}")
-
-    predictions = Prediction.query.filter_by(prediction_date=yesterday, is_correct=None).all()
-    if not predictions:
-        logger.info("No unverified predictions found for yesterday")
-        return
-
-    for prediction in predictions:
-        try:
-            url = f"{API_BASE_URL}?met=Fixtures&matchId={prediction.match_id}&APIkey={API_KEY}"
-            response = fetch_with_retry(url)
-            response.encoding = 'utf-8'
-            data = response.json()
-            if data.get("success") != 1 or not data.get("result"):
-                logger.error(f"❌ No result found for match {prediction.match} (ID: {prediction.match_id})")
-                continue
-
-            match = data["result"][0]
-            result = match.get('event_final_result', '')
-            if not result or '-' not in result:
-                logger.error(f"❌ Invalid result format for {prediction.match}: {result}")
-                continue
-
-            home_goals, away_goals = map(int, result.replace(' ', '').split('-')[:2])
-            total_goals = home_goals + away_goals
-            prediction.actual_result = result
-
-            if prediction.recommendation == "Over 1.5":
-                prediction.is_correct = total_goals >= 2
-            elif prediction.recommendation == "Under 3.5":
-                prediction.is_correct = total_goals <= 3
-            else:
-                prediction.is_correct = False
-                logger.warning(f"Unexpected recommendation for {prediction.match}: {prediction.recommendation}")
-
-            prediction.verified_date = today
-            db.session.commit()
-            logger.info(f"✅ Verified {prediction.match}: Predicted {prediction.recommendation}, Actual {result}, Correct: {prediction.is_correct}")
-        except Exception as e:
-            logger.error(f"❌ Error verifying {prediction.match}: {e}")
-            continue
 
 # === Modified Main Function ===
 def main(date_from=None):
@@ -1021,73 +865,18 @@ def main(date_from=None):
         time.sleep(0.5)
 
     logger.info(f"Total API Calls Made: {api_call_count}")
-    predictions_data = []
-    wat_tz = pytz.timezone('Africa/Lagos')
-    current_date = datetime.now(wat_tz).date()
-
-    for result in results:
-        if result['Recommendation'] in ['Over 1.5', 'Under 3.5']:
-            # Parse match info to extract home_team, away_team, and match_date
-            try:
-                match_parts = result['Match'].split(' vs ')
-                home_team = match_parts[0].strip()
-                away_team = match_parts[1].split(' (')[0].strip()
-                match_date_str = result['Match'].split('(')[1].split(',')[0].strip()
-                match_date = datetime.strptime(match_date_str, '%Y-%m-%d').date()
-            except Exception as e:
-                logger.error(f"❌ Error parsing match info for {result['Match']}: {e}")
-                continue
-
-            # Extract match_id and league_id
-            match_id = None
-            league_id = None
-            for match in all_matches:
-                if match.get('event_home_team') in home_team and match.get('event_away_team') in away_team:
-                    match_id = match.get('event_key')
-                    league_id = match.get('league_key')
-                    break
-
-            if not match_id or not league_id:
-                logger.error(f"❌ Skipping {result['Match']}: Missing match_id or league_id")
-                continue
-
-            # Save to database
-            prediction = Prediction(
-                match=result['Match'],
-                recommendation=result['Recommendation'],
-                meta_over_prob=result['MetaOverProb'],
-                meta_under_prob=result['MetaUnderProb'],
-                over_confidence=result['OverConfidence'],
-                under_confidence=result['UnderConfidence'],
-                reason=result['Reason'],
-                triggered_rules=json.dumps(result['TriggeredRules']),
-                prediction_date=current_date,
-                match_id=match_id,
-                league_id=league_id,
-                home_team=home_team,
-                away_team=away_team,
-                match_date=match_date
-            )
-            try:
-                db.session.add(prediction)
-                db.session.commit()
-                logger.info(f"✅ Saved prediction for {result['Match']} to database")
-            except Exception as e:
-                logger.error(f"❌ Error saving prediction for {result['Match']}: {e}")
-                db.session.rollback()
-                continue
-
-        predictions_data.append({
-            'Match': result['Match'],
-            'MetaOverProb': result['MetaOverProb'],
-            'MetaUnderProb': result['MetaUnderProb'],
-            'Recommendation': result['Recommendation'],
-            'OverConfidence': result['OverConfidence'],
-            'UnderConfidence': result['UnderConfidence'],
-            'Reason': result['Reason'],
-            'TriggeredRules': result['TriggeredRules']
-        })
-
+    predictions_data = [
+        {
+            'Match': r['Match'],
+            'MetaOverProb': r['MetaOverProb'],
+            'MetaUnderProb': r['MetaUnderProb'],
+            'Recommendation': r['Recommendation'],
+            'OverConfidence': r['OverConfidence'],
+            'UnderConfidence': r['UnderConfidence'],
+            'Reason': r['Reason'],
+            'TriggeredRules': r['TriggeredRules']
+        } for r in results
+    ]
     with open('predictions.json', 'w', encoding='utf-8') as f:
         json.dump(predictions_data, f)
 
@@ -1139,14 +928,6 @@ def schedule_predictions():
         except Exception as e:
             logger.error(f"Scheduled job failed: {e}")
 
-    def verify_job_wrapper():
-        try:
-            logger.info(f"Starting scheduled verification job at {datetime.now(wat_tz)}")
-            verify_past_predictions()
-            logger.info("Scheduled verification job completed")
-        except Exception as e:
-            logger.error(f"Verification job failed: {e}")
-
     scheduler.add_job(
         job_wrapper,
         'cron',
@@ -1157,21 +938,11 @@ def schedule_predictions():
         misfire_grace_time=3600,
         timezone=wat_tz
     )
-    scheduler.add_job(
-        verify_job_wrapper,
-        'cron',
-        hour=0,
-        minute=30,
-        id='daily_verification_job',
-        replace_existing=True,
-        misfire_grace_time=3600,
-        timezone=wat_tz
-    )
     scheduler.add_listener(
         lambda event: logger.info(f"Job {event.job_id} executed") if not event.exception else logger.error(f"Job {event.job_id} failed: {event.exception}"),
         EVENT_JOB_EXECUTED | EVENT_JOB_ERROR
     )
-    logger.info("Scheduler started for 12:15 AM WAT daily predictions and 12:30 AM WAT verification")
+    logger.info("Scheduler started for 12:15 AM WAT daily predictions")
     scheduler.start()
     return scheduler
 
@@ -1184,6 +955,8 @@ def home():
             logger.info("No predictions.json found, running predictions...")
             main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
         predictions = load_predictions()
+        if not predictions:
+            return render_template('home.html', predictions=[], error="No matches available for today.", user=current_user)
         free_preds = []
         for pred in predictions:
             pick = "Over 1.5" if pred['MetaOverProb'] > pred['MetaUnderProb'] else "Under 3.5"
@@ -1191,32 +964,11 @@ def home():
                 'match': pred['Match'],
                 'pick': pick
             })
-
-        # Fetch past VIP predictions (last 7 days, verified only)
-        wat_tz = pytz.timezone('Africa/Lagos')
-        seven_days_ago = datetime.now(wat_tz).date() - timedelta(days=7)
-        past_predictions = Prediction.query.filter(
-            Prediction.prediction_date >= seven_days_ago,
-            Prediction.is_correct.isnot(None)
-        ).order_by(Prediction.prediction_date.desc()).limit(20).all()
-
-        return render_template(
-            'home.html',
-            predictions=free_preds,
-            past_predictions=past_predictions,
-            error=None,
-            user=current_user
-        )
+        return render_template('home.html', predictions=free_preds, error=None, user=current_user)
     except Exception as e:
         logger.error(f"❌ Error rendering home: {e}")
         flash('Server error. Please try again.', 'danger')
-        return render_template(
-            'home.html',
-            predictions=[],
-            past_predictions=[],
-            error="Server error occurred.",
-            user=current_user
-        )
+        return render_template('home.html', predictions=[], error="Server error occurred.", user=current_user)
 
 @app.route('/vip')
 @login_required
@@ -1399,18 +1151,24 @@ def paystack_callback():
 @app.cli.command("run-predictions")
 def run_predictions():
     wat_tz = pytz.timezone('Africa/Lagos')
-    try:
-        main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
-        logger.info("✅ CLI run-predictions completed")
-    except Exception as e:
-        logger.error(f"❌ CLI run-predictions failed: {e}")
+    logger.info("Running predictions via CLI command")
+    main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
 
-# === Initialize Scheduler ===
+# === Main Entry Point ===
 if __name__ == '__main__':
-    scheduler = schedule_predictions()
-    try:
-        app.run(debug=True)
-    except Exception as e:
-        logger.error(f"❌ Error starting Flask app: {e}")
-        if scheduler:
-            scheduler.shutdown()
+    if os.getenv('RUN_MODE', 'web') == 'worker':
+        logger.info("Starting in worker mode")
+        scheduler = schedule_predictions()
+        try:
+            while True:
+                time.sleep(60)
+        except KeyboardInterrupt:
+            if scheduler:
+                scheduler.shutdown()
+                logger.info("Worker shutdown")
+    else:
+        logger.info("Starting in web mode")
+        with app.app_context():
+            db.create_all()
+            create_admin_user()
+        app.run(debug=False)
