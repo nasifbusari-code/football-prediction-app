@@ -206,6 +206,19 @@ def init_db():
         logger.error(f"❌ Error initializing database: {e}")
         return f"Error: {str(e)}", 500
 
+@app.route('/debug_predictions')
+def debug_predictions():
+    try:
+        predictions = Prediction.query.filter(Prediction.is_correct.isnot(None)).limit(5).all()
+        return jsonify([{
+            'match': p.match,
+            'prediction_date': p.prediction_date.isoformat(),
+            'is_correct': p.is_correct,
+            'actual_result': p.actual_result
+        } for p in predictions])
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+
 @app.route('/update_db', methods=['GET'])
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def update_db():
