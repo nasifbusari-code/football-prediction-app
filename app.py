@@ -331,12 +331,12 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         base_score *= 0.9
         triggered_rules.append("Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)")
     if wins_plus_draws >= 7 and avg_conceded <= 1.5:
-        base_score *= 0.85
+        base_score *= 0.80
         triggered_rules.append(f"New Rule: -15% to base_score (wins + draws = {wins_plus_draws} >= 7 and avg conceded = {avg_conceded:.2f} <= 1.5)")
 
     # New loss rule
     if total_losses >= 6 and avg_conceded_both >= 1.6:
-        base_score *= 1.15
+        base_score *= 1.20
         triggered_rules.append(f"New Loss Rule: +15% to base_score (losses = {total_losses} >= 6 and avg conceded both teams = {avg_conceded_both:.2f} >= 1.6)")
 
     base_score = max(0, min(base_score, 100))
