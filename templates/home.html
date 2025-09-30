@@ -19,36 +19,6 @@
         </div>
     </section>
 
-    <!-- Past VIP Predictions Section -->
-    <section class="past-predictions py-4 bg-dark text-white">
-        <div class="container">
-            <h2 class="text-center mb-4">See Our VIP Success!</h2>
-            {% if past_predictions %}
-                <div class="marquee-container">
-                    <div class="marquee">
-                        {% for pred in past_predictions %}
-                            <span class="marquee-item mx-3 animate__animated animate__bounceIn">
-                                {{ pred.match }} ({{ pred.match_date.strftime('%Y-%m-%d') }}) - 
-                                <strong>{{ pred.recommendation }}</strong>: 
-                                <span class="badge bg-{% if pred.is_correct %}success{% else %}danger{% endif %}">
-                                    {{ 'Correct' if pred.is_correct else 'Incorrect' }}
-                                </span> 
-                                (Result: {{ pred.actual_result }})
-                            </span>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="text-center mt-3">
-                    <a href="{{ url_for('pay') }}" class="btn btn-warning btn-lg">Join VIP to Get These Predictions!</a>
-                </div>
-            {% else %}
-                <div class="alert alert-info text-center">
-                    No past VIP predictions available yet. Check back tomorrow!
-                </div>
-            {% endif %}
-        </div>
-    </section>
-
     <!-- Predictions Section -->
     <section class="predictions py-5">
         <div class="container">
