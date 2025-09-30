@@ -28,6 +28,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql import text
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from dotenv import load_dotenv
+from flask_migrate import Migrate
 
 # Load environment variables
 load_dotenv()
