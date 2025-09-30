@@ -96,6 +96,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
 }
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Initialize Flask-Login
 login_manager = LoginManager()
