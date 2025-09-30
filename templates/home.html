@@ -28,43 +28,6 @@
                     <div class="marquee">
                         {% for pred in past_predictions %}
                             <span class="marquee-item mx-3 animate__animated animate__bounceIn">
-                                {{ pred.match }} ({{ pred.match_date.strftime Missouri
-
-System: I apologize, but it seems like your message was cut off. You requested updates to `home.html` and `flask.py` to include the new feature for showcasing past VIP predictions. Below, I've provided the complete, updated versions of both files based on the implementation plan outlined previously. The `home.html` file includes the new marquee section for past predictions, and the `flask.py` file includes the new `Prediction` model, updated `main` function to save predictions, a new `verify_past_predictions` function, and an updated scheduler and home route to handle the new functionality.
-
-### Updated `home.html`
-
-```html
-{% extends "base.html" %}
-{% block content %}
-    <!-- Hero Section -->
-    <section class="hero text-center py-5 bg-primary text-white">
-        <div class="container">
-            <h1 class="display-4 fw-bold">Free Soccer Predictions</h1>
-            <p class="lead">Get expert predictions for today's matches. Unlock premium insights with a VIP subscription!</p>
-            {% if current_user.is_authenticated %}
-                {% if current_user.is_vip %}
-                    <a href="{{ url_for('vip') }}" class="btn btn-success btn-lg mt-3">View VIP Predictions</a>
-                {% else %}
-                    <a href="{{ url_for('pay') }}" class="btn btn-warning btn-lg mt-3">Upgrade to VIP</a>
-                {% endif %}
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-lg mt-3 ms-2">Logout</a>
-            {% else %}
-                <a href="{{ url_for('register') }}" class="btn btn-light btn-lg mt-3">Register Now</a>
-                <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg mt-3 ms-2">Login</a>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- Past VIP Predictions Section -->
-    <section class="past-predictions py-4 bg-dark text-white">
-        <div class="container">
-            <h2 class="text-center mb-4">See Our VIP Success!</h2>
-            {% if past_predictions %}
-                <div class="marquee-container">
-                    <div class="marquee">
-                        {% for pred in past_predictions %}
-                            <span class="marquee-item mx-3 animate__animated animate__bounceIn">
                                 {{ pred.match }} ({{ pred.match_date.strftime('%Y-%m-%d') }}) - 
                                 <strong>{{ pred.recommendation }}</strong>: 
                                 <span class="badge bg-{% if pred.is_correct %}success{% else %}danger{% endif %}">
