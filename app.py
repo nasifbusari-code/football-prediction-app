@@ -293,9 +293,10 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         else:
             away_outcomes.append('l')
 
-    # Count wins and draws
+    # Count wins, draws, and losses
     total_wins = home_outcomes.count('w') + away_outcomes.count('w')
     total_draws = home_outcomes.count('d') + away_outcomes.count('d')
+    total_losses = home_outcomes.count('l') + away_outcomes.count('l')
     wins_plus_draws = total_wins + total_draws
 
     base_score = poisson_prob * 100
@@ -304,11 +305,13 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     scored_sum = row['avg_home_scored'] + row['avg_away_scored']
     conceded_sum = row['avg_home_conceded'] + row['avg_away_conceded']
     division_result = 1.0 if scored_sum == conceded_sum else max(scored_sum, conceded_sum) / min(scored_sum, conceded_sum) if min(scored_sum, conceded_sum) != 0 else float('inf')
-
     zero_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g == 0)
     avg_conceded = (row['avg_home_conceded'] + row['avg_away_conceded']) / 2
     high_goal_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g >= 2)
+    one_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g == 1)
+    avg_conceded_both = (sum(HomeConcededList) + sum(AwayConcededList)) / 10
 
+    # Existing rules
     if avg_conceded >= 1.8 and high_goal_count >= 10:
         base_score += 20
         triggered_rules.append("Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)")
@@ -324,17 +327,17 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if division_result >= 1.2 and zero_count in [6, 7, 8]:
         base_score += 15
         triggered_rules.append("Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])")
-
-    # Existing Rule: Decrease base_score by 10% if count of 1s in all lists >= 9
-    one_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g == 1)
-    if one_count >= 9:
+    if one_count >= 10:
         base_score *= 0.9
         triggered_rules.append("Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)")
-
-    # New Rule: Decrease base_score by 15% if wins + draws >= 7 and avg conceded <= 1.5
     if wins_plus_draws >= 7 and avg_conceded <= 1.5:
         base_score *= 0.85
         triggered_rules.append(f"New Rule: -15% to base_score (wins + draws = {wins_plus_draws} >= 7 and avg conceded = {avg_conceded:.2f} <= 1.5)")
+
+    # New loss rule
+    if total_losses >= 6 and avg_conceded_both >= 1.6:
+        base_score *= 1.15
+        triggered_rules.append(f"New Loss Rule: +15% to base_score (losses = {total_losses} >= 6 and avg conceded both teams = {avg_conceded_both:.2f} >= 1.6)")
 
     base_score = max(0, min(base_score, 100))
     over_conf = max(0, min(base_score, 90))
