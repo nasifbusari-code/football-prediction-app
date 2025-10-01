@@ -663,7 +663,7 @@ def make_prediction(data_dict, match_info):
 
     try:
         logistic_prob = logistic_model.predict_proba(data_scaled)[0, 1]
-        xgb_prob = xgb_model.predict_proba(data_scaled)[0, 1]  # Updated to XGBProb
+        xgb_prob = xgb_model.predict_proba(data_scaled)[0, 1]
         rf_prob = rf_model.predict_proba(data_scaled)[0, 1]
         nb_prob = nb_model.predict_proba(data_scaled)[0, 1]
         et_prob = et_model.predict_proba(data_scaled)[0, 1]
@@ -672,7 +672,7 @@ def make_prediction(data_dict, match_info):
         return {"error": f"Prediction error: {e}"}
 
     data['LogisticProb'] = logistic_prob
-    data['XGBProb'] = xgb_prob  # Updated to XGBProb
+    data['XGBProb'] = xgb_prob
     data['RFProb'] = rf_prob
     data['NBProb'] = nb_prob
     data['ETProb'] = et_prob
@@ -685,14 +685,14 @@ def make_prediction(data_dict, match_info):
     )
 
     meta_feature_columns = [
-        'RuleOverConfidence', 'RuleUnderConfidence', 'LogisticProb', 'XGBProb',  # Updated to XGBProb
+        'RuleOverConfidence', 'RuleUnderConfidence', 'LogisticProb', 'XGBProb',
         'RFProb', 'NBProb', 'ETProb', 'PoissonProb'
     ]
     meta_data = pd.DataFrame([{
         'RuleOverConfidence': over_conf,
         'RuleUnderConfidence': under_conf,
         'LogisticProb': logistic_prob,
-        'XGBProb': xgb_prob,  # Updated to XGBProb
+        'XGBProb': xgb_prob,
         'RFProb': rf_prob,
         'NBProb': nb_prob,
         'ETProb': et_prob,
@@ -717,29 +717,18 @@ def make_prediction(data_dict, match_info):
     meta_over_prob = meta_probs[1] * 100
     meta_under_prob = meta_probs[0] * 100
 
-    # Check confidence gap
-    confidence_gap = over_conf - under_conf
-    min_confidence_gap = 15.0  # Minimum gap of 15% required
-
+    # Modified recommendation logic: Removed confidence gap check
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
         recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
     elif 70 <= meta_over_prob <= 100:
-        if confidence_gap >= min_confidence_gap:
-            recommendation = "Over 1.5"
-            reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91% threshold and Over confidence ({over_conf:.1f}%) is at least 15% higher than Under confidence ({under_conf:.1f}%)."
-        else:
-            recommendation = "NO BET"
-            reason = f"Match rejected: Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91%, but confidence gap ({confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
+        recommendation = "Over 1.5"
+        reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 100% threshold."
     elif 70 <= meta_under_prob <= 100:
-        if -confidence_gap >= min_confidence_gap:  # Under_conf must be at least 15% higher than over_conf
-            recommendation = "Under 3.5"
-            reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91% threshold and Under confidence ({under_conf:.1f}%) is at least 15% higher than Over confidence ({over_conf:.1f}%)."
-        else:
-            recommendation = "NO BET"
-            reason = f"Match rejected: Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91%, but confidence gap ({-confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
+        recommendation = "Under 3.5"
+        reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 100% threshold."
     else:
-        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91% threshold. No bet recommended."
+        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 100% threshold. No bet recommended."
 
     return {
         'Match': match_info,
