@@ -2,10 +2,9 @@ import pandas as pd
 import numpy as np
 from scipy.stats import poisson
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, ExtraTreesClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
-import xgboost as xgb  # Replaced GradientBoostingClassifier with XGBClassifier
 import requests
 import os
 import time
@@ -51,16 +50,13 @@ API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
 
-# === Check XGBoost Version ===
-logger.info(f"XGBoost version: {xgb.__version__}")
-
 # === Load Models and Scalers ===
 logger.info("Loading models...")
 start_time = time.time()
 try:
     scaler_base = joblib.load("favour_v6_base_scaler.pkl")
     logistic_model = joblib.load("favour_v6_logistic_model.pkl")
-    xgb_model = joblib.load("favour_v6_xgb_model.pkl")  # Updated to load XGBoost model
+    gb_model = joblib.load("favour_v6_gb_model.pkl")
     rf_model = joblib.load("favour_v6_rf_model.pkl")
     nb_model = joblib.load("favour_v6_nb_model.pkl")
     et_model = joblib.load("favour_v6_et_model.pkl")
@@ -574,6 +570,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     }
 
 # === Prediction Logic ===
+
 def make_prediction(data_dict, match_info):
     required_length = 5
     lists = [
