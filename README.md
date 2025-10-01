@@ -1,5 +1,3 @@
-Below is the updated README.md content for your GitHub repository, tailored with your personal information (Name: Busari Nasif Stephen, Email: nasif.busari@yahoo.com, Country: Nigeria) and the web URL for your deployed prediction site (https://football-prediction-app-3j81.onrender.com)
-
 # Football Match Prediction System
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue) ![Flask](https://img.shields.io/badge/Flask-2.0%2B-green) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-blue) ![Paystack](https://img.shields.io/badge/Paystack-API-yellow)
