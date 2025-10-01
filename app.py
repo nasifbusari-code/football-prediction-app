@@ -333,8 +333,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if wins_plus_draws >= 7 and avg_conceded <= 1.5:
         base_score *= 0.80
         triggered_rules.append(f"New Rule: -15% to base_score (wins + draws = {wins_plus_draws} >= 7 and avg conceded = {avg_conceded:.2f} <= 1.5)")
-
-    # New loss rule
     if total_losses >= 6 and avg_conceded_both >= 1.6:
         base_score *= 1.20
         triggered_rules.append(f"New Loss Rule: +15% to base_score (losses = {total_losses} >= 6 and avg conceded both teams = {avg_conceded_both:.2f} >= 1.6)")
@@ -707,22 +705,22 @@ def make_prediction(data_dict, match_info):
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
         recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
-    elif meta_over_prob >= 75:
+    elif 70 <= meta_over_prob <= 91:
         if confidence_gap >= min_confidence_gap:
             recommendation = "Over 1.5"
-            reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) exceeds 75% threshold and Over confidence ({over_conf:.1f}%) is at least 15% higher than Under confidence ({under_conf:.1f}%)."
+            reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91% threshold and Over confidence ({over_conf:.1f}%) is at least 15% higher than Under confidence ({under_conf:.1f}%)."
         else:
             recommendation = "NO BET"
-            reason = f"Match rejected: Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) exceeds 75%, but confidence gap ({confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
-    elif meta_under_prob >= 75:
+            reason = f"Match rejected: Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91%, but confidence gap ({confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
+    elif 70 <= meta_under_prob <= 91:
         if -confidence_gap >= min_confidence_gap:  # Under_conf must be at least 15% higher than over_conf
             recommendation = "Under 3.5"
-            reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold and Under confidence ({under_conf:.1f}%) is at least 15% higher than Over confidence ({over_conf:.1f}%)."
+            reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91% threshold and Under confidence ({under_conf:.1f}%) is at least 15% higher than Over confidence ({over_conf:.1f}%)."
         else:
             recommendation = "NO BET"
-            reason = f"Match rejected: Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75%, but confidence gap ({-confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
+            reason = f"Match rejected: Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91%, but confidence gap ({-confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
     else:
-        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) exceeds 75% threshold. No bet recommended."
+        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91% threshold. No bet recommended."
 
     return {
         'Match': match_info,
