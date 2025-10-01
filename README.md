@@ -1,4 +1,4 @@
-Below is the updated README.md content for your GitHub repository, tailored with your personal information (Name: Busari Nasif Stephen, Email: nasif.busari@yahoo.com, Country: Nigeria) and the web URL for your deployed prediction site (https://football-prediction-app-3j81.onrender.com). The content is ready to be copied and pasted into a README.md file in your repository's root directory. I've refined the previous version to ensure clarity, professionalism, and alignment with your request, while maintaining the detailed workflow to impress potential recruiters. The file highlights your technical skills, includes a live demo link, and provides clear contact information.markdown
+Below is the updated README.md content for your GitHub repository, tailored with your personal information (Name: Busari Nasif Stephen, Email: nasif.busari@yahoo.com, Country: Nigeria) and the web URL for your deployed prediction site (https://football-prediction-app-3j81.onrender.com)
 
 # Football Match Prediction System
 
