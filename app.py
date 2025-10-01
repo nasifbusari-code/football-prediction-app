@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np
 from scipy.stats import poisson
 from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier, ExtraTreesClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
+import xgboost as xgb  # Replaced GradientBoostingClassifier with XGBClassifier
 import requests
 import os
 import time
@@ -50,13 +51,16 @@ API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
 
+# === Check XGBoost Version ===
+logger.info(f"XGBoost version: {xgb.__version__}")
+
 # === Load Models and Scalers ===
 logger.info("Loading models...")
 start_time = time.time()
 try:
     scaler_base = joblib.load("favour_v6_base_scaler.pkl")
     logistic_model = joblib.load("favour_v6_logistic_model.pkl")
-    gb_model = joblib.load("favour_v6_gb_model.pkl")
+    xgb_model = joblib.load("favour_v6_xgb_model.pkl")  # Updated to load XGBoost model
     rf_model = joblib.load("favour_v6_rf_model.pkl")
     nb_model = joblib.load("favour_v6_nb_model.pkl")
     et_model = joblib.load("favour_v6_et_model.pkl")
@@ -659,7 +663,7 @@ def make_prediction(data_dict, match_info):
 
     try:
         logistic_prob = logistic_model.predict_proba(data_scaled)[0, 1]
-        gb_prob = gb_model.predict_proba(data_scaled)[0, 1]
+        xgb_prob = xgb_model.predict_proba(data_scaled)[0, 1]  # Updated to XGBProb
         rf_prob = rf_model.predict_proba(data_scaled)[0, 1]
         nb_prob = nb_model.predict_proba(data_scaled)[0, 1]
         et_prob = et_model.predict_proba(data_scaled)[0, 1]
@@ -668,7 +672,7 @@ def make_prediction(data_dict, match_info):
         return {"error": f"Prediction error: {e}"}
 
     data['LogisticProb'] = logistic_prob
-    data['GBProb'] = gb_prob
+    data['XGBProb'] = xgb_prob  # Updated to XGBProb
     data['RFProb'] = rf_prob
     data['NBProb'] = nb_prob
     data['ETProb'] = et_prob
@@ -681,14 +685,14 @@ def make_prediction(data_dict, match_info):
     )
 
     meta_feature_columns = [
-        'RuleOverConfidence', 'RuleUnderConfidence', 'LogisticProb', 'GBProb',
+        'RuleOverConfidence', 'RuleUnderConfidence', 'LogisticProb', 'XGBProb',  # Updated to XGBProb
         'RFProb', 'NBProb', 'ETProb', 'PoissonProb'
     ]
     meta_data = pd.DataFrame([{
         'RuleOverConfidence': over_conf,
         'RuleUnderConfidence': under_conf,
         'LogisticProb': logistic_prob,
-        'GBProb': gb_prob,
+        'XGBProb': xgb_prob,  # Updated to XGBProb
         'RFProb': rf_prob,
         'NBProb': nb_prob,
         'ETProb': et_prob,
@@ -720,14 +724,14 @@ def make_prediction(data_dict, match_info):
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
         recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
-    elif 70 <= meta_over_prob <= 91:
+    elif 70 <= meta_over_prob <= 100:
         if confidence_gap >= min_confidence_gap:
             recommendation = "Over 1.5"
             reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91% threshold and Over confidence ({over_conf:.1f}%) is at least 15% higher than Under confidence ({under_conf:.1f}%)."
         else:
             recommendation = "NO BET"
             reason = f"Match rejected: Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91%, but confidence gap ({confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
-    elif 70 <= meta_under_prob <= 91:
+    elif 70 <= meta_under_prob <= 100:
         if -confidence_gap >= min_confidence_gap:  # Under_conf must be at least 15% higher than over_conf
             recommendation = "Under 3.5"
             reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91% threshold and Under confidence ({under_conf:.1f}%) is at least 15% higher than Over confidence ({over_conf:.1f}%)."
