@@ -311,6 +311,21 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     one_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g == 1)
     avg_conceded_both = (sum(HomeConcededList) + sum(AwayConcededList)) / 10
 
+    # NEW RULE START: Defensive Outlier Check
+    home_clean_sheets = sum(1 for c in HomeConcededList if c == 0)
+    away_clean_sheets = sum(1 for c in AwayConcededList if c == 0)
+    clean_sheet_rate_home = home_clean_sheets / len(HomeConcededList)
+    clean_sheet_rate_away = away_clean_sheets / len(AwayConcededList)
+    total_goals_per_match = (sum(HomeGoalList) + sum(HomeConcededList) + sum(AwayGoalList) + sum(AwayConcededList)) / 10
+    low_scoring_matches = sum(1 for h, a in zip(HomeGoalList + AwayGoalList, HomeConcededList + AwayConcededList) if h + a <= 2)
+    low_scoring_rate = low_scoring_matches / (len(HomeGoalList) + len(AwayGoalList))
+    if total_goals_per_match >= 3.5 and (clean_sheet_rate_home >= 0.3 or clean_sheet_rate_away >= 0.3) and low_scoring_rate >= 0.2:
+        base_score *= 0.80
+        triggered_rules.append(f"Defensive Outlier Check: -20% to base_score (total goals per match = {total_goals_per_match:.2f} >= 3.5, "
+                              f"clean sheet rate home = {clean_sheet_rate_home:.2f} or away = {clean_sheet_rate_away:.2f} >= 0.3, "
+                              f"low scoring rate = {low_scoring_rate:.2f} >= 0.2)")
+    # NEW RULE END
+
     # Existing rules
     if avg_conceded >= 1.8 and high_goal_count >= 10:
         base_score += 20
@@ -869,9 +884,9 @@ def main(date_from=None):
             'MetaOverProb': r['MetaOverProb'],
             'MetaUnderProb': r['MetaUnderProb'],
             'Recommendation': r['Recommendation'],
+            'Reason': r['Reason'],
             'OverConfidence': r['OverConfidence'],
             'UnderConfidence': r['UnderConfidence'],
-            'Reason': r['Reason'],
             'TriggeredRules': r['TriggeredRules']
         } for r in results
     ]
