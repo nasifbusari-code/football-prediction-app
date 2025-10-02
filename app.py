@@ -45,7 +45,7 @@ logger = logging.getLogger()
 logger.info("Starting Flask application...")
 
 # === API Configuration ===
-API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a')
+API_KEY = os.getenv('SPORTS_API_KEY', '')
 API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
