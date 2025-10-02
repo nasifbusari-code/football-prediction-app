@@ -1,0 +1,24 @@
+{
+  "name": "Over2.5 Lord",
+  "short_name": "Over2.5",
+  "description": "Expert soccer predictions with AI-driven insights and VIP membership for premium analytics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#212529",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "lang": "en-US",
+  "orientation": "portrait"
+}
