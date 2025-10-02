@@ -102,7 +102,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Paystack setup
-PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5')
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 
 # === Database Model ===
@@ -359,7 +359,7 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     return over_conf, under_conf, triggered_rules
 
 # === Fuzzy Matching for Team Names ===
-def is_team_match(api_team_name, expected_team_name, threshold=75):
+def is_team_match(api_team_name, expected_team_name, threshold=65):
     score = fuzz.token_set_ratio(api_team_name.lower(), expected_team_name.lower())
     logger.debug(f"is_team_match: Comparing '{api_team_name}' vs '{expected_team_name}', Score: {score}, Threshold: {threshold}")
     return score >= threshold
