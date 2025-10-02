@@ -45,7 +45,7 @@ logger = logging.getLogger()
 logger.info("Starting Flask application...")
 
 # === API Configuration ===
-API_KEY = os.getenv('SPORTS_API_KEY', '')
+API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a')
 API_BASE_URL = "https://apiv2.allsportsapi.com/football"
 HEADERS = {'Content-Type': 'application/json'}
 SEASON_ID = "2024-2025"
@@ -102,7 +102,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Paystack setup
-PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY')
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_3ab2fd3709c83c56dd600042ed0ea8690271f6c5')
 PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY')
 
 # === Database Model ===
@@ -570,7 +570,6 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     }
 
 # === Prediction Logic ===
-
 def make_prediction(data_dict, match_info):
     required_length = 5
     lists = [
@@ -660,7 +659,7 @@ def make_prediction(data_dict, match_info):
 
     try:
         logistic_prob = logistic_model.predict_proba(data_scaled)[0, 1]
-        xgb_prob = xgb_model.predict_proba(data_scaled)[0, 1]
+        gb_prob = gb_model.predict_proba(data_scaled)[0, 1]
         rf_prob = rf_model.predict_proba(data_scaled)[0, 1]
         nb_prob = nb_model.predict_proba(data_scaled)[0, 1]
         et_prob = et_model.predict_proba(data_scaled)[0, 1]
@@ -669,7 +668,7 @@ def make_prediction(data_dict, match_info):
         return {"error": f"Prediction error: {e}"}
 
     data['LogisticProb'] = logistic_prob
-    data['XGBProb'] = xgb_prob
+    data['GBProb'] = gb_prob
     data['RFProb'] = rf_prob
     data['NBProb'] = nb_prob
     data['ETProb'] = et_prob
@@ -682,14 +681,14 @@ def make_prediction(data_dict, match_info):
     )
 
     meta_feature_columns = [
-        'RuleOverConfidence', 'RuleUnderConfidence', 'LogisticProb', 'XGBProb',
+        'RuleOverConfidence', 'RuleUnderConfidence', 'LogisticProb', 'GBProb',
         'RFProb', 'NBProb', 'ETProb', 'PoissonProb'
     ]
     meta_data = pd.DataFrame([{
         'RuleOverConfidence': over_conf,
         'RuleUnderConfidence': under_conf,
         'LogisticProb': logistic_prob,
-        'XGBProb': xgb_prob,
+        'GBProb': gb_prob,
         'RFProb': rf_prob,
         'NBProb': nb_prob,
         'ETProb': et_prob,
@@ -714,18 +713,29 @@ def make_prediction(data_dict, match_info):
     meta_over_prob = meta_probs[1] * 100
     meta_under_prob = meta_probs[0] * 100
 
-    # Modified recommendation logic: Removed confidence gap check
+    # Check confidence gap
+    confidence_gap = over_conf - under_conf
+    min_confidence_gap = 15.0  # Minimum gap of 15% required
+
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
         recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
-    elif 70 <= meta_over_prob <= 100:
-        recommendation = "Over 1.5"
-        reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 100% threshold."
-    elif 70 <= meta_under_prob <= 100:
-        recommendation = "Under 3.5"
-        reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 100% threshold."
+    elif 70 <= meta_over_prob <= 91:
+        if confidence_gap >= min_confidence_gap:
+            recommendation = "Over 1.5"
+            reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91% threshold and Over confidence ({over_conf:.1f}%) is at least 15% higher than Under confidence ({under_conf:.1f}%)."
+        else:
+            recommendation = "NO BET"
+            reason = f"Match rejected: Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) is between 70% and 91%, but confidence gap ({confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
+    elif 70 <= meta_under_prob <= 91:
+        if -confidence_gap >= min_confidence_gap:  # Under_conf must be at least 15% higher than over_conf
+            recommendation = "Under 3.5"
+            reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91% threshold and Under confidence ({under_conf:.1f}%) is at least 15% higher than Over confidence ({over_conf:.1f}%)."
+        else:
+            recommendation = "NO BET"
+            reason = f"Match rejected: Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91%, but confidence gap ({-confidence_gap:.1f}%) is less than required 15% (Over: {over_conf:.1f}%, Under: {under_conf:.1f}%)."
     else:
-        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 100% threshold. No bet recommended."
+        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) is between 70% and 91% threshold. No bet recommended."
 
     return {
         'Match': match_info,
@@ -803,7 +813,8 @@ def main(date_from=None):
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
     target_league_ids = [
-        158, 138
+        156, 155, 250, 244, 176, 173, 245, 251, 223, 329, 330, 7097, 171, 175, 152, 302, 207, 168,
+        308, 118, 253, 593, 614, 352, 353, 362, 307, 329, 209, 212, 363, 322, 157, 151, 154, 153, 206, 158, 138
     ]
 
     leagues = fetch_all_leagues()
