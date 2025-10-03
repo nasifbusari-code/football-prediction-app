@@ -334,8 +334,8 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         base_score += 10
         triggered_rules.append("Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)")
     if high_goal_count <= 9 and zero_count <= 6:
-        base_score -= 25
-        triggered_rules.append("Rule 2: -25 to base_score (high goal/conceded count <= 9 and zero count <= 6)")
+        base_score -= 5
+        triggered_rules.append("Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)")
     if high_goal_count >= 8 and zero_count >= 7:
         base_score += 15
         triggered_rules.append("Rule 3: +15 to base_score (high goal/conceded count >= 8 and zero count >= 7)")
