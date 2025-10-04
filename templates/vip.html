@@ -106,6 +106,20 @@
                                                 {{ pred.MetaUnderProb|round(1) }}%
                                             </span>
                                         </p>
+                                        <p class="card-text">
+                                            <strong>Over 1.5 Odds:</strong> 
+                                            <span class="text-primary" data-bs-toggle="tooltip" 
+                                                  title="Market odds for Over 1.5 goals from AllSportsAPI">
+                                                {{ pred.Over1_5Odds|round(2) if pred.Over1_5Odds else 'N/A' }}
+                                            </span>
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Under 3.5 Odds:</strong> 
+                                            <span class="text-primary" data-bs-toggle="tooltip" 
+                                                  title="Market odds for Under 3.5 goals from AllSportsAPI">
+                                                {{ pred.Under3_5Odds|round(2) if pred.Under3_5Odds else 'N/A' }}
+                                            </span>
+                                        </p>
                                         <button class="btn btn-outline-primary btn-sm" 
                                                 data-bs-toggle="collapse" 
                                                 data-bs-target="#details-{{ loop.index }}"
