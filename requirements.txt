@@ -24,6 +24,7 @@ flask_migrate
 python-dotenv
 flask-migrate
 aiohttp
+cachetools
 
 
 
