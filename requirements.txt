@@ -26,6 +26,9 @@ flask-migrate
 aiohttp
 cachetools
 aiohttp_retry
+psutil
+
+
 
 
 
