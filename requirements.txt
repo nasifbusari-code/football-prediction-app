@@ -27,6 +27,8 @@ aiohttp
 cachetools
 aiohttp_retry
 psutil
+dotenv
+
 
 
 
