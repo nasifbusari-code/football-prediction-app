@@ -45,10 +45,9 @@ logger = logging.getLogger()
 logger.info("Starting Flask application...")
 
 # === API Configuration ===
-API_KEY = os.getenv('SPORTS_API_KEY', '')
-API_BASE_URL = "https://apiv2.allsportsapi.com/football"
-HEADERS = {'Content-Type': 'application/json'}
-SEASON_ID = "2024-2025"
+API_KEY = os.getenv('SPORTS_API_KEY', '4ff6b5869f85aac30e4d39711a7079d4fb95bece286672f340aac81cce20ef1a')
+API_BASE_URL = "https://apiv3.apifootball.com/"
+HEADERS = {}  # APIFootball typically doesn't require specific headers
 
 # === Load Models and Scalers ===
 logger.info("Loading models...")
@@ -246,6 +245,7 @@ def fetch_with_retry(url):
     api_call_count += 1
     logger.info(f"API Call #{api_call_count}: {url}")
     response = requests.get(url, headers=HEADERS, timeout=30)
+    # APIFootball may not include rate limit headers; log if present
     logger.info(f"Rate Limit Headers: {response.headers.get('X-Rate-Limit-Limit', 'N/A')}, "
                 f"Remaining: {response.headers.get('X-Rate-Limit-Remaining', 'N/A')}, "
                 f"Reset: {response.headers.get('X-Rate-Limit-Reset', 'N/A')}")
@@ -261,21 +261,21 @@ def fetch_odds(match_id):
     global api_call_count
     logger.info(f"Fetching odds for Match ID: {match_id}")
     try:
-        url = f"{API_BASE_URL}?met=Odds&matchId={match_id}&APIkey={API_KEY}"
+        url = f"{API_BASE_URL}?action=get_odds&match_id={match_id}&APIkey={API_KEY}"
         response = fetch_with_retry(url)
         response.encoding = 'utf-8'
         data = response.json()
-        if data.get("success") != 1 or not data.get("result"):
+        logger.debug(f"Odds API response for Match ID {match_id}: {data}")
+        if isinstance(data, dict) and 'error' in data:
+            logger.warning(f"⚠️ API error fetching odds for Match ID {match_id}: {data['error']}")
+            return None
+        if not data or not isinstance(data, list):
             logger.warning(f"⚠️ No odds data found for Match ID: {match_id}")
             return None
-        odds_data = data["result"].get(str(match_id), [])
-        if not odds_data:
-            logger.warning(f"⚠️ Empty odds data for Match ID: {match_id}")
-            return None
-        # Assuming we take the first bookmaker's odds (e.g., 'bwin')
-        for bookmaker in odds_data:
-            over_1_5 = float(bookmaker.get('o+1.5', 0)) if bookmaker.get('o+1.5') else None
-            under_3_5 = float(bookmaker.get('u+3.5', 0)) if bookmaker.get('u+3.5') else None
+        # Assuming APIFootball returns a list of odds; take the first valid set
+        for odds_entry in data:
+            over_1_5 = float(odds_entry.get('odd_1_5_over', 0)) if odds_entry.get('odd_1_5_over') else None
+            under_3_5 = float(odds_entry.get('odd_3_5_under', 0)) if odds_entry.get('odd_3_5_under') else None
             if over_1_5 and under_3_5:
                 return {'over_1_5': over_1_5, 'under_3_5': under_3_5}
         logger.warning(f"⚠️ No valid Over 1.5 or Under 3.5 odds found for Match ID: {match_id}")
@@ -284,7 +284,7 @@ def fetch_odds(match_id):
         logger.error(f"❌ Error fetching odds for Match ID {match_id}: {e}")
         return None
 
-# === Confidence Function ===
+# === Confidence Function (Unchanged) ===
 def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, AwayConcededList, HomeBTTS, AwayBTTS, poisson_prob):
     try:
         HomeGoalList = list(map(int, HomeGoalList))
@@ -340,7 +340,7 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     one_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g == 1)
     avg_conceded_both = (sum(HomeConcededList) + sum(AwayConcededList)) / 10
 
-    # NEW RULE START: Defensive Outlier Check
+    # Defensive Outlier Check
     home_clean_sheets = sum(1 for c in HomeConcededList if c == 0)
     away_clean_sheets = sum(1 for c in AwayConcededList if c == 0)
     clean_sheet_rate_home = home_clean_sheets / len(HomeConcededList)
@@ -353,7 +353,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         triggered_rules.append(f"Defensive Outlier Check: -20% to base_score (total goals per match = {total_goals_per_match:.2f} >= 3.5, "
                               f"clean sheet rate home = {clean_sheet_rate_home:.2f} or away = {clean_sheet_rate_away:.2f} >= 0.3, "
                               f"low scoring rate = {low_scoring_rate:.2f} >= 0.2)")
-    # NEW RULE END
 
     # Existing rules
     if avg_conceded >= 1.8 and high_goal_count >= 10:
@@ -381,7 +380,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         base_score *= 1.20
         triggered_rules.append(f"New Loss Rule: +15% to base_score (losses = {total_losses} >= 6 and avg conceded both teams = {avg_conceded_both:.2f} >= 1.6)")
     
-    # New Rule: Increase base score by 25% if losses >= 4 and count of >=2 in goal/conceded lists >= 6
     if total_losses >= 4 and high_goal_count >= 6:
         base_score *= 1.25
         triggered_rules.append(f"New Rule: +25% to base_score (losses = {total_losses} >= 4 and high goal/conceded count = {high_goal_count} >= 6)")
@@ -392,14 +390,14 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
 
     return over_conf, under_conf, triggered_rules
 
-# === Fuzzy Matching for Team Names ===
+# === Fuzzy Matching for Team Names (Unchanged) ===
 def is_team_match(api_team_name, expected_team_name, threshold=65):
     score = fuzz.token_set_ratio(api_team_name.lower(), expected_team_name.lower())
     logger.debug(f"is_team_match: Comparing '{api_team_name}' vs '{expected_team_name}', Score: {score}, Threshold: {threshold}")
     return score >= threshold
 
 # === Fetch Match Data ===
-def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_id, match_date, home_team_name, away_team_name):
+def fetch_match_data(home_team_key, away_team_key, league_id, match_id, match_date, home_team_name, away_team_name):
     global api_call_count
     match_info = f"{home_team_name} vs {away_team_name} ({match_date})"
     logger.info(f"Processing match: {match_info}, LeagueID: {league_id}, MatchID: {match_id}")
@@ -416,14 +414,14 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     HomeGoalList, HomeConcededList, HomeBTTS = [], [], []
     home_red_cards = []
     try:
-        recent_url = f"{API_BASE_URL}?met=Fixtures&teamId={home_team_key}&leagueId={league_id}&APIkey={API_KEY}&season={season_id}&from={from_date}&to={to_date}&limit=20"
+        recent_url = f"{API_BASE_URL}?action=get_events&team_id={home_team_key}&league_id={league_id}&APIkey={API_KEY}&from={from_date}&to={to_date}&limit=20"
         response = fetch_with_retry(recent_url)
         response.encoding = 'utf-8'
         home_team_response = response.json()
-        logger.debug(f"Home team {home_team_key} matches API response: {home_team_response}")
-        if not home_team_response.get('success') == 1:
-            raise ValueError(f"Invalid response for home team {home_team_key}")
-        home_matches = home_team_response.get('result', [])
+        logger.debug(f"Home team {home_team_key} ({home_team_name}) matches API response: {home_team_response}")
+        if isinstance(home_team_response, dict) and 'error' in home_team_response:
+            raise ValueError(f"API error for home team {home_team_key} matches: {home_team_response['error']}")
+        home_matches = home_team_response
         if not isinstance(home_matches, list):
             raise ValueError(f"Incomplete response for home team {home_team_key}")
     except Exception as e:
@@ -431,41 +429,41 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
         return None
 
     home_filtered = []
-    for match in sorted(home_matches, key=lambda x: x.get('event_date', '9999-12-31'), reverse=True):
-        if match.get('event_key') == match_id:
+    for match in sorted(home_matches, key=lambda x: x.get('match_date', '9999-12-31'), reverse=True):
+        if match.get('match_id') == match_id:
+            logger.debug(f"Skipping match for {home_team_name} on {match.get('match_date')}: Matches selected upcoming match (ID: {match_id})")
             continue
-        if match.get('event_status') != 'Finished':
+        if match.get('match_status') != 'Finished':
+            logger.debug(f"Skipping match for {home_team_name} on {match.get('match_date')}: Not finished (Status: {match.get('match_status', 'Unknown')})")
             continue
-        if str(match.get('league_key', '')) != str(league_id):
+        if str(match.get('league_id', '')) != str(league_id):
+            logger.debug(f"Skipping match for {home_team_name} on {match.get('match_date')}: League ID {match.get('league_id')} does not match target league {league_id}")
             continue
-        if is_team_match(match.get('event_home_team', ''), home_team_name):
-            result = match.get('event_final_result', '')
-            if result and '-' in result and len(result.split('-')) == 2:
-                try:
-                    parts = result.replace(' ', '').split('-')
-                    home_goals, away_goals = map(int, parts[:2])
-                    cards = match.get('cards', [])
-                    match_red_cards = [
-                        {'time': card.get('time', '0'), 'card': card.get('card')}
-                        for card in cards if card.get('card') == 'red card'
-                    ]
-                    for card in match_red_cards:
-                        try:
-                            time_str = card.get('time', '0')
-                            minute = int(time_str.split('+')[0]) if '+' in time_str else int(time_str)
-                            if minute <= 70:
-                                logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
-                                return None
-                        except (ValueError, TypeError):
-                            logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
+        if is_team_match(match.get('match_hometeam_name', ''), home_team_name):
+            try:
+                home_goals = int(match.get('match_hometeam_score', 0))
+                away_goals = int(match.get('match_awayteam_score', 0))
+                cards = match.get('cards', [])
+                match_red_cards = [
+                    {'time': card.get('time', '0'), 'card': card.get('card')}
+                    for card in cards if card.get('card') == 'red card'
+                ]
+                for card in match_red_cards:
+                    try:
+                        time_str = card.get('time', '0')
+                        minute = int(time_str.split('+')[0]) if '+' in time_str else int(time_str)
+                        if minute <= 70:
+                            logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('match_date')}")
                             return None
-                    home_filtered.append({'match': match, 'red_cards': match_red_cards})
-                    if len(home_filtered) == 5:
-                        break
-                except (ValueError, TypeError):
-                    continue
-            else:
-                logger.warning(f"⚠️ Invalid result format for home match {match.get('event_date')}: {result}")
+                    except (ValueError, TypeError):
+                        logger.warning(f"⚠️ Invalid red card time in match {match.get('match_date')}: {time_str}")
+                        return None
+                home_filtered.append({'match': match, 'red_cards': match_red_cards})
+                logger.debug(f"Added home match for {home_team_name} on {match.get('match_date')}: {home_goals}-{away_goals}, Red Cards: {len(match_red_cards)}")
+                if len(home_filtered) == 5:
+                    break
+            except (ValueError, TypeError):
+                logger.warning(f"⚠️ Invalid score format for home match {match.get('match_date')}")
                 continue
 
     if len(home_filtered) != 5:
@@ -475,9 +473,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     for item in home_filtered:
         match = item['match']
         match_red_cards = item['red_cards']
-        result = match.get('event_final_result', '')
-        home_goals, away_goals = (map(int, result.replace(' ', '').split('-')[:2]) 
-                                  if result and '-' in result else (0, 0))
+        home_goals = int(match.get('match_hometeam_score', 0))
+        away_goals = int(match.get('match_awayteam_score', 0))
         HomeGoalList.append(home_goals)
         HomeConcededList.append(away_goals)
         HomeBTTS.append(1 if home_goals > 0 and away_goals > 0 else 0)
@@ -488,14 +485,14 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     AwayGoalList, AwayConcededList, AwayBTTS = [], [], []
     away_red_cards = []
     try:
-        recent_url = f"{API_BASE_URL}?met=Fixtures&teamId={away_team_key}&leagueId={league_id}&APIkey={API_KEY}&season={season_id}&from={from_date}&to={to_date}&limit=20"
+        recent_url = f"{API_BASE_URL}?action=get_events&team_id={away_team_key}&league_id={league_id}&APIkey={API_KEY}&from={from_date}&to={to_date}&limit=20"
         response = fetch_with_retry(recent_url)
         response.encoding = 'utf-8'
         away_team_response = response.json()
-        logger.debug(f"Away team {away_team_key} matches API response: {away_team_response}")
-        if not away_team_response.get('success') == 1:
-            raise ValueError(f"Invalid response for away team {away_team_key}")
-        away_matches = away_team_response.get('result', [])
+        logger.debug(f"Away team {away_team_key} ({away_team_name}) matches API response: {away_team_response}")
+        if isinstance(away_team_response, dict) and 'error' in away_team_response:
+            raise ValueError(f"API error for away team {away_team_key} matches: {away_team_response['error']}")
+        away_matches = away_team_response
         if not isinstance(away_matches, list):
             raise ValueError(f"Incomplete response for away team {away_team_key}")
     except Exception as e:
@@ -503,41 +500,41 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
         return None
 
     away_filtered = []
-    for match in sorted(away_matches, key=lambda x: x.get('event_date', '9999-12-31'), reverse=True):
-        if match.get('event_key') == match_id:
+    for match in sorted(away_matches, key=lambda x: x.get('match_date', '9999-12-31'), reverse=True):
+        if match.get('match_id') == match_id:
+            logger.debug(f"Skipping match for {away_team_name} on {match.get('match_date')}: Matches selected upcoming match (ID: {match_id})")
             continue
-        if match.get('event_status') != 'Finished':
+        if match.get('match_status') != 'Finished':
+            logger.debug(f"Skipping match for {away_team_name} on {match.get('match_date')}: Not finished (Status: {match.get('match_status', 'Unknown')})")
             continue
-        if str(match.get('league_key', '')) != str(league_id):
+        if str(match.get('league_id', '')) != str(league_id):
+            logger.debug(f"Skipping match for {away_team_name} on {match.get('match_date')}: League ID {match.get('league_id')} does not match target league {league_id}")
             continue
-        if is_team_match(match.get('event_away_team', ''), away_team_name):
-            result = match.get('event_final_result', '')
-            if result and '-' in result and len(result.split('-')) == 2:
-                try:
-                    parts = result.replace(' ', '').split('-')
-                    home_goals, away_goals = map(int, parts[:2])
-                    cards = match.get('cards', [])
-                    match_red_cards = [
-                        {'time': card.get('time', '0'), 'card': card.get('card')}
-                        for card in cards if card.get('card') == 'red card'
-                    ]
-                    for card in match_red_cards:
-                        try:
-                            time_str = card.get('time', '0')
-                            minute = int(time_str.split('+')[0]) if '+' in time_str else int(time_str)
-                            if minute <= 70:
-                                logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('event_date')}")
-                                return None
-                        except (ValueError, TypeError):
-                            logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
+        if is_team_match(match.get('match_awayteam_name', ''), away_team_name):
+            try:
+                home_goals = int(match.get('match_hometeam_score', 0))
+                away_goals = int(match.get('match_awayteam_score', 0))
+                cards = match.get('cards', [])
+                match_red_cards = [
+                    {'time': card.get('time', '0'), 'card': card.get('card')}
+                    for card in cards if card.get('card') == 'red card'
+                ]
+                for card in match_red_cards:
+                    try:
+                        time_str = card.get('time', '0')
+                        minute = int(time_str.split('+')[0]) if '+' in time_str else int(time_str)
+                        if minute <= 70:
+                            logger.error(f"❌ Skipping {match_info}: Red card at {minute} minutes in match {match.get('match_date')}")
                             return None
-                    away_filtered.append({'match': match, 'red_cards': match_red_cards})
-                    if len(away_filtered) == 5:
-                        break
-                except (ValueError, TypeError):
-                    continue
-            else:
-                logger.warning(f"⚠️ Invalid result format for away match {match.get('event_date')}: {result}")
+                    except (ValueError, TypeError):
+                        logger.warning(f"⚠️ Invalid red card time in match {match.get('match_date')}: {time_str}")
+                        return None
+                away_filtered.append({'match': match, 'red_cards': match_red_cards})
+                logger.debug(f"Added away match for {away_team_name} on {match.get('match_date')}: {home_goals}-{away_goals}, Red Cards: {len(match_red_cards)}")
+                if len(away_filtered) == 5:
+                    break
+            except (ValueError, TypeError):
+                logger.warning(f"⚠️ Invalid score format for away match {match.get('match_date')}")
                 continue
 
     if len(away_filtered) != 5:
@@ -547,9 +544,8 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     for item in away_filtered:
         match = item['match']
         match_red_cards = item['red_cards']
-        result = match.get('event_final_result', '')
-        home_goals, away_goals = (map(int, result.replace(' ', '').split('-')[:2]) 
-                                  if result and '-' in result else (0, 0))
+        home_goals = int(match.get('match_hometeam_score', 0))
+        away_goals = int(match.get('match_awayteam_score', 0))
         AwayGoalList.append(away_goals)
         AwayConcededList.append(home_goals)
         AwayBTTS.append(1 if home_goals > 0 and away_goals > 0 else 0)
@@ -573,22 +569,17 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
                         minute = int(time_str.split('+')[0]) if '+' in time_str else int(time_str)
                         red_card_times.append(minute)
                     except (ValueError, TypeError):
-                        logger.warning(f"⚠️ Invalid red card time in match {match.get('event_date')}: {time_str}")
+                        logger.warning(f"⚠️ Invalid red card time in match {match.get('match_date')}: {time_str}")
                         return None
                 red_card_times.sort()
                 if len(red_card_times) != 2 or red_card_times[1] <= 75:
                     logger.error(f"❌ Skipping {match_info}: Second red card at {red_card_times[1]} minutes")
                     return None
-                result = match.get('event_final_result', '')
-                if result and '-' in result:
-                    try:
-                        home_goals, away_goals = map(int, result.replace(' ', '').split('-')[:2])
-                        if home_goals != 0 or away_goals != 0:
-                            logger.error(f"❌ Skipping {match_info}: Match with 2 red cards has goals ({result})")
-                            return None
-                    except (ValueError, TypeError):
-                        logger.warning(f"⚠️ Invalid result format in match {match.get('event_date')}: {result}")
-                        return None
+                home_goals = int(match.get('match_hometeam_score', 0))
+                away_goals = int(match.get('match_awayteam_score', 0))
+                if home_goals != 0 or away_goals != 0:
+                    logger.error(f"❌ Skipping {match_info}: Match with 2 red cards has goals ({home_goals}-{away_goals})")
+                    return None
 
     return {
         'TotalHomeGoals': sum(HomeGoalList),
@@ -603,7 +594,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
         'AwayBTTS': AwayBTTS
     }
 
-# === Prediction Logic ===
+# === Prediction Logic (Unchanged) ===
 def make_prediction(data_dict, match_info, match_id):
     required_length = 5
     lists = [
@@ -794,42 +785,44 @@ def fetch_all_leagues():
         with open(cache_file, 'r', encoding='utf-8') as f:
             leagues = json.load(f)
             logger.info("Loaded leagues from cache")
-            return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
+            return [(league['league_id'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
     logger.info("Fetching all leagues...")
     try:
-        url = f"{API_BASE_URL}?met=Leagues&APIkey={API_KEY}"
+        url = f"{API_BASE_URL}?action=get_leagues&APIkey={API_KEY}"
         response = fetch_with_retry(url)
         response.encoding = 'utf-8'
         data = response.json()
-        if data.get("success") != 1:
-            logger.error(f"❌ API error fetching leagues: {data}")
+        logger.debug(f"Leagues API response: {data}")
+        if isinstance(data, dict) and 'error' in data:
+            logger.error(f"❌ API error fetching leagues: {data['error']}")
             return []
-        leagues = data["result"]
+        leagues = data
         with open(cache_file, 'w', encoding='utf-8') as f:
             json.dump(leagues, f)
         logger.info(f"✅ Retrieved and cached {len(leagues)} leagues")
         with open('leagues.txt', 'w', encoding='utf-8') as f:
             f.write("League List:\n")
             for league in leagues:
-                f.write(f"ID: {league['league_key']}, Name: {league['league_name']}, Country: {league.get('country_name', 'Unknown')}\n")
-        return [(league['league_key'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
+                f.write(f"ID: {league['league_id']}, Name: {league['league_name']}, Country: {league.get('country_name', 'Unknown')}\n")
+        return [(league['league_id'], league['league_name'], league.get('country_name', 'Unknown')) for league in leagues]
     except Exception as e:
         logger.error(f"❌ Error fetching leagues: {e}")
         return []
 
 # === Fetch Upcoming Matches for a League ===
-def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from):
+def fetch_upcoming_matches(league_id, league_name, country_name, date_from):
     global api_call_count
     logger.info(f"Fetching matches for {league_name} ({country_name}, ID: {league_id}) on {date_from}")
     try:
-        url = f"{API_BASE_URL}?met=Fixtures&leagueId={league_id}&APIkey={API_KEY}&season={season_id}&from={date_from}&to={date_from}"
+        url = f"{API_BASE_URL}?action=get_events&league_id={league_id}&APIkey={API_KEY}&from={date_from}&to={date_from}"
         response = fetch_with_retry(url)
         response.encoding = 'utf-8'
         data = response.json()
-        if data.get("success") != 1 or not data.get("result"):
-            logger.warning(f"⚠️ No matches found for {league_name} on {date_from}")
+        logger.debug(f"Matches API response for {league_name}: {data}")
+        if isinstance(data, dict) and 'error' in data:
+            logger.warning(f"⚠️ API error fetching matches for {league_name}: {data['error']}")
             return []
-        matches = data["result"]
+        matches = data
         for match in matches:
             match['league_name'] = league_name
             match['country_name'] = country_name
@@ -847,11 +840,8 @@ def main(date_from=None):
         date_from = datetime.now(wat_tz).strftime('%Y-%m-%d')
         logger.info(f"No date provided, defaulting to today: {date_from}")
 
-    season_id = SEASON_ID
-    logger.info(f"Using Season ID: {season_id} for date: {date_from}")
-
     target_league_ids = [
-        152, 302, 244, 254, 168
+        152, 302, 244, 253, 175
     ]
 
     leagues = fetch_all_leagues()
@@ -869,7 +859,7 @@ def main(date_from=None):
     all_matches = []
     logger.info(f"\nFetching matches for {date_from} for {len(leagues)} selected leagues...")
     for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
-        matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)
+        matches = fetch_upcoming_matches(league_id, league_name, country_name, date_from)
         all_matches.extend(matches)
         time.sleep(0.5)
 
@@ -879,20 +869,20 @@ def main(date_from=None):
 
     logger.info(f"\nFound {len(all_matches)} matches for {date_from}:")
     for match in all_matches:
-        match_info = f"{match.get('event_home_team', 'Unknown')} vs {match.get('event_away_team', 'Unknown')} ({match['league_name']}, {match['country_name']})"
-        logger.info(f"- {match_info} (Match ID: {match.get('event_key')})")
+        match_info = f"{match.get('match_hometeam_name', 'Unknown')} vs {match.get('match_awayteam_name', 'Unknown')} ({match['league_name']}, {match['country_name']})"
+        logger.info(f"- {match_info} (Match ID: {match.get('match_id')})")
 
     results = []
     skipped_matches = []
     logger.info("\nPredicting outcomes...")
     for match in tqdm(all_matches, desc="Predicting matches"):
-        match_id = match.get('event_key')
-        home_team_key = match.get('home_team_key')
-        away_team_key = match.get('away_team_key')
-        home_team_name = match.get('event_home_team', 'Unknown')
-        away_team_name = match.get('event_away_team', 'Unknown')
-        match_date = match.get('event_date')
-        league_id = match.get('league_key')
+        match_id = match.get('match_id')
+        home_team_key = match.get('match_hometeam_id')
+        away_team_key = match.get('match_awayteam_id')
+        home_team_name = match.get('match_hometeam_name', 'Unknown')
+        away_team_name = match.get('match_awayteam_name', 'Unknown')
+        match_date = match.get('match_date')
+        league_id = match.get('league_id')
         league_name = match['league_name']
         country_name = match['country_name']
         match_info = f"{home_team_name} vs {away_team_name} ({match_date}, {league_name}, {country_name})"
@@ -902,12 +892,12 @@ def main(date_from=None):
             skipped_matches.append(match_info)
             continue
 
-        data_dict = fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_id, match_date, home_team_name, away_team_name)
+        data_dict = fetch_match_data(home_team_key, away_team_key, league_id, match_id, match_date, home_team_name, away_team_name)
         if data_dict is None:
             skipped_matches.append(match_info)
             continue
 
-        result = make_prediction(data_dict, match_info, match_id)  # Pass match_id
+        result = make_prediction(data_dict, match_info, match_id)
         if 'error' in result:
             skipped_matches.append(match_info)
             continue
@@ -955,7 +945,7 @@ def main(date_from=None):
             logger.info("\n=== Skipped Matches ===")
             f.write("\nSkipped Matches:\n" + "\n".join(skipped_matches) + "\n")
 
-# === Load Predictions ===
+# === Load Predictions (Unchanged) ===
 def load_predictions():
     try:
         with open('predictions.json', 'r', encoding='utf-8') as f:
@@ -964,7 +954,7 @@ def load_predictions():
         logger.error(f"❌ Error loading predictions.json: {e}")
         return []
 
-# === Schedule Predictions ===
+# === Schedule Predictions (Unchanged) ===
 scheduler = None
 def schedule_predictions():
     if os.getenv('RUN_MODE', 'web') != 'worker':
@@ -1000,7 +990,7 @@ def schedule_predictions():
     scheduler.start()
     return scheduler
 
-# === Routes ===
+# === Routes (Unchanged) ===
 @app.route('/')
 def home():
     try:
