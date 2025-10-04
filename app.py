@@ -28,16 +28,21 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql import text
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from dotenv import load_dotenv
+import glob
+import psutil
+from logging.handlers import RotatingFileHandler
+from functools import lru_cache
 
 # Load environment variables
 load_dotenv()
 
 # === Configure Logging ===
+handler = logging.handlers.RotatingFileHandler('prediction_log.txt', maxBytes=5*1024*1024, backupCount=2, encoding='utf-8')
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,  # Changed to INFO for production
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('prediction_log.txt', encoding='utf-8'),
+        handler,
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -237,6 +242,21 @@ def load_user(user_id):
         logger.error(f"❌ Unexpected error in load_user: {e}")
         return None
 
+# === Cache Management ===
+def clear_old_caches(days_old=7):
+    cache_files = glob.glob("matches_cache_*.json")
+    for cache_file in cache_files:
+        if os.path.getmtime(cache_file) < (datetime.now().timestamp() - days_old * 86400):
+            os.remove(cache_file)
+            logger.info(f"Deleted old cache file: {cache_file}")
+
+# === Resource Monitoring ===
+def log_resource_usage():
+    process = psutil.Process()
+    memory = process.memory_info().rss / 1024 / 1024  # MB
+    cpu = process.cpu_percent(interval=0.1)
+    logger.info(f"Resource Usage: Memory={memory:.2f}MB, CPU={cpu:.2f}%")
+
 # === Retry Logic for API Calls ===
 api_call_count = 0
 
@@ -246,12 +266,12 @@ def fetch_with_retry(url):
     api_call_count += 1
     logger.info(f"API Call #{api_call_count}: {url}")
     response = requests.get(url, headers=HEADERS, timeout=30)
-    logger.info(f"Rate Limit Headers: {response.headers.get('X-Rate-Limit-Limit', 'N/A')}, "
-                f"Remaining: {response.headers.get('X-Rate-Limit-Remaining', 'N/A')}, "
-                f"Reset: {response.headers.get('X-Rate-Limit-Reset', 'N/A')}")
-    if response.status_code == 429:
-        retry_after = response.headers.get('Retry-After', 10)
-        logger.warning(f"Rate limit hit, suggested wait: {retry_after} seconds")
+    remaining = int(response.headers.get('X-Rate-Limit-Remaining', 100))
+    reset_time = int(response.headers.get('X-Rate-Limit-Reset', 0))
+    if remaining < 10:
+        wait_time = max(10, reset_time - int(time.time())) + 1
+        logger.warning(f"Low rate limit remaining ({remaining}), waiting {wait_time}s")
+        time.sleep(wait_time)
     response.raise_for_status()
     return response
 
@@ -272,7 +292,6 @@ def fetch_odds(match_id):
         if not odds_data:
             logger.warning(f"⚠️ Empty odds data for Match ID: {match_id}")
             return None
-        # Assuming we take the first bookmaker's odds (e.g., 'bwin')
         for bookmaker in odds_data:
             over_1_5 = float(bookmaker.get('o+1.5', 0)) if bookmaker.get('o+1.5') else None
             under_3_5 = float(bookmaker.get('u+3.5', 0)) if bookmaker.get('u+3.5') else None
@@ -303,7 +322,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         logger.warning(f"⚠️ Missing required columns in row: {missing_cols}")
         return 0.0, 100.0, []
 
-    # Calculate match outcomes
     home_outcomes = []
     for h_goals, h_conceded in zip(HomeGoalList, HomeConcededList):
         if h_goals > h_conceded:
@@ -322,7 +340,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         else:
             away_outcomes.append('l')
 
-    # Count wins, draws, and losses
     total_wins = home_outcomes.count('w') + away_outcomes.count('w')
     total_draws = home_outcomes.count('d') + away_outcomes.count('d')
     total_losses = home_outcomes.count('l') + away_outcomes.count('l')
@@ -340,7 +357,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     one_count = sum(1 for g in HomeGoalList + AwayGoalList + HomeConcededList + AwayConcededList if g == 1)
     avg_conceded_both = (sum(HomeConcededList) + sum(AwayConcededList)) / 10
 
-    # NEW RULE START: Defensive Outlier Check
     home_clean_sheets = sum(1 for c in HomeConcededList if c == 0)
     away_clean_sheets = sum(1 for c in AwayConcededList if c == 0)
     clean_sheet_rate_home = home_clean_sheets / len(HomeConcededList)
@@ -353,9 +369,7 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
         triggered_rules.append(f"Defensive Outlier Check: -20% to base_score (total goals per match = {total_goals_per_match:.2f} >= 3.5, "
                               f"clean sheet rate home = {clean_sheet_rate_home:.2f} or away = {clean_sheet_rate_away:.2f} >= 0.3, "
                               f"low scoring rate = {low_scoring_rate:.2f} >= 0.2)")
-    # NEW RULE END
 
-    # Existing rules
     if avg_conceded >= 1.8 and high_goal_count >= 10:
         base_score += 20
         triggered_rules.append("Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)")
@@ -380,8 +394,6 @@ def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, Away
     if total_losses >= 6 and avg_conceded_both >= 1.6:
         base_score *= 1.20
         triggered_rules.append(f"New Loss Rule: +15% to base_score (losses = {total_losses} >= 6 and avg conceded both teams = {avg_conceded_both:.2f} >= 1.6)")
-    
-    # New Rule: Increase base score by 25% if losses >= 4 and count of >=2 in goal/conceded lists >= 6
     if total_losses >= 4 and high_goal_count >= 6:
         base_score *= 1.25
         triggered_rules.append(f"New Rule: +25% to base_score (losses = {total_losses} >= 4 and high goal/conceded count = {high_goal_count} >= 6)")
@@ -605,6 +617,12 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
 
 # === Prediction Logic ===
 def make_prediction(data_dict, match_info, match_id):
+    odds = fetch_odds(match_id)
+    if not odds or (odds['over_1_5'] and (odds['over_1_5'] < 1.10 or odds['over_1_5'] > 1.23)) or \
+                   (odds['under_3_5'] and (odds['under_3_5'] < 1.08 or odds['under_3_5'] > 1.25)):
+        logger.warning(f"Skipping {match_info}: Odds unavailable or outside acceptable range")
+        return {"error": "Invalid odds"}
+
     required_length = 5
     lists = [
         data_dict['HomeGoalList'], data_dict['HomeConcededList'],
@@ -747,12 +765,9 @@ def make_prediction(data_dict, match_info, match_id):
     meta_over_prob = meta_probs[1] * 100
     meta_under_prob = meta_probs[0] * 100
 
-    # Fetch odds for the match
-    odds = fetch_odds(match_id)
     over_1_5_odds = odds['over_1_5'] if odds else None
     under_3_5_odds = odds['under_3_5'] if odds else None
 
-    # Updated recommendation logic with odds range check
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
         recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
@@ -820,6 +835,15 @@ def fetch_all_leagues():
 # === Fetch Upcoming Matches for a League ===
 def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from):
     global api_call_count
+    cache_file = f"matches_cache_{league_id}_{date_from}.json"
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r', encoding='utf-8') as f:
+            logger.info(f"Loading cached matches for {league_name} on {date_from}")
+            matches = json.load(f)
+            for match in matches:
+                match['league_name'] = league_name
+                match['country_name'] = country_name
+            return matches
     logger.info(f"Fetching matches for {league_name} ({country_name}, ID: {league_id}) on {date_from}")
     try:
         url = f"{API_BASE_URL}?met=Fixtures&leagueId={league_id}&APIkey={API_KEY}&season={season_id}&from={date_from}&to={date_from}"
@@ -830,6 +854,8 @@ def fetch_upcoming_matches(league_id, league_name, country_name, season_id, date
             logger.warning(f"⚠️ No matches found for {league_name} on {date_from}")
             return []
         matches = data["result"]
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(matches, f)
         for match in matches:
             match['league_name'] = league_name
             match['country_name'] = country_name
@@ -845,100 +871,79 @@ def main(date_from=None):
     wat_tz = pytz.timezone('Africa/Lagos')
     if date_from is None:
         date_from = datetime.now(wat_tz).strftime('%Y-%m-%d')
-        logger.info(f"No date provided, defaulting to today: {date_from}")
-
+    logger.info(f"Using date: {date_from}")
     season_id = SEASON_ID
-    logger.info(f"Using Season ID: {season_id} for date: {date_from}")
+    clear_old_caches()
 
+    # Define 20 leagues (example IDs, replace with actual ones from leagues.txt)
     target_league_ids = [
-        152, 302, 244, 253, 175
+        156, 155, 250, 244, 176,
+        173, 245, 251, 223, 329,
+        308, 118, 253, 593, 614,
+        352, 353, 362, 307, 329
     ]
-
-    leagues = fetch_all_leagues()
-    if not leagues:
-        logger.error("❌ Aborting: No leagues retrieved.")
-        return
-
-    leagues = [(league_id, league_name, country_name) for league_id, league_name, country_name in leagues
-               if league_id in target_league_ids]
+    max_leagues = 20  # Process up to 20 leagues
+    leagues = [(lid, lname, cname) for lid, lname, cname in fetch_all_leagues() if lid in target_league_ids][:max_leagues]
 
     if not leagues:
-        logger.error("❌ Aborting: No matching leagues found for provided IDs.")
+        logger.error("❌ Aborting: No matching leagues found.")
         return
 
-    all_matches = []
-    logger.info(f"\nFetching matches for {date_from} for {len(leagues)} selected leagues...")
-    for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
-        matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)
-        all_matches.extend(matches)
-        time.sleep(0.5)
-
-    if not all_matches:
-        logger.error(f"❌ No matches found for selected leagues on {date_from}.")
-        return
-
-    logger.info(f"\nFound {len(all_matches)} matches for {date_from}:")
-    for match in all_matches:
-        match_info = f"{match.get('event_home_team', 'Unknown')} vs {match.get('event_away_team', 'Unknown')} ({match['league_name']}, {match['country_name']})"
-        logger.info(f"- {match_info} (Match ID: {match.get('event_key')})")
-
-    results = []
+    predictions_data = []
     skipped_matches = []
-    logger.info("\nPredicting outcomes...")
-    for match in tqdm(all_matches, desc="Predicting matches"):
-        match_id = match.get('event_key')
-        home_team_key = match.get('home_team_key')
-        away_team_key = match.get('away_team_key')
-        home_team_name = match.get('event_home_team', 'Unknown')
-        away_team_name = match.get('event_away_team', 'Unknown')
-        match_date = match.get('event_date')
-        league_id = match.get('league_key')
-        league_name = match['league_name']
-        country_name = match['country_name']
-        match_info = f"{home_team_name} vs {away_team_name} ({match_date}, {league_name}, {country_name})"
+    for league_id, league_name, country_name in tqdm(leagues, desc="Processing leagues"):
+        matches = fetch_upcoming_matches(league_id, league_name, country_name, season_id, date_from)[:5]  # Limit to 5 matches per league
+        for match in tqdm(matches, desc=f"Predicting {league_name} matches"):
+            match_id = match.get('event_key')
+            home_team_key = match.get('home_team_key')
+            away_team_key = match.get('away_team_key')
+            home_team_name = match.get('event_home_team', 'Unknown')
+            away_team_name = match.get('event_away_team', 'Unknown')
+            match_date = match.get('event_date')
+            league_id = match.get('league_key')
+            match_info = f"{home_team_name} vs {away_team_name} ({match_date}, {league_name}, {country_name})"
 
-        if not home_team_key or not away_team_key:
-            logger.error(f"❌ Skipping {match_info}: Missing team key(s)")
-            skipped_matches.append(match_info)
-            continue
+            if not home_team_key or not away_team_key:
+                logger.error(f"❌ Skipping {match_info}: Missing team key(s)")
+                skipped_matches.append(match_info)
+                continue
 
-        data_dict = fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_id, match_date, home_team_name, away_team_name)
-        if data_dict is None:
-            skipped_matches.append(match_info)
-            continue
+            data_dict = fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_id, match_date, home_team_name, away_team_name)
+            if data_dict is None:
+                skipped_matches.append(match_info)
+                continue
 
-        result = make_prediction(data_dict, match_info, match_id)  # Pass match_id
-        if 'error' in result:
-            skipped_matches.append(match_info)
-            continue
-        results.append(result)
-        time.sleep(0.5)
+            result = make_prediction(data_dict, match_info, match_id)
+            if 'error' in result:
+                skipped_matches.append(match_info)
+                continue
+            predictions_data.append({
+                'Match': result['Match'],
+                'MetaOverProb': result['MetaOverProb'],
+                'MetaUnderProb': result['MetaUnderProb'],
+                'Recommendation': result['Recommendation'],
+                'Reason': result['Reason'],
+                'OverConfidence': result['OverConfidence'],
+                'UnderConfidence': result['UnderConfidence'],
+                'TriggeredRules': result['TriggeredRules'],
+                'Over1_5Odds': result['Over1_5Odds'],
+                'Under3_5Odds': result['Under3_5Odds']
+            })
+            with open('predictions.json', 'w', encoding='utf-8') as f:
+                json.dump(predictions_data, f)
+            log_resource_usage()
+            time.sleep(1)  # Prevent CPU overload
+
+        log_resource_usage()
+        time.sleep(2)  # Respect API rate limits
 
     logger.info(f"Total API Calls Made: {api_call_count}")
-    predictions_data = [
-        {
-            'Match': r['Match'],
-            'MetaOverProb': r['MetaOverProb'],
-            'MetaUnderProb': r['MetaUnderProb'],
-            'Recommendation': r['Recommendation'],
-            'Reason': r['Reason'],
-            'OverConfidence': r['OverConfidence'],
-            'UnderConfidence': r['UnderConfidence'],
-            'TriggeredRules': r['TriggeredRules'],
-            'Over1_5Odds': r['Over1_5Odds'],
-            'Under3_5Odds': r['Under3_5Odds']
-        } for r in results
-    ]
-    with open('predictions.json', 'w', encoding='utf-8') as f:
-        json.dump(predictions_data, f)
-
-    logger.info("\n=== Prediction Results ===")
     with open('predictions.txt', 'w', encoding='utf-8') as f:
-        if not results:
+        if not predictions_data:
             msg = f"❌ No valid predictions for {date_from}. Check prediction_log.txt."
             logger.error(msg)
             f.write(msg + "\n")
-        for result in results:
+        for result in predictions_data:
             output = (f"\nMatch: {result['Match']}\n"
                       f"Over 1.5 Confidence: {result['OverConfidence']:.1f}%\n"
                       f"Under 3.5 Confidence: {result['UnderConfidence']:.1f}%\n"
@@ -949,10 +954,8 @@ def main(date_from=None):
                       f"Recommendation: {result['Recommendation']}\n"
                       f"Reason: {result['Reason']}\n"
                       f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n" + f"{'='*50}")
-            logger.info(output)
             f.write(output + "\n")
         if skipped_matches:
-            logger.info("\n=== Skipped Matches ===")
             f.write("\nSkipped Matches:\n" + "\n".join(skipped_matches) + "\n")
 
 # === Load Predictions ===
@@ -1000,14 +1003,26 @@ def schedule_predictions():
     scheduler.start()
     return scheduler
 
+# === Cache User Data ===
+@lru_cache(maxsize=100)
+def get_user_data(user_id):
+    try:
+        user = User.query.get(int(user_id))
+        return user.is_vip, user.vip_expiry, user.is_admin
+    except Exception as e:
+        logger.error(f"❌ Error fetching user data for {user_id}: {e}")
+        return False, None, False
+
 # === Routes ===
 @app.route('/')
 def home():
     try:
         if not os.path.exists('predictions.json'):
             wat_tz = pytz.timezone('Africa/Lagos')
-            logger.info("No predictions.json found, running predictions...")
-            main(date_from=datetime.now(wat_tz).strftime('%Y-%m-%d'))
+            logger.info("No predictions.json found, starting prediction thread...")
+            threading.Thread(target=main, args=(datetime.now(wat_tz).strftime('%Y-%m-%d'),), daemon=True).start()
+            flash('Predictions are being generated in the background. Please check back shortly.', 'info')
+            return render_template('home.html', predictions=[], error="Predictions are being generated.", user=current_user)
         predictions = load_predictions()
         if not predictions:
             return render_template('home.html', predictions=[], error="No matches available for today.", user=current_user)
@@ -1028,11 +1043,12 @@ def home():
 @login_required
 def vip():
     try:
-        if current_user.is_admin:
+        is_vip, vip_expiry, is_admin = get_user_data(current_user.id)
+        if is_admin:
             predictions = load_predictions()
             vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
             return render_template('vip.html', predictions=vip_preds, user=current_user, admin_message="Admin Access: Full VIP privileges")
-        if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
+        if not is_vip or (vip_expiry and vip_expiry < datetime.utcnow()):
             current_user.is_vip = False
             current_user.vip_expiry = None
             db.session.commit()
@@ -1054,7 +1070,8 @@ def vip():
 @login_required
 def predictions():
     try:
-        if not current_user.is_vip and not current_user.is_admin:
+        is_vip, vip_expiry, is_admin = get_user_data(current_user.id)
+        if not is_vip and not is_admin:
             flash('VIP access required for predictions.', 'danger')
             return redirect(url_for('pay'))
         predictions = load_predictions()
