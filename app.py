@@ -255,6 +255,35 @@ def fetch_with_retry(url):
     response.raise_for_status()
     return response
 
+# === Helper Function to Fetch Odds ===
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10), retry=retry_if_exception_type(requests.exceptions.RequestException))
+def fetch_odds(match_id):
+    global api_call_count
+    logger.info(f"Fetching odds for Match ID: {match_id}")
+    try:
+        url = f"{API_BASE_URL}?met=Odds&matchId={match_id}&APIkey={API_KEY}"
+        response = fetch_with_retry(url)
+        response.encoding = 'utf-8'
+        data = response.json()
+        if data.get("success") != 1 or not data.get("result"):
+            logger.warning(f"⚠️ No odds data found for Match ID: {match_id}")
+            return None
+        odds_data = data["result"].get(str(match_id), [])
+        if not odds_data:
+            logger.warning(f"⚠️ Empty odds data for Match ID: {match_id}")
+            return None
+        # Assuming we take the first bookmaker's odds (e.g., 'bwin')
+        for bookmaker in odds_data:
+            over_1_5 = float(bookmaker.get('o+1.5', 0)) if bookmaker.get('o+1.5') else None
+            under_3_5 = float(bookmaker.get('u+3.5', 0)) if bookmaker.get('u+3.5') else None
+            if over_1_5 and under_3_5:
+                return {'over_1_5': over_1_5, 'under_3_5': under_3_5}
+        logger.warning(f"⚠️ No valid Over 1.5 or Under 3.5 odds found for Match ID: {match_id}")
+        return None
+    except Exception as e:
+        logger.error(f"❌ Error fetching odds for Match ID {match_id}: {e}")
+        return None
+
 # === Confidence Function ===
 def favour_v6_confidence(row, HomeGoalList, HomeConcededList, AwayGoalList, AwayConcededList, HomeBTTS, AwayBTTS, poisson_prob):
     try:
@@ -575,7 +604,7 @@ def fetch_match_data(home_team_key, away_team_key, season_id, league_id, match_i
     }
 
 # === Prediction Logic ===
-def make_prediction(data_dict, match_info):
+def make_prediction(data_dict, match_info, match_id):
     required_length = 5
     lists = [
         data_dict['HomeGoalList'], data_dict['HomeConcededList'],
@@ -718,18 +747,31 @@ def make_prediction(data_dict, match_info):
     meta_over_prob = meta_probs[1] * 100
     meta_under_prob = meta_probs[0] * 100
 
-    # Simplified recommendation logic based on 75% threshold
+    # Fetch odds for the match
+    odds = fetch_odds(match_id)
+    over_1_5_odds = odds['over_1_5'] if odds else None
+    under_3_5_odds = odds['under_3_5'] if odds else None
+
+    # Updated recommendation logic with odds range check
     if zero_count in [6, 7, 8] and meta_probs[0] > meta_probs[1]:
         recommendation = "NO BET"
         reason = f"Match rejected: {zero_count} zeros in goal/conceded lists and meta-model favors Under 3.5 ({meta_under_prob:.1f}% vs Over 1.5 {meta_over_prob:.1f}%)."
     elif meta_over_prob >= 70.0:
-        recommendation = "Over 1.5"
-        reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) meets or exceeds 75% threshold."
+        if over_1_5_odds and 1.10 <= over_1_5_odds <= 1.23:
+            recommendation = "Over 1.5"
+            reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) meets or exceeds 70% threshold, and Over 1.5 odds ({over_1_5_odds:.2f}) are within 1.10-1.23 range."
+        else:
+            recommendation = "NO BET"
+            reason = f"Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) meets 70% threshold, but Over 1.5 odds ({over_1_5_odds:.2f if over_1_5_odds else 'N/A'}) are outside 1.10-1.23 range."
     elif meta_under_prob >= 70.0:
-        recommendation = "Under 3.5"
-        reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) meets or exceeds 75% threshold."
+        if under_3_5_odds and 1.08 <= under_3_5_odds <= 1.25:
+            recommendation = "Under 3.5"
+            reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) meets or exceeds 70% threshold, and Under 3.5 odds ({under_3_5_odds:.2f if under_3_5_odds else 'N/A'}) are within 1.08-1.25 range."
+        else:
+            recommendation = "NO BET"
+            reason = f"Meta-Model Under 3.5 Probability ({meta_under_prob:.1f}%) meets 70% threshold, but Under 3.5 odds ({under_3_5_odds:.2f if under_3_5_odds else 'N/A'}) are outside 1.08-1.25 range."
     else:
-        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) meets the 75% threshold. No bet recommended."
+        reason = f"Neither Meta-Model Over 1.5 Probability ({meta_over_prob:.1f}%) nor Under 3.5 Probability ({meta_under_prob:.1f}%) meets the 70% threshold. No bet recommended."
 
     return {
         'Match': match_info,
@@ -739,7 +781,9 @@ def make_prediction(data_dict, match_info):
         'MetaUnderProb': meta_under_prob,
         'Recommendation': recommendation,
         'Reason': reason,
-        'TriggeredRules': triggered_rules
+        'TriggeredRules': triggered_rules,
+        'Over1_5Odds': over_1_5_odds,
+        'Under3_5Odds': under_3_5_odds
     }
 
 # === Fetch All Leagues ===
@@ -807,8 +851,7 @@ def main(date_from=None):
     logger.info(f"Using Season ID: {season_id} for date: {date_from}")
 
     target_league_ids = [
-        156, 155, 250, 244, 176, 173, 245, 251, 223, 329, 330, 7097, 171, 175, 152, 302, 207, 168, 312, 
-        308, 118, 253, 593, 614, 352, 353, 362, 307, 329, 209, 212, 363, 322, 157, 151, 154, 153, 206, 158, 138, 198, 200
+        152
     ]
 
     leagues = fetch_all_leagues()
@@ -864,7 +907,7 @@ def main(date_from=None):
             skipped_matches.append(match_info)
             continue
 
-        result = make_prediction(data_dict, match_info)
+        result = make_prediction(data_dict, match_info, match_id)  # Pass match_id
         if 'error' in result:
             skipped_matches.append(match_info)
             continue
@@ -881,7 +924,9 @@ def main(date_from=None):
             'Reason': r['Reason'],
             'OverConfidence': r['OverConfidence'],
             'UnderConfidence': r['UnderConfidence'],
-            'TriggeredRules': r['TriggeredRules']
+            'TriggeredRules': r['TriggeredRules'],
+            'Over1_5Odds': r['Over1_5Odds'],
+            'Under3_5Odds': r['Under3_5Odds']
         } for r in results
     ]
     with open('predictions.json', 'w', encoding='utf-8') as f:
@@ -899,6 +944,8 @@ def main(date_from=None):
                       f"Under 3.5 Confidence: {result['UnderConfidence']:.1f}%\n"
                       f"Meta-Model Over 1.5 Probability: {result['MetaOverProb']:.1f}%\n"
                       f"Meta-Model Under 3.5 Probability: {result['MetaUnderProb']:.1f}%\n"
+                      f"Over 1.5 Odds: {result['Over1_5Odds']:.2f if result['Over1_5Odds'] else 'N/A'}\n"
+                      f"Under 3.5 Odds: {result['Under3_5Odds']:.2f if result['Under3_5Odds'] else 'N/A'}\n"
                       f"Recommendation: {result['Recommendation']}\n"
                       f"Reason: {result['Reason']}\n"
                       f"Triggered Rules:\n" + "\n".join(result['TriggeredRules']) + "\n" + f"{'='*50}")
