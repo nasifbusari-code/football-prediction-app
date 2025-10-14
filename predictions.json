@@ -1,0 +1,1727 @@
+[
+  {
+    "Match": "Illertissen vs Ansbach (2025-10-14, Regionalliga, Germany)",
+    "MetaOverProb": 88.07399326362797,
+    "MetaUnderProb": 11.926006736372045,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (88.1%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 13 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 2.40 >= 1.3, recent high-scoring form: home last 2 = [2, 0], away last 2 = [1, 1])"
+    ]
+  },
+  {
+    "Match": "Brentford U21 vs QPR U21 (2025-10-14, Professional Development League, England)",
+    "MetaOverProb": 15.119160254448419,
+    "MetaUnderProb": 84.8808397455516,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Under 3.5 Probability (84.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.90 >= 1.3, recent high-scoring form: home last 2 = [3, 2], away last 2 = [3, 3])"
+    ]
+  },
+  {
+    "Match": "Peterborough U21 vs Fleetwood U21 (2025-10-14, Professional Development League, England)",
+    "MetaOverProb": 15.837914706843344,
+    "MetaUnderProb": 84.16208529315666,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 78.56329612948878,
+    "UnderConfidence": 21.436703870511224,
+    "Reason": "Meta-Model Under 3.5 Probability (84.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [2, 2], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "Emden vs Hannover II (2025-10-15, Regionalliga, Germany)",
+    "MetaOverProb": 85.70264765456137,
+    "MetaUnderProb": 14.297352345438627,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (85.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 2.20 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 13 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 2.20 >= 1.3, recent high-scoring form: home last 2 = [1, 3], away last 2 = [2, 4])"
+    ]
+  },
+  {
+    "Match": "TPV vs Ilves 2 (2025-10-16, Kakkonen, Finland)",
+    "MetaOverProb": 96.5982283984653,
+    "MetaUnderProb": 3.4017716015347066,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 77.89937261753937,
+    "UnderConfidence": 22.10062738246063,
+    "Reason": "Meta-Model Over 1.5 Probability (96.6%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 1.50 <= 1.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 9 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [4, 11], away last 2 = [2, 5])"
+    ]
+  },
+  {
+    "Match": "Ilves vs KuPS (2025-10-16, Veikkausliiga, Finland)",
+    "MetaOverProb": 97.49185348853834,
+    "MetaUnderProb": 2.508146511461664,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 38.00414150871279,
+    "UnderConfidence": 61.99585849128721,
+    "Reason": "Meta-Model Over 1.5 Probability (97.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 10 >= 7 and avg conceded = 0.90 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "R. Oviedo vs Espanyol (2025-10-17, La Liga, Spain)",
+    "MetaOverProb": 69.05991643467046,
+    "MetaUnderProb": 30.940083565329545,
+    "Recommendation": "NO BET",
+    "OverConfidence": 61.470062938884396,
+    "UnderConfidence": 38.529937061115604,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (69.1%) nor Under 3.5 Probability (30.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 3: +15 to base_score (high goal/conceded count >= 8 and zero count >= 7)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 1.70 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 9 >= 6)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 0.60 <= 1.0, home scoreless matches = 2 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.20 <= 0.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.80 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 2 >= 1, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Union Berlin vs B. Monchengladbach (2025-10-17, Bundesliga, Germany)",
+    "MetaOverProb": 11.122891039252654,
+    "MetaUnderProb": 88.87710896074734,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 68.58853476165095,
+    "UnderConfidence": 31.411465238349052,
+    "Reason": "Meta-Model Under 3.5 Probability (88.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 6 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [2, 0], away last 2 = [1, 1])"
+    ]
+  },
+  {
+    "Match": "PSG vs Strasbourg (2025-10-17, Ligue 1, France)",
+    "MetaOverProb": 93.84344704564882,
+    "MetaUnderProb": 6.156552954351175,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 21.535189192917073,
+    "UnderConfidence": 78.46481080708293,
+    "Reason": "Meta-Model Over 1.5 Probability (93.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.10 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.80 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 1.40 <= 4 * 0.80, home BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Vissel Kobe vs Kashima Antlers (2025-10-17, J1 League, Japan)",
+    "MetaOverProb": 1.5355710669541036,
+    "MetaUnderProb": 98.4644289330459,
+    "Recommendation": "NO BET",
+    "OverConfidence": 13.137023038649282,
+    "UnderConfidence": 86.86297696135071,
+    "Reason": "Match rejected: 8 zeros in goal/conceded lists and meta-model favors Under 3.5 (98.5% vs Over 1.5 1.5%), but both Fortress and Drought rules not triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 0.40 <= 1.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.40 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 1.40 <= 4 * 0.40, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Hannover vs Schalke (2025-10-17, 2. Bundesliga, Germany)",
+    "MetaOverProb": 43.9484096986666,
+    "MetaUnderProb": 56.0515903013334,
+    "Recommendation": "NO BET",
+    "OverConfidence": 11.436783536051156,
+    "UnderConfidence": 88.56321646394885,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (43.9%) nor Under 3.5 Probability (56.1%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.00 <= 1.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 1.00 <= 1.0, away scoreless matches = 2 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Eindhoven FC vs Vitesse (2025-10-17, Eerste Divisie, Netherlands)",
+    "MetaOverProb": 94.23540599637666,
+    "MetaUnderProb": 5.764594003623347,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 1.0342698624973536,
+    "Reason": "Meta-Model Over 1.5 Probability (94.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.80 >= 1.3, recent high-scoring form: home last 2 = [1, 1], away last 2 = [0, 2])"
+    ]
+  },
+  {
+    "Match": "Den Haag vs Dordrecht (2025-10-17, Eerste Divisie, Netherlands)",
+    "MetaOverProb": 96.45555778607067,
+    "MetaUnderProb": 3.544442213929326,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 62.60710581734263,
+    "UnderConfidence": 37.39289418265737,
+    "Reason": "Meta-Model Over 1.5 Probability (96.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.90 >= 3.5, clean sheet rate home = 0.20 or away = 0.40 >= 0.3, low scoring rate = 0.30 >= 0.2)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.50 <= 1.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [3, 3], away last 2 = [3, 1])"
+    ]
+  },
+  {
+    "Match": "Jong Utrecht vs Maastricht (2025-10-17, Eerste Divisie, Netherlands)",
+    "MetaOverProb": 44.91528135085299,
+    "MetaUnderProb": 55.084718649147014,
+    "Recommendation": "NO BET",
+    "OverConfidence": 68.6379427368063,
+    "UnderConfidence": 31.362057263193705,
+    "Reason": "Match rejected: 7 zeros in goal/conceded lists and meta-model favors Under 3.5 (55.1% vs Over 1.5 44.9%), but both Fortress and Drought rules not triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 3: +15 to base_score (high goal/conceded count >= 8 and zero count >= 7)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 1.00 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 2 >= 1, away BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [4, 2], away last 2 = [0, 3])"
+    ]
+  },
+  {
+    "Match": "Jong Ajax vs Jong PSV (2025-10-17, Eerste Divisie, Netherlands)",
+    "MetaOverProb": 75.67613752864536,
+    "MetaUnderProb": 24.323862471354634,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (75.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 6 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 2.00 >= 1.3, recent high-scoring form: home last 2 = [0, 4], away last 2 = [0, 2])"
+    ]
+  },
+  {
+    "Match": "Helmond vs Jong AZ (2025-10-17, Eerste Divisie, Netherlands)",
+    "MetaOverProb": 21.039041595495714,
+    "MetaUnderProb": 78.96095840450428,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 24.930907561228224,
+    "UnderConfidence": 75.06909243877178,
+    "Reason": "Meta-Model Under 3.5 Probability (79.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.10 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Eintracht Trier vs FC 08 Homburg (2025-10-17, Regionalliga, Germany)",
+    "MetaOverProb": 18.50737347849471,
+    "MetaUnderProb": 81.4926265215053,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 9.37151049482543,
+    "Reason": "Meta-Model Under 3.5 Probability (81.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 8 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [3, 1], away last 2 = [4, 3])"
+    ]
+  },
+  {
+    "Match": "Drochtersen/Assel vs Lubeck (2025-10-17, Regionalliga, Germany)",
+    "MetaOverProb": 50.66566646166033,
+    "MetaUnderProb": 49.33433353833968,
+    "Recommendation": "NO BET",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (50.7%) nor Under 3.5 Probability (49.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [4, 3], away last 2 = [4, 0])"
+    ]
+  },
+  {
+    "Match": "Eilenburg vs Luckenwalde (2025-10-17, Regionalliga, Germany)",
+    "MetaOverProb": 84.0198656755331,
+    "MetaUnderProb": 15.980134324466894,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 78.9232127124903,
+    "UnderConfidence": 21.076787287509703,
+    "Reason": "Meta-Model Over 1.5 Probability (84.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 1.60 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 8 >= 6)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 0.80 <= 1.0, home scoreless matches = 3 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.20 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.20 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [0, 3], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "Unterhaching vs Bayreuth (2025-10-17, Regionalliga, Germany)",
+    "MetaOverProb": 49.45745058412248,
+    "MetaUnderProb": 50.542549415877524,
+    "Recommendation": "NO BET",
+    "OverConfidence": 38.43446664618656,
+    "UnderConfidence": 61.56553335381344,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (49.5%) nor Under 3.5 Probability (50.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.10 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Schalke II vs Fortuna Koln (2025-10-17, Regionalliga, Germany)",
+    "MetaOverProb": 97.29453310375213,
+    "MetaUnderProb": 2.7054668962478723,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 30.849438305361584,
+    "UnderConfidence": 69.15056169463841,
+    "Reason": "Meta-Model Over 1.5 Probability (97.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.50 >= 3.5, clean sheet rate home = 0.20 or away = 0.40 >= 0.3, low scoring rate = 0.30 >= 0.2)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.30 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Aue vs Mannheim (2025-10-17, 3. Liga, Germany)",
+    "MetaOverProb": 37.95969764058504,
+    "MetaUnderProb": 62.04030235941496,
+    "Recommendation": "NO BET",
+    "OverConfidence": 63.350687786745056,
+    "UnderConfidence": 36.649312213254944,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (38.0%) nor Under 3.5 Probability (62.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.50 <= 1.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [2, 0], away last 2 = [0, 4])"
+    ]
+  },
+  {
+    "Match": "Ballinamallard vs Loughgall (2025-10-17, Championship, Northern Ireland)",
+    "MetaOverProb": 30.039206281256885,
+    "MetaUnderProb": 69.9607937187431,
+    "Recommendation": "NO BET",
+    "OverConfidence": 23.904618362964353,
+    "UnderConfidence": 76.09538163703564,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (30.0%) nor Under 3.5 Probability (70.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.30 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Portadown vs Linfield (2025-10-17, Premiership, Northern Ireland)",
+    "MetaOverProb": 83.36636319248274,
+    "MetaUnderProb": 16.633636807517266,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 69.90256630810984,
+    "UnderConfidence": 30.09743369189016,
+    "Reason": "Meta-Model Over 1.5 Probability (83.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 1.70 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 7 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [2, 0], away last 2 = [0, 1])"
+    ]
+  },
+  {
+    "Match": "Lillestrom vs Lyn (2025-10-17, 1. Division, Norway)",
+    "MetaOverProb": 2.004054954768917,
+    "MetaUnderProb": 97.99594504523108,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 29.137023038649286,
+    "UnderConfidence": 70.86297696135071,
+    "Reason": "Meta-Model Under 3.5 Probability (98.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: -15% to base_score (wins + draws = 10 >= 7 and avg conceded = 0.50 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Fulham vs Arsenal (2025-10-18, Premier League, England)",
+    "MetaOverProb": 8.128642580961634,
+    "MetaUnderProb": 91.87135741903836,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (91.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 0.90 <= 1.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 1.00 <= 1.0, away scoreless matches = 2 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Barcelona vs Girona (2025-10-18, La Liga, Spain)",
+    "MetaOverProb": 30.97173518639095,
+    "MetaUnderProb": 69.02826481360904,
+    "Recommendation": "NO BET",
+    "OverConfidence": 81.75467867844952,
+    "UnderConfidence": 18.245321321550477,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (31.0%) nor Under 3.5 Probability (69.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.90 >= 3.5, clean sheet rate home = 0.40 or away = 0.20 >= 0.3, low scoring rate = 0.30 >= 0.2)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [2, 4], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "RB Leipzig vs Hamburger SV (2025-10-18, Bundesliga, Germany)",
+    "MetaOverProb": 34.366317605270524,
+    "MetaUnderProb": 65.63368239472946,
+    "Recommendation": "NO BET",
+    "OverConfidence": 13.081209294831481,
+    "UnderConfidence": 86.91879070516852,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (34.4%) nor Under 3.5 Probability (65.6%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.30 <= 1.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 1.00 <= 1.0, away clean sheets = 4 >= 3, avg home scored = 2.20 <= 4 * 1.00, away BTTS rate = 0.00 <= 0.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.00 <= 1.0, away scoreless matches = 5 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.00 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.00 >= 0.6, combined avg conceded = 1.30 >= 1.3, recent high-scoring form: home last 2 = [3, 1], away last 2 = [0, 0])"
+    ]
+  },
+  {
+    "Match": "Yunnan Yukun vs Tianjin Jinmen Tiger (2025-10-18, Chinese Super League, China)",
+    "MetaOverProb": 97.34192811670238,
+    "MetaUnderProb": 2.658071883297619,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 70.93909479396919,
+    "UnderConfidence": 29.06090520603081,
+    "Reason": "Meta-Model Over 1.5 Probability (97.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 2.00 >= 1.3, recent high-scoring form: home last 2 = [2, 4], away last 2 = [0, 2])"
+    ]
+  },
+  {
+    "Match": "Verdy vs Albirex Niigata (2025-10-18, J1 League, Japan)",
+    "MetaOverProb": 6.729626956908527,
+    "MetaUnderProb": 93.27037304309147,
+    "Recommendation": "NO BET",
+    "OverConfidence": 80.87643931537195,
+    "UnderConfidence": 19.123560684628046,
+    "Reason": "Match rejected: 7 zeros in goal/conceded lists and meta-model favors Under 3.5 (93.3% vs Over 1.5 6.7%), but both Fortress and Drought rules not triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Loss Rule: +15% to base_score (losses = 7 >= 6 and avg conceded both teams = 1.70 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 7 >= 4 and high goal/conceded count = 7 >= 6)"
+    ]
+  },
+  {
+    "Match": "Okayama vs Cerezo Osaka (2025-10-18, J1 League, Japan)",
+    "MetaOverProb": 96.31257403947758,
+    "MetaUnderProb": 3.687425960522417,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (96.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 10 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.80 >= 1.3, recent high-scoring form: home last 2 = [2, 0], away last 2 = [0, 3])"
+    ]
+  },
+  {
+    "Match": "Gamba Osaka vs Kashiwa Reysol (2025-10-18, J1 League, Japan)",
+    "MetaOverProb": 98.66639102303576,
+    "MetaUnderProb": 1.3336089769642356,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (98.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.80 >= 1.3, recent high-scoring form: home last 2 = [3, 0], away last 2 = [1, 2])"
+    ]
+  },
+  {
+    "Match": "Brann vs Haugesund (2025-10-18, Eliteserien, Norway)",
+    "MetaOverProb": 43.31629253727339,
+    "MetaUnderProb": 56.68370746272661,
+    "Recommendation": "NO BET",
+    "OverConfidence": 90,
+    "UnderConfidence": 6.196258925385337,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (43.3%) nor Under 3.5 Probability (56.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 11 >= 6)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.40 <= 1.0, away scoreless matches = 4 >= 2, home clean sheets = 2 >= 1, away BTTS rate = 0.20 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.20 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [1, 4], away last 2 = [0, 0])"
+    ]
+  },
+  {
+    "Match": "Mantova vs Sudtirol (2025-10-18, Serie B, Italy)",
+    "MetaOverProb": 4.3027518613485585,
+    "MetaUnderProb": 95.69724813865143,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 74.72765734406607,
+    "UnderConfidence": 25.272342655933926,
+    "Reason": "Meta-Model Under 3.5 Probability (95.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.80 >= 1.3, recent high-scoring form: home last 2 = [0, 2], away last 2 = [3, 2])"
+    ]
+  },
+  {
+    "Match": "QPR vs Millwall (2025-10-18, Championship, England)",
+    "MetaOverProb": 47.55638215914495,
+    "MetaUnderProb": 52.44361784085505,
+    "Recommendation": "NO BET",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (47.6%) nor Under 3.5 Probability (52.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 0.80 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.40 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 1.20 <= 4 * 0.40, home BTTS rate = 0.40 <= 0.5)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 1.00 <= 1.0, home scoreless matches = 2 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "West Brom vs Preston (2025-10-18, Championship, England)",
+    "MetaOverProb": 4.107052523526751,
+    "MetaUnderProb": 95.89294747647324,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (95.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.00 <= 1.5)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 0.60 <= 1.0, home scoreless matches = 2 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Doncaster vs Northampton (2025-10-18, League One, England)",
+    "MetaOverProb": 12.32430028377351,
+    "MetaUnderProb": 87.67569971622649,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 31.918986491146335,
+    "UnderConfidence": 68.08101350885366,
+    "Reason": "Meta-Model Under 3.5 Probability (87.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.40 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Cardiff vs Reading (2025-10-18, League One, England)",
+    "MetaOverProb": 94.44368634125262,
+    "MetaUnderProb": 5.556313658747392,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 64.59533561135842,
+    "UnderConfidence": 35.40466438864158,
+    "Reason": "Meta-Model Over 1.5 Probability (94.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.50 <= 1.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 6 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [4, 3], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "El Gouna vs National Bank Egypt (2025-10-18, Premier League, Egypt)",
+    "MetaOverProb": 2.4023571228549514,
+    "MetaUnderProb": 97.59764287714505,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (97.6%) exceeds 70% threshold. Allowed despite 9 zeros due to both Fortress and Drought rules being triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 0.60 <= 1.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.40 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 0.60 <= 4 * 0.40, away BTTS rate = 0.20 <= 0.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 1.00 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "De Graafschap vs Oss (2025-10-18, Eerste Divisie, Netherlands)",
+    "MetaOverProb": 86.93984970859951,
+    "MetaUnderProb": 13.060150291400502,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (86.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 2.40 >= 1.3, recent high-scoring form: home last 2 = [0, 3], away last 2 = [2, 0])"
+    ]
+  },
+  {
+    "Match": "Van vs Pyunik Yerevan (2025-10-18, Premier League, Armenia)",
+    "MetaOverProb": 23.839096775631305,
+    "MetaUnderProb": 76.16090322436871,
+    "Recommendation": "NO BET",
+    "OverConfidence": 20.930907561228224,
+    "UnderConfidence": 79.06909243877178,
+    "Reason": "Match rejected: 7 zeros in goal/conceded lists and meta-model favors Under 3.5 (76.2% vs Over 1.5 23.8%), but both Fortress and Drought rules not triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 3: +15 to base_score (high goal/conceded count >= 8 and zero count >= 7)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.20 <= 1.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.80 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 1.40 <= 4 * 0.80, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Middelfart vs Horsens (2025-10-18, 1. Division, Denmark)",
+    "MetaOverProb": 13.45421312619513,
+    "MetaUnderProb": 86.54578687380487,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (86.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.10 <= 1.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.60 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 1.60 <= 4 * 0.60, away BTTS rate = 0.20 <= 0.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.80 <= 1.0, away scoreless matches = 2 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Boston Utd vs Scunthorpe (2025-10-18, National League, England)",
+    "MetaOverProb": 96.75160861019648,
+    "MetaUnderProb": 3.2483913898035106,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 5.838269693955603,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Over 1.5 Probability (96.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.00 <= 1.5)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 1.00 <= 1.0, home scoreless matches = 2 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Rochdale vs Yeovil (2025-10-18, National League, England)",
+    "MetaOverProb": 93.22659916087514,
+    "MetaUnderProb": 6.773400839124852,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 10.256287413035775,
+    "UnderConfidence": 89.74371258696422,
+    "Reason": "Meta-Model Over 1.5 Probability (93.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 0.90 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.60 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 1.80 <= 4 * 0.60, home BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "York City vs Wealdstone (2025-10-18, National League, England)",
+    "MetaOverProb": 89.23399467579556,
+    "MetaUnderProb": 10.76600532420445,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 71.01775465244549,
+    "UnderConfidence": 28.98224534755451,
+    "Reason": "Meta-Model Over 1.5 Probability (89.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.50 >= 3.5, clean sheet rate home = 0.40 or away = 0.20 >= 0.3, low scoring rate = 0.30 >= 0.2)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 10 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.40 >= 1.3, recent high-scoring form: home last 2 = [4, 2], away last 2 = [1, 2])"
+    ]
+  },
+  {
+    "Match": "Brackley Town vs Gateshead (2025-10-18, National League, England)",
+    "MetaOverProb": 37.923699636936746,
+    "MetaUnderProb": 62.076300363063254,
+    "Recommendation": "NO BET",
+    "OverConfidence": 56.19847144564801,
+    "UnderConfidence": 43.80152855435199,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (37.9%) nor Under 3.5 Probability (62.1%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.20 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [0, 1], away last 2 = [0, 4])"
+    ]
+  },
+  {
+    "Match": "Morecambe vs Southend (2025-10-18, National League, England)",
+    "MetaOverProb": 16.330760255327352,
+    "MetaUnderProb": 83.66923974467264,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Under 3.5 Probability (83.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 2.20 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 2.20 >= 1.3, recent high-scoring form: home last 2 = [1, 0], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "Sutton vs Hartlepool (2025-10-18, National League, England)",
+    "MetaOverProb": 89.81665559076353,
+    "MetaUnderProb": 10.183344409236476,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 60.95507095142567,
+    "UnderConfidence": 39.04492904857433,
+    "Reason": "Meta-Model Over 1.5 Probability (89.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 1.70 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 7 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [3, 2], away last 2 = [0, 1])"
+    ]
+  },
+  {
+    "Match": "07 Vestur Sorvagur 2 vs NSI Runavik 2 (2025-10-18, 1. Deild, Faroe Islands)",
+    "MetaOverProb": 41.96449561077966,
+    "MetaUnderProb": 58.03550438922035,
+    "Recommendation": "NO BET",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (42.0%) nor Under 3.5 Probability (58.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Loss Rule: +15% to base_score (losses = 8 >= 6 and avg conceded both teams = 3.30 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 8 >= 4 and high goal/conceded count = 13 >= 6)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 0.60 <= 1.0, home scoreless matches = 4 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.20 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 10 matches with 3+ goals, home BTTS rate = 0.20 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 3.30 >= 1.3, recent high-scoring form: home last 2 = [3, 0], away last 2 = [0, 5])"
+    ]
+  },
+  {
+    "Match": "Hertha Zehlendorf vs BFC Dynamo (2025-10-18, Regionalliga, Germany)",
+    "MetaOverProb": 28.093988396835734,
+    "MetaUnderProb": 71.90601160316427,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Under 3.5 Probability (71.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 11 >= 6)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 1.00 <= 1.0, home scoreless matches = 3 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.80 >= 1.3, recent high-scoring form: home last 2 = [0, 0], away last 2 = [3, 2])"
+    ]
+  },
+  {
+    "Match": "Werder Bremen II vs Hannover II (2025-10-18, Regionalliga, Germany)",
+    "MetaOverProb": 81.450164484196,
+    "MetaUnderProb": 18.54983551580399,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (81.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 12 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 6 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 2.20 >= 1.3, recent high-scoring form: home last 2 = [0, 6], away last 2 = [2, 4])"
+    ]
+  },
+  {
+    "Match": "Emden vs Jeddeloh (2025-10-18, Regionalliga, Germany)",
+    "MetaOverProb": 85.84549026896315,
+    "MetaUnderProb": 14.154509731036862,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (85.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 10 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.80 >= 1.3, recent high-scoring form: home last 2 = [1, 3], away last 2 = [0, 1])"
+    ]
+  },
+  {
+    "Match": "Wiedenbruck vs Dusseldorf II (2025-10-18, Regionalliga, Germany)",
+    "MetaOverProb": 94.49603852077828,
+    "MetaUnderProb": 5.503961479221702,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 81.44578228632652,
+    "UnderConfidence": 18.55421771367348,
+    "Reason": "Meta-Model Over 1.5 Probability (94.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 8 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [3, 2], away last 2 = [1, 2])"
+    ]
+  },
+  {
+    "Match": "Rodinghausen vs Bocholt (2025-10-18, Regionalliga, Germany)",
+    "MetaOverProb": 22.95004955320546,
+    "MetaUnderProb": 77.04995044679454,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 85.56842815848181,
+    "UnderConfidence": 14.431571841518192,
+    "Reason": "Meta-Model Under 3.5 Probability (77.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 9 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 2.00 >= 1.3, recent high-scoring form: home last 2 = [0, 1], away last 2 = [2, 3])"
+    ]
+  },
+  {
+    "Match": "Koln II vs Bonner (2025-10-18, Regionalliga, Germany)",
+    "MetaOverProb": 87.20676092658238,
+    "MetaUnderProb": 12.793239073417617,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 58.813150685064294,
+    "UnderConfidence": 41.186849314935706,
+    "Reason": "Meta-Model Over 1.5 Probability (87.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.50 <= 1.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [3, 2], away last 2 = [1, 4])"
+    ]
+  },
+  {
+    "Match": "Aubstadt vs Bayern II (2025-10-18, Regionalliga, Germany)",
+    "MetaOverProb": 7.4290035845204745,
+    "MetaUnderProb": 92.57099641547953,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (92.6%) exceeds 70% threshold. Allowed despite 9 zeros due to both Fortress and Drought rules being triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 1.00 <= 1.0, home clean sheets = 4 >= 3, avg away scored = 1.00 <= 4 * 1.00, home BTTS rate = 0.20 <= 0.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 1.00 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 4 >= 1, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Sagan Tosu vs Blaublitz (2025-10-18, J2 League, Japan)",
+    "MetaOverProb": 37.98366561939032,
+    "MetaUnderProb": 62.016334380609685,
+    "Recommendation": "NO BET",
+    "OverConfidence": 25.10404483845994,
+    "UnderConfidence": 74.89595516154006,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (38.0%) nor Under 3.5 Probability (62.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 1.10 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Iwaki vs Ehime (2025-10-18, J2 League, Japan)",
+    "MetaOverProb": 67.96968782189427,
+    "MetaUnderProb": 32.030312178105724,
+    "Recommendation": "NO BET",
+    "OverConfidence": 76.90501453408234,
+    "UnderConfidence": 23.09498546591766,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (68.0%) nor Under 3.5 Probability (32.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 8 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 6 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.40 >= 1.3, recent high-scoring form: home last 2 = [3, 1], away last 2 = [0, 0])"
+    ]
+  },
+  {
+    "Match": "Omiya Ardija vs Fujieda MYFC (2025-10-18, J2 League, Japan)",
+    "MetaOverProb": 0.7734075010140461,
+    "MetaUnderProb": 99.22659249898595,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 29.11997427507991,
+    "UnderConfidence": 70.88002572492009,
+    "Reason": "Meta-Model Under 3.5 Probability (99.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: +25% to base_score (losses = 7 >= 4 and high goal/conceded count = 8 >= 6)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.80 <= 1.0, away scoreless matches = 2 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Iwata vs Tokushima (2025-10-18, J2 League, Japan)",
+    "MetaOverProb": 49.068909760166214,
+    "MetaUnderProb": 50.931090239833786,
+    "Recommendation": "NO BET",
+    "OverConfidence": 34.282369227715336,
+    "UnderConfidence": 65.71763077228466,
+    "Reason": "Match rejected: 8 zeros in goal/conceded lists and meta-model favors Under 3.5 (50.9% vs Over 1.5 49.1%), but both Fortress and Drought rules not triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 6 >= 6)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 1.00 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 1.20 <= 4 * 1.00, home BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Jelgava vs BFC Daugavpils (2025-10-18, Virsliga, Latvia)",
+    "MetaOverProb": 11.312085366540261,
+    "MetaUnderProb": 88.68791463345973,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 61.07246137857902,
+    "UnderConfidence": 38.92753862142098,
+    "Reason": "Meta-Model Under 3.5 Probability (88.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 6 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [1, 1], away last 2 = [1, 3])"
+    ]
+  },
+  {
+    "Match": "Limavady vs Annagh (2025-10-18, Championship, Northern Ireland)",
+    "MetaOverProb": 4.888453065446305,
+    "MetaUnderProb": 95.1115469345537,
+    "Recommendation": "NO BET",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Match rejected: 9 zeros in goal/conceded lists and meta-model favors Under 3.5 (95.1% vs Over 1.5 4.9%), but both Fortress and Drought rules not triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 0.50 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.60 <= 1.0, home clean sheets = 4 >= 3, avg away scored = 1.60 <= 4 * 0.60, home BTTS rate = 0.00 <= 0.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.40 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 1.40 <= 4 * 0.40, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Newington vs Armagh (2025-10-18, Championship, Northern Ireland)",
+    "MetaOverProb": 85.29923022206368,
+    "MetaUnderProb": 14.700769777936321,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (85.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 12 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 9 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [2, 3], away last 2 = [5, 0])"
+    ]
+  },
+  {
+    "Match": "Warrenpoint vs H&W Welders (2025-10-18, Championship, Northern Ireland)",
+    "MetaOverProb": 98.66768117906952,
+    "MetaUnderProb": 1.3323188209304848,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 52.98000252111071,
+    "UnderConfidence": 47.01999747888929,
+    "Reason": "Meta-Model Over 1.5 Probability (98.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.70 >= 3.5, clean sheet rate home = 0.20 or away = 0.40 >= 0.3, low scoring rate = 0.30 >= 0.2)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.40 <= 1.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 8 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.40 >= 1.3, recent high-scoring form: home last 2 = [3, 3], away last 2 = [2, 3])"
+    ]
+  },
+  {
+    "Match": "Institute vs Dundela (2025-10-18, Championship, Northern Ireland)",
+    "MetaOverProb": 0.6173793198197622,
+    "MetaUnderProb": 99.38262068018024,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 9.447004909386145,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (99.4%) exceeds 70% threshold. Allowed despite 8 zeros due to both Fortress and Drought rules being triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.60 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 0.40 <= 4 * 0.60, home BTTS rate = 0.20 <= 0.5)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.40 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 3 >= 1, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Ballinamallard vs Loughgall (2025-10-18, Championship, Northern Ireland)",
+    "MetaOverProb": 30.039206281256885,
+    "MetaUnderProb": 69.9607937187431,
+    "Recommendation": "NO BET",
+    "OverConfidence": 23.904618362964353,
+    "UnderConfidence": 76.09538163703564,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (30.0%) nor Under 3.5 Probability (70.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.30 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Queens Univ. vs Ards (2025-10-18, Championship, Northern Ireland)",
+    "MetaOverProb": 16.85578205150559,
+    "MetaUnderProb": 83.1442179484944,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 7.5624234090147695,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (83.1%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.30 <= 1.5)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 1.00 <= 1.0, home scoreless matches = 2 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Ostersund vs Brage (2025-10-18, Superettan, Sweden)",
+    "MetaOverProb": 86.35105721613611,
+    "MetaUnderProb": 13.648942783863887,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (86.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.60 >= 3.5, clean sheet rate home = 0.40 or away = 0.20 >= 0.3, low scoring rate = 0.20 >= 0.2)",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 10 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 2.00 >= 1.3, recent high-scoring form: home last 2 = [0, 1], away last 2 = [1, 5])"
+    ]
+  },
+  {
+    "Match": "Varberg vs Sandviken (2025-10-18, Superettan, Sweden)",
+    "MetaOverProb": 83.32243947368958,
+    "MetaUnderProb": 16.677560526310415,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 80.24986633443487,
+    "UnderConfidence": 19.75013366556513,
+    "Reason": "Meta-Model Over 1.5 Probability (83.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 8 >= 6)"
+    ]
+  },
+  {
+    "Match": "Falkenberg vs Orgryte (2025-10-18, Superettan, Sweden)",
+    "MetaOverProb": 14.237974527094163,
+    "MetaUnderProb": 85.76202547290583,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 32.07341630151626,
+    "UnderConfidence": 67.92658369848374,
+    "Reason": "Meta-Model Under 3.5 Probability (85.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 0.50 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Lexington vs Sacramento Republic (2025-10-18, USL Championship, USA)",
+    "MetaOverProb": 97.43804545292731,
+    "MetaUnderProb": 2.561954547072689,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 1.5910101063397235,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Over 1.5 Probability (97.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 0.90 <= 1.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.80 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 1.60 <= 4 * 0.80, away BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Mariehamn vs AC Oulu (2025-10-18, Veikkausliiga, Finland)",
+    "MetaOverProb": 90.075955194082,
+    "MetaUnderProb": 9.924044805917998,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 83.48897986731332,
+    "UnderConfidence": 16.51102013268668,
+    "Reason": "Meta-Model Over 1.5 Probability (90.1%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 9 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [2, 0], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "Haka vs KTP (2025-10-18, Veikkausliiga, Finland)",
+    "MetaOverProb": 9.064801276393746,
+    "MetaUnderProb": 90.93519872360625,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Under 3.5 Probability (90.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Loss Rule: +15% to base_score (losses = 9 >= 6 and avg conceded both teams = 2.10 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 9 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [2, 0], away last 2 = [0, 0])"
+    ]
+  },
+  {
+    "Match": "Moss vs Kongsvinger (2025-10-18, 1. Division, Norway)",
+    "MetaOverProb": 96.68526864692402,
+    "MetaUnderProb": 3.3147313530759948,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (96.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [1, 3], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "Sogndal vs Start (2025-10-18, 1. Division, Norway)",
+    "MetaOverProb": 25.842991769222884,
+    "MetaUnderProb": 74.15700823077711,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 68.21685418848114,
+    "UnderConfidence": 31.783145811518864,
+    "Reason": "Meta-Model Under 3.5 Probability (74.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 0.20 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [2, 1], away last 2 = [2, 3])"
+    ]
+  },
+  {
+    "Match": "Skeid vs Stabaek (2025-10-18, 1. Division, Norway)",
+    "MetaOverProb": 51.83667545904195,
+    "MetaUnderProb": 48.16332454095805,
+    "Recommendation": "NO BET",
+    "OverConfidence": 36.526284500187856,
+    "UnderConfidence": 63.473715499812144,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (51.8%) nor Under 3.5 Probability (48.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 1.70 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 7 >= 6)"
+    ]
+  },
+  {
+    "Match": "Notodden vs Eik-Tonsberg (2025-10-18, 2. Division, Norway)",
+    "MetaOverProb": 32.29906508638777,
+    "MetaUnderProb": 67.70093491361223,
+    "Recommendation": "NO BET",
+    "OverConfidence": 59.6377337172911,
+    "UnderConfidence": 40.3622662827089,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (32.3%) nor Under 3.5 Probability (67.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 1.70 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 8 >= 6)"
+    ]
+  },
+  {
+    "Match": "Cagliari vs Bologna (2025-10-19, Serie A, Italy)",
+    "MetaOverProb": 95.43451647227099,
+    "MetaUnderProb": 4.565483527729001,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 82.97033743758023,
+    "UnderConfidence": 17.029662562419773,
+    "Reason": "Meta-Model Over 1.5 Probability (95.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 9 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [3, 1], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "St. Pauli vs Hoffenheim (2025-10-19, Bundesliga, Germany)",
+    "MetaOverProb": 96.87415906138146,
+    "MetaUnderProb": 3.1258409386185444,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 81.13533897832451,
+    "UnderConfidence": 18.864661021675488,
+    "Reason": "Meta-Model Over 1.5 Probability (96.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [3, 0], away last 2 = [2, 2])"
+    ]
+  },
+  {
+    "Match": "Alanyaspor vs Goztepe (2025-10-19, S\u00fcper Lig, Turkey)",
+    "MetaOverProb": 1.619559404452306,
+    "MetaUnderProb": 98.3804405955477,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 0,
+    "UnderConfidence": 90,
+    "Reason": "Meta-Model Under 3.5 Probability (98.4%) exceeds 70% threshold. Allowed despite 9 zeros due to both Fortress and Drought rules being triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 0.50 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.60 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 1.60 <= 4 * 0.60, home BTTS rate = 0.20 <= 0.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.40 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 1.00 <= 4 * 0.40, away BTTS rate = 0.40 <= 0.5)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 1.00 <= 1.0, home scoreless matches = 2 >= 2, away clean sheets = 3 >= 1, home BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Ey\u00fcp vs Kas\u0131mpa\u015fa (2025-10-19, S\u00fcper Lig, Turkey)",
+    "MetaOverProb": 2.536392911974663,
+    "MetaUnderProb": 97.46360708802534,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 84.86639147983516,
+    "UnderConfidence": 15.133608520164842,
+    "Reason": "Meta-Model Under 3.5 Probability (97.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 9 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.90 >= 1.3, recent high-scoring form: home last 2 = [0, 1], away last 2 = [1, 2])"
+    ]
+  },
+  {
+    "Match": "Elfsborg vs Oster (2025-10-19, Allsvenskan, Sweden)",
+    "MetaOverProb": 90.62742516267062,
+    "MetaUnderProb": 9.372574837329395,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 68.77766632517753,
+    "UnderConfidence": 31.222333674822465,
+    "Reason": "Meta-Model Over 1.5 Probability (90.6%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [2, 4], away last 2 = [1, 0])"
+    ]
+  },
+  {
+    "Match": "Varnamo vs Brommapojkarna (2025-10-19, Allsvenskan, Sweden)",
+    "MetaOverProb": 54.62681684028132,
+    "MetaUnderProb": 45.373183159718664,
+    "Recommendation": "NO BET",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (54.6%) nor Under 3.5 Probability (45.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 2.10 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [2, 2], away last 2 = [1, 2])"
+    ]
+  },
+  {
+    "Match": "Dalian Yingbo vs Wuhan Three Towns (2025-10-19, Chinese Super League, China)",
+    "MetaOverProb": 9.089180901230595,
+    "MetaUnderProb": 90.91081909876941,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Under 3.5 Probability (90.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Loss Rule: +15% to base_score (losses = 7 >= 6 and avg conceded both teams = 2.10 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 7 >= 4 and high goal/conceded count = 12 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.20 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [2, 2], away last 2 = [1, 2])"
+    ]
+  },
+  {
+    "Match": "Tromso vs Viking (2025-10-19, Eliteserien, Norway)",
+    "MetaOverProb": 3.9396310723294463,
+    "MetaUnderProb": 96.06036892767055,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 32.713302408020134,
+    "UnderConfidence": 67.28669759197987,
+    "Reason": "Meta-Model Under 3.5 Probability (96.1%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.30 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.60 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 2.20 <= 4 * 0.60, home BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.30 >= 1.3, recent high-scoring form: home last 2 = [1, 0], away last 2 = [3, 1])"
+    ]
+  },
+  {
+    "Match": "KFUM Oslo vs Kristiansund (2025-10-19, Eliteserien, Norway)",
+    "MetaOverProb": 37.12912641760611,
+    "MetaUnderProb": 62.87087358239389,
+    "Recommendation": "NO BET",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Match rejected: 7 zeros in goal/conceded lists and meta-model favors Under 3.5 (62.9% vs Over 1.5 37.1%), but both Fortress and Drought rules not triggered.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 3: +15 to base_score (high goal/conceded count >= 8 and zero count >= 7)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.40 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 1 >= 1, away BTTS rate = 0.20 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.20 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [0, 4], away last 2 = [0, 0])"
+    ]
+  },
+  {
+    "Match": "Molde vs Sandefjord (2025-10-19, Eliteserien, Norway)",
+    "MetaOverProb": 96.24494324279263,
+    "MetaUnderProb": 3.7550567572073623,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 68.05849614469378,
+    "UnderConfidence": 31.941503855306223,
+    "Reason": "Meta-Model Over 1.5 Probability (96.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 11 >= 6)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.60 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 1.40 <= 4 * 0.60, home BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 2 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.30 >= 1.3, recent high-scoring form: home last 2 = [1, 2], away last 2 = [1, 0])"
+    ]
+  },
+  {
+    "Match": "Darmstadt vs Magdeburg (2025-10-19, 2. Bundesliga, Germany)",
+    "MetaOverProb": 0.518101189621269,
+    "MetaUnderProb": 99.48189881037874,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 66.35989651613933,
+    "UnderConfidence": 33.64010348386067,
+    "Reason": "Meta-Model Under 3.5 Probability (99.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 8 >= 6)"
+    ]
+  },
+  {
+    "Match": "Elversberg vs Greuther Furth (2025-10-19, 2. Bundesliga, Germany)",
+    "MetaOverProb": 0.7179229455913781,
+    "MetaUnderProb": 99.28207705440863,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 33.6948267321043,
+    "UnderConfidence": 66.3051732678957,
+    "Reason": "Meta-Model Under 3.5 Probability (99.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.30 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.60 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 2.20 <= 4 * 0.60, home BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.30 >= 1.3, recent high-scoring form: home last 2 = [1, 3], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "FC Gandzasar vs Ararat-Armenia (2025-10-19, Premier League, Armenia)",
+    "MetaOverProb": 9.121422846715793,
+    "MetaUnderProb": 90.8785771532842,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 19.807578642852043,
+    "UnderConfidence": 80.19242135714796,
+    "Reason": "Meta-Model Under 3.5 Probability (90.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.10 <= 1.5)"
+    ]
+  },
+  {
+    "Match": "Honka vs VJS (2025-10-19, Kakkonen, Finland)",
+    "MetaOverProb": 16.153555861391457,
+    "MetaUnderProb": 83.84644413860855,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 71.44177737146626,
+    "UnderConfidence": 28.55822262853374,
+    "Reason": "Meta-Model Under 3.5 Probability (83.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 1.30 <= 1.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 10 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.30 >= 1.3, recent high-scoring form: home last 2 = [3, 7], away last 2 = [3, 3])"
+    ]
+  },
+  {
+    "Match": "Drochtersen vs L\u00fcbeck (2025-10-19, Regionalliga, Germany)",
+    "MetaOverProb": 50.66566646166033,
+    "MetaUnderProb": 49.33433353833968,
+    "Recommendation": "NO BET",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (50.7%) nor Under 3.5 Probability (49.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [4, 3], away last 2 = [4, 0])"
+    ]
+  },
+  {
+    "Match": "Kickers Emden vs Jeddeloh (2025-10-19, Regionalliga, Germany)",
+    "MetaOverProb": 85.84549026896315,
+    "MetaUnderProb": 14.154509731036862,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (85.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 10 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.80 >= 1.3, recent high-scoring form: home last 2 = [1, 3], away last 2 = [0, 1])"
+    ]
+  },
+  {
+    "Match": "Hannoverscher SC vs Schoningen (2025-10-19, Regionalliga, Germany)",
+    "MetaOverProb": 28.741522567536087,
+    "MetaUnderProb": 71.2584774324639,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Under 3.5 Probability (71.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 6 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 2.40 >= 1.3, recent high-scoring form: home last 2 = [4, 2], away last 2 = [2, 1])"
+    ]
+  },
+  {
+    "Match": "Werder II vs Hannover II (2025-10-19, Regionalliga, Germany)",
+    "MetaOverProb": 81.450164484196,
+    "MetaUnderProb": 18.54983551580399,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (81.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 12 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 6 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 2.20 >= 1.3, recent high-scoring form: home last 2 = [0, 6], away last 2 = [2, 4])"
+    ]
+  },
+  {
+    "Match": "Bahlinger vs Freiburg II (2025-10-19, Regionalliga, Germany)",
+    "MetaOverProb": 86.70043520518286,
+    "MetaUnderProb": 13.299564794817137,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (86.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [1, 1], away last 2 = [2, 2])"
+    ]
+  },
+  {
+    "Match": "Meuselwitz vs Magdeburg II (2025-10-19, Regionalliga, Germany)",
+    "MetaOverProb": 65.45045748484768,
+    "MetaUnderProb": 34.549542515152325,
+    "Recommendation": "NO BET",
+    "OverConfidence": 56.033028118902244,
+    "UnderConfidence": 43.966971881097756,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (65.5%) nor Under 3.5 Probability (34.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 6 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.80 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.40 >= 1.3, recent high-scoring form: home last 2 = [1, 1], away last 2 = [4, 2])"
+    ]
+  },
+  {
+    "Match": "Imabari vs Renofa Yamaguchi (2025-10-19, J2 League, Japan)",
+    "MetaOverProb": 53.77074525554541,
+    "MetaUnderProb": 46.22925474445459,
+    "Recommendation": "NO BET",
+    "OverConfidence": 83.19804548073903,
+    "UnderConfidence": 16.801954519260974,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (53.8%) nor Under 3.5 Probability (46.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 10 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 2 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [1, 2], away last 2 = [0, 2])"
+    ]
+  },
+  {
+    "Match": "Montedio Yamagata vs Kumamoto (2025-10-19, J2 League, Japan)",
+    "MetaOverProb": 78.4926643950308,
+    "MetaUnderProb": 21.507335604969196,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 2.466321105033714,
+    "Reason": "Meta-Model Over 1.5 Probability (78.5%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [1, 1], away last 2 = [0, 2])"
+    ]
+  },
+  {
+    "Match": "Oita Trinita vs Vegalta Sendai (2025-10-19, J2 League, Japan)",
+    "MetaOverProb": 76.30413666075309,
+    "MetaUnderProb": 23.695863339246905,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 10.962250849622297,
+    "UnderConfidence": 89.0377491503777,
+    "Reason": "Meta-Model Over 1.5 Probability (76.3%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "New Rule: -15% to base_score (wins + draws = 8 >= 7 and avg conceded = 1.00 <= 1.5)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 0.60 <= 1.0, home scoreless matches = 3 >= 2, away clean sheets = 2 >= 1, home BTTS rate = 0.20 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Helsingborg vs Orebro (2025-10-19, Superettan, Sweden)",
+    "MetaOverProb": 89.95705797380221,
+    "MetaUnderProb": 10.042942026197807,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 9.761746758761404,
+    "Reason": "Meta-Model Over 1.5 Probability (90.0%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 7 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 0.20 or away BTTS rate = 1.00 >= 0.6, combined avg conceded = 1.30 >= 1.3, recent high-scoring form: home last 2 = [0, 3], away last 2 = [1, 1])"
+    ]
+  },
+  {
+    "Match": "Indy Eleven vs Loudoun (2025-10-19, USL Championship, USA)",
+    "MetaOverProb": 65.58499568045522,
+    "MetaUnderProb": 34.41500431954479,
+    "Recommendation": "NO BET",
+    "OverConfidence": 75.43462404528026,
+    "UnderConfidence": 24.56537595471974,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (65.6%) nor Under 3.5 Probability (34.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 4 matches with 3+ goals, home BTTS rate = 1.00 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 1.70 >= 1.3, recent high-scoring form: home last 2 = [3, 1], away last 2 = [1, 0])"
+    ]
+  },
+  {
+    "Match": "Tampa Bay vs Hartford Athletic (2025-10-19, USL Championship, USA)",
+    "MetaOverProb": 92.85247493634567,
+    "MetaUnderProb": 7.147525063654323,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 12.11216603983086,
+    "UnderConfidence": 87.88783396016913,
+    "Reason": "Meta-Model Over 1.5 Probability (92.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.50 >= 3.5, clean sheet rate home = 0.20 or away = 0.60 >= 0.3, low scoring rate = 0.30 >= 0.2)",
+      "New Rule: -15% to base_score (wins + draws = 9 >= 7 and avg conceded = 1.10 <= 1.5)",
+      "Fortress Rule (Away): -20 to base_score (avg away conceded = 0.60 <= 1.0, away clean sheets = 3 >= 3, avg home scored = 2.20 <= 4 * 0.60, away BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Charleston vs Detroit (2025-10-19, USL Championship, USA)",
+    "MetaOverProb": 15.29152194783574,
+    "MetaUnderProb": 84.70847805216425,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 88.2728598480643,
+    "UnderConfidence": 11.7271401519357,
+    "Reason": "Meta-Model Under 3.5 Probability (84.7%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 9 >= 6)",
+      "Drought Rule (Away): -20 to base_score (avg away scored = 0.60 <= 1.0, away scoreless matches = 3 >= 2, home clean sheets = 2 >= 1, away BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 6 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.60 >= 1.3, recent high-scoring form: home last 2 = [3, 1], away last 2 = [0, 2])"
+    ]
+  },
+  {
+    "Match": "El Paso vs FC Tulsa (2025-10-19, USL Championship, USA)",
+    "MetaOverProb": 29.558829096169383,
+    "MetaUnderProb": 70.44117090383062,
+    "Recommendation": "Under 3.5",
+    "OverConfidence": 35.90856797277076,
+    "UnderConfidence": 64.09143202722925,
+    "Reason": "Meta-Model Under 3.5 Probability (70.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 7 >= 6)"
+    ]
+  },
+  {
+    "Match": "Monterey Bay vs Pittsburgh (2025-10-19, USL Championship, USA)",
+    "MetaOverProb": 52.569831797887346,
+    "MetaUnderProb": 47.43016820211265,
+    "Recommendation": "NO BET",
+    "OverConfidence": 43.066286576585576,
+    "UnderConfidence": 56.933713423414424,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (52.6%) nor Under 3.5 Probability (47.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 7 >= 6)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 0.80 <= 1.0, home scoreless matches = 2 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 3 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.50 >= 1.3, recent high-scoring form: home last 2 = [0, 2], away last 2 = [1, 1])"
+    ]
+  },
+  {
+    "Match": "Gnistan vs SJK (2025-10-19, Veikkausliiga, Finland)",
+    "MetaOverProb": 66.12850978981285,
+    "MetaUnderProb": 33.87149021018715,
+    "Recommendation": "NO BET",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (66.1%) nor Under 3.5 Probability (33.9%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 13 >= 6)",
+      "Drought Rule (Home): -20 to base_score (avg home scored = 0.80 <= 1.0, home scoreless matches = 3 >= 2, away clean sheets = 1 >= 1, home BTTS rate = 0.40 <= 0.5)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.40 or away BTTS rate = 0.80 >= 0.6, combined avg conceded = 1.90 >= 1.3, recent high-scoring form: home last 2 = [3, 0], away last 2 = [4, 2])"
+    ]
+  },
+  {
+    "Match": "Jazz Pori vs Keski-Uusimaa (2025-10-19, Ykk\u00f6nen, Finland)",
+    "MetaOverProb": 85.3801160969701,
+    "MetaUnderProb": 14.619883903029901,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 90,
+    "UnderConfidence": 0,
+    "Reason": "Meta-Model Over 1.5 Probability (85.4%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 1: +20 to base_score (avg conceded >= 1.8 and high goal/conceded count >= 10)",
+      "Rule 4: +10 to base_score (avg conceded >= 1.5 and high goal/conceded count >= 8)",
+      "New Rule: +25% to base_score (losses = 5 >= 4 and high goal/conceded count = 11 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 5 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.60 >= 0.6, combined avg conceded = 2.10 >= 1.3, recent high-scoring form: home last 2 = [1, 2], away last 2 = [3, 0])"
+    ]
+  },
+  {
+    "Match": "Skeid vs Stab\u00e6k (2025-10-19, 1. Division, Norway)",
+    "MetaOverProb": 51.83667545904195,
+    "MetaUnderProb": 48.16332454095805,
+    "Recommendation": "NO BET",
+    "OverConfidence": 36.526284500187856,
+    "UnderConfidence": 63.473715499812144,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (51.8%) nor Under 3.5 Probability (48.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule: -10% to base_score (count of 1s in HomeGoalList, AwayGoalList, HomeConcededList, AwayConcededList >= 9)",
+      "New Loss Rule: +15% to base_score (losses = 6 >= 6 and avg conceded both teams = 1.70 >= 1.6)",
+      "New Rule: +25% to base_score (losses = 6 >= 4 and high goal/conceded count = 7 >= 6)"
+    ]
+  },
+  {
+    "Match": "Brattvag vs Sotra (2025-10-19, 2. Division, Norway)",
+    "MetaOverProb": 39.24010413301721,
+    "MetaUnderProb": 60.759895866982795,
+    "Recommendation": "NO BET",
+    "OverConfidence": 30.615189459429978,
+    "UnderConfidence": 69.38481054057002,
+    "Reason": "Neither Meta-Model Over 1.5 Probability (39.2%) nor Under 3.5 Probability (60.8%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "Rule 7: +15 to base_score (division result >= 1.2 and zero count in [6, 7, 8])",
+      "New Rule: -15% to base_score (wins + draws = 7 >= 7 and avg conceded = 1.10 <= 1.5)",
+      "Fortress Rule (Home): -20 to base_score (avg home conceded = 0.80 <= 1.0, home clean sheets = 3 >= 3, avg away scored = 0.60 <= 4 * 0.80, home BTTS rate = 0.40 <= 0.5)"
+    ]
+  },
+  {
+    "Match": "Philadelphia Union II vs Cincinnati 2 (2025-10-19, MLS Next Pro, USA)",
+    "MetaOverProb": 98.24156791274501,
+    "MetaUnderProb": 1.7584320872549952,
+    "Recommendation": "Over 1.5",
+    "OverConfidence": 59.812474186909554,
+    "UnderConfidence": 40.187525813090446,
+    "Reason": "Meta-Model Over 1.5 Probability (98.2%) exceeds 70% threshold.",
+    "TriggeredRules": [
+      "Poisson: Base score set to Poisson model probability",
+      "Defensive Outlier Check: -20% to base_score (total goals per match = 3.70 >= 3.5, clean sheet rate home = 0.40 or away = 0.20 >= 0.3, low scoring rate = 0.30 >= 0.2)",
+      "Rule 2: -5 to base_score (high goal/conceded count <= 9 and zero count <= 6)",
+      "New Rule: +25% to base_score (losses = 4 >= 4 and high goal/conceded count = 9 >= 6)",
+      "High-Scoring Outlier Rule: +20 to base_score (at least one team has 7 matches with 3+ goals, home BTTS rate = 0.60 or away BTTS rate = 0.40 >= 0.6, combined avg conceded = 1.30 >= 1.3, recent high-scoring form: home last 2 = [1, 5], away last 2 = [0, 3])"
+    ]
+  }
+]
