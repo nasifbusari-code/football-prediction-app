@@ -1044,7 +1044,7 @@ def vip():
             session_time = session.get('_session_expiry', datetime.now(timezone.utc))
             session_days_left = (session_time - datetime.now(timezone.utc)).days
 
-        # Handle calculator form submission
+        # Handle form submission
         if request.method == 'POST':
             try:
                 # Get form inputs
@@ -1080,11 +1080,25 @@ def vip():
                         calculator_result = result
                         logger.info(f"Calculator result for user {current_user.username}: {result}")
 
+                # Check if request is AJAX
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    if error:
+                        return jsonify({'error': error}), 400
+                    return jsonify({
+                        'predicted_points': calculator_result['predicted_points'],
+                        'lower_bound': calculator_result['lower_bound'],
+                        'upper_bound': calculator_result['upper_bound'],
+                        'over_under': calculator_result['over_under'],
+                        'favor': calculator_result['favor']
+                    })
+
             except ValueError as e:
                 error = "Invalid input. Please ensure all fields are filled correctly."
                 logger.error(f"Calculator input error for user {current_user.username}: {e}")
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return jsonify({'error': error}), 400
 
-        # Prepare template variables
+        # For non-AJAX requests, render the full template
         admin_message = "Admin Access: Full VIP privileges" if current_user.is_admin else None
         return render_template(
             'vip.html',
@@ -1104,25 +1118,6 @@ def vip():
         return redirect(url_for('home'))
     except Exception as e:
         logger.error(f"❌ Unexpected error in vip route: {e}")
-        flash('Server error. Please try again.', 'danger')
-        return redirect(url_for('home'))
-
-@app.route('/predictions')
-@login_required
-def predictions():
-    try:
-        if not current_user.is_vip and not current_user.is_admin:
-            flash('VIP access required for predictions.', 'danger')
-            return redirect(url_for('pay'))
-        predictions = load_predictions()
-        vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-        return render_template('predictions.html', predictions=vip_preds, user=current_user)
-    except OperationalError as e:
-        logger.error(f"❌ Database error in predictions route: {e}")
-        flash('Database connection issue. Please try again.', 'danger')
-        return redirect(url_for('home'))
-    except Exception as e:
-        logger.error(f"❌ Unexpected error in predictions route: {e}")
         flash('Server error. Please try again.', 'danger')
         return redirect(url_for('home'))
 
