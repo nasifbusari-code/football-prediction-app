@@ -147,19 +147,17 @@
     <section class="calculator py-5 bg-light">
         <div class="container">
             <h2 class="mb-4 text-center">Basketball Total Points Calculator</h2>
-            {% if error %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
+            <div id="calculator-error" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                <span id="error-message"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
             {% if not current_user.is_admin and (not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < now)) %}
                 <div class="alert alert-warning text-center">
                     VIP membership required to use the calculator. 
                     <a href="{{ url_for('pay') }}" class="btn btn-warning mt-3">Upgrade to VIP</a>
                 </div>
             {% else %}
-                <form method="POST" class="row g-3 justify-content-center">
+                <form method="POST" class="row g-3 justify-content-center" id="calculator-form">
                     <div class="col-md-4">
                         <label for="over_under" class="form-label">Over/Under Odds</label>
                         <input type="number" step="0.5" class="form-control" id="over_under" name="over_under" placeholder="e.g., 210.5" required>
@@ -195,24 +193,26 @@
                         <input type="number" class="form-control" id="points_q3" name="points_q3" placeholder="e.g., 60">
                     </div>
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-primary">Calculate</button>
+                        <button type="submit" class="btn btn-primary" id="calculate-btn">Calculate</button>
                     </div>
                 </form>
 
-                {% if calculator_result %}
-                    <div class="card mt-4 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">Prediction Results</h5>
-                            <p><strong>Predicted Total Points:</strong> {{ calculator_result.predicted_points }}</p>
-                            <p><strong>Prediction Range:</strong> {{ calculator_result.lower_bound }} - {{ calculator_result.upper_bound }}</p>
-                            <p><strong>Over/Under ({{ calculator_result.over_under }}):</strong> 
-                                <span class="badge bg-{% if calculator_result.favor == 'OVER' %}success{% else %}info{% endif %}">
-                                    {{ calculator_result.favor }}
-                                </span>
-                            </p>
+                <div id="calculator-results" class="mt-4">
+                    {% if calculator_result %}
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Prediction Results</h5>
+                                <p><strong>Predicted Total Points:</strong> {{ calculator_result.predicted_points }}</p>
+                                <p><strong>Prediction Range:</strong> {{ calculator_result.lower_bound }} - {{ calculator_result.upper_bound }}</p>
+                                <p><strong>Over/Under ({{ calculator_result.over_under }}):</strong> 
+                                    <span class="badge bg-{% if calculator_result.favor == 'OVER' %}success{% else %}info{% endif %}">
+                                        {{ calculator_result.favor }}
+                                    </span>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
     </section>
@@ -282,6 +282,62 @@
                             input.querySelector('input').value = '';
                         }
                     });
+                });
+            }
+
+            // AJAX form submission
+            const form = document.getElementById('calculator-form');
+            const resultsDiv = document.getElementById('calculator-results');
+            const errorDiv = document.getElementById('calculator-error');
+            const errorMessage = document.getElementById('error-message');
+            const calculateBtn = document.getElementById('calculate-btn');
+
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    calculateBtn.disabled = true;
+                    calculateBtn.innerText = 'Calculating...';
+                    errorDiv.classList.add('d-none');
+
+                    const formData = new FormData(this);
+                    try {
+                        const response = await fetch('/vip', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            resultsDiv.innerHTML = `
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Prediction Results</h5>
+                                        <p><strong>Predicted Total Points:</strong> ${data.predicted_points}</p>
+                                        <p><strong>Prediction Range:</strong> ${data.lower_bound} - ${data.upper_bound}</p>
+                                        <p><strong>Over/Under (${data.over_under}):</strong> 
+                                            <span class="badge bg-${data.favor === 'OVER' ? 'success' : 'info'}">
+                                                ${data.favor}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            errorMessage.textContent = data.error || 'An error occurred. Please try again.';
+                            errorDiv.classList.remove('d-none');
+                            resultsDiv.innerHTML = '';
+                        }
+                    } catch (err) {
+                        errorMessage.textContent = 'Network error. Please try again.';
+                        errorDiv.classList.remove('d-none');
+                        resultsDiv.innerHTML = '';
+                    } finally {
+                        calculateBtn.disabled = false;
+                        calculateBtn.innerText = 'Calculate';
+                    }
                 });
             }
         });
