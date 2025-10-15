@@ -1,194 +1,84 @@
-{% extends "base.html" %}
-{% block content %}
-    <!-- Hero Section -->
-    <section class="hero text-center py-5 bg-primary text-white">
-        <div class="container">
-            <h1 class="display-4 fw-bold">VIP Predictions</h1>
-            <p class="lead">Exclusive, high-accuracy predictions tailored for our premium members.</p>
-            {% if not current_user.is_admin %}
-                <p class="mb-0">Your VIP Membership: 
-                    {% if current_user.vip_expiry %}
-                        Active until {{ current_user.vip_expiry.strftime('%Y-%m-%d') }}
-                        <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Extend VIP</a>
-                    {% else %}
-                        Expired. <a href="{{ url_for('pay') }}" class="btn btn-warning btn-sm ms-2">Renew VIP</a>
-                    {% endif %}
-                </p>
-                {% if vip_days_left and vip_days_left < 1 %}
-                    <p class="alert alert-warning mt-3">Your VIP subscription expires in {{ vip_days_left | round(1) }} days. <a href="{{ url_for('pay') }}" class="text-primary">Renew now</a>.</p>
-                {% endif %}
-            {% else %}
-                <p class="mb-0">Admin Access: Full VIP privileges</p>
-            {% endif %}
-            {% if session_days_left and session_days_left < 2 %}
-                <p class="alert alert-warning mt-3">Your session will expire in {{ session_days_left | round(1) }} days. Log in again to refresh.</p>
-            {% endif %}
-        </div>
-    </section>
+from calculator import predict_final_points  # Import the calculator function
+from datetime import datetime, timezone  # Ensure timezone is imported
 
-    <!-- Predictions Section -->
-    <section class="predictions py-5">
-        <div class="container">
-            {% if error %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% else %}
-                <!-- Sportbet Code Tables -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h4 class="text-center mb-3">Daily Rollover</h4>
-                        <table class="table table-bordered table-sm table-striped shadow-sm">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th scope="col">Bet Code</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>L7UMYF</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <h4 class="text-center mb-3">Millionaire Ticket</h4>
-                        <table class="table table-bordered table-sm table-striped shadow-sm">
-                            <thead class="table-success">
-                                <tr>
-                                    <th scope="col">Bet Code</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>YYYY-YYYY-YYYY</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <!-- End Sportbet Code Tables -->
+@app.route('/vip', methods=['GET', 'POST'])
+@login_required
+def vip():
+    try:
+        # Initialize variables
+        predictions = load_predictions()
+        vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
+        error = None
+        calculator_result = None
+        vip_days_left = None
+        session_days_left = None
 
-                {% if predictions %}
-                    <h2 class="mb-4 text-center">Today's VIP Predictions</h2>
-                    <div class="mb-4 text-center">
-                        <button class="btn btn-outline-primary me-2" onclick="filterPredictions('all')">All</button>
-                        <button class="btn btn-outline-success me-2" onclick="filterPredictions('Over 1.5')">Over 1.5</button>
-                        <button class="btn btn-outline-info" onclick="filterPredictions('Under 3.5')">Under 3.5</button>
-                    </div>
-                    <div class="row" id="predictionsContainer">
-                        {% for pred in predictions %}
-                            <div class="col-md-6 col-lg-4 mb-4 prediction-card" 
-                                 data-recommendation="{{ pred.Recommendation }}">
-                                <div class="card h-100 shadow-sm animate__animated animate__fadeIn">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <i class="bi bi-soccer-ball me-2"></i>{{ pred.Match }}
-                                        </h5>
-                                        <p class="card-text">
-                                            <strong>Recommendation:</strong> 
-                                            <span class="badge bg-{% if pred.Recommendation == 'Over 1.5' %}success{% elif pred.Recommendation == 'Under 3.5' %}info{% else %}secondary{% endif %}">
-                                                {{ pred.Recommendation }}
-                                            </span>
-                                        </p>
-                                        <p class="card-text">
-                                            <strong>Over 1.5 Probability:</strong> 
-                                            <span class="text-success" data-bs-toggle="tooltip" 
-                                                  title="Probability of 2+ goals based on our hybrid AI model">
-                                                {{ pred.MetaOverProb|round(1) }}%
-                                            </span>
-                                        </p>
-                                        <p class="card-text">
-                                            <strong>Under 3.5 Probability:</strong> 
-                                            <span class="text-info" data-bs-toggle="tooltip" 
-                                                  title="Probability of fewer than 4 goals based on our hybrid AI model">
-                                                {{ pred.MetaUnderProb|round(1) }}%
-                                            </span>
-                                        </p>
-                                        <button class="btn btn-outline-primary btn-sm" 
-                                                data-bs-toggle="collapse" 
-                                                data-bs-target="#details-{{ loop.index }}"
-                                                aria-expanded="false">
-                                            View Details
-                                        </button>
-                                        <div class="collapse mt-3" id="details-{{ loop.index }}">
-                                            <div class="card card-body">
-                                                <p><strong>Reason:</strong> {{ pred.Reason }}</p>
-                                                <p><strong>Over Confidence:</strong> {{ pred.OverConfidence|round(1) }}%</p>
-                                                <p><strong>Under Confidence:</strong> {{ pred.UnderConfidence|round(1) }}%</p>
-                                                <p><strong>Triggered Rules:</strong></p>
-                                                <ul>
-                                                    {% for rule in pred.TriggeredRules %}
-                                                        <li>{{ rule }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="alert alert-info text-center">
-                        No VIP predictions available for today. Check back tomorrow or contact support.
-                        <br>
-                        {% if not current_user.is_admin %}
-                            <a href="{{ url_for('pay') }}" class="btn btn-warning mt-3">Extend VIP Membership</a>
-                        {% endif %}
-                    </div>
-                {% endif %}
-            {% endif %}
-        </div>
-    </section>
+        # Calculate VIP and session days left
+        if current_user.is_vip and current_user.vip_expiry:
+            vip_days_left = (current_user.vip_expiry - datetime.now(timezone.utc)).days
+        if session.get('_user_id'):
+            session_time = session.get('_session_expiry', datetime.now(timezone.utc))
+            session_days_left = (session_time - datetime.now(timezone.utc)).days
 
-    <!-- Loading Spinner -->
-    <div class="loading-spinner d-none" id="loadingSpinner">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
+        # Handle calculator form submission
+        if request.method == 'POST':
+            try:
+                # Get form inputs
+                over_under = float(request.form.get('over_under'))
+                current_quarter = int(request.form.get('current_quarter'))
+                current_quarter_points = int(request.form.get('current_quarter_points'))
+                minutes_remaining = float(request.form.get('minutes_remaining'))
+                points_per_quarter = []
+                for i in range(current_quarter - 1):
+                    points = request.form.get(f'points_q{i+1}')
+                    points_per_quarter.append(int(points) if points else 0)
 
-    <!-- Call-to-Action Section -->
-    <section class="cta text-center py-5 bg-light">
-        <div class="container">
-            <h2 class="mb-3">Maximize Your Wins!</h2>
-            <p class="lead">Stay with VIP for exclusive predictions, detailed analytics, and higher accuracy.</p>
-            {% if not current_user.is_admin %}
-                <a href="{{ url_for('pay') }}" class="btn btn-primary btn-lg">Extend Your VIP Membership</a>
-            {% endif %}
-        </div>
-    </section>
-{% endblock %}
+                # Validate VIP access
+                if not current_user.is_admin and (not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.now(timezone.utc))):
+                    current_user.is_vip = False
+                    current_user.vip_expiry = None
+                    db.session.commit()
+                    error = "VIP subscription has expired. Please renew to use the calculator."
+                    logger.warning(f"User {current_user.username} attempted calculator access with expired/no VIP")
+                else:
+                    # Run the calculator
+                    result = predict_final_points(
+                        over_under,
+                        points_per_quarter,
+                        current_quarter_points,
+                        current_quarter,
+                        minutes_remaining
+                    )
+                    if isinstance(result, str):
+                        error = result
+                        logger.error(f"Calculator error for user {current_user.username}: {error}")
+                    else:
+                        calculator_result = result
+                        logger.info(f"Calculator result for user {current_user.username}: {result}")
 
-{% block scripts %}
-    <script>
-        // Enable tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
+            except ValueError as e:
+                error = "Invalid input. Please ensure all fields are filled correctly."
+                logger.error(f"Calculator input error for user {current_user.username}: {e}")
 
-        // Filter predictions
-        function filterPredictions(type) {
-            const cards = document.querySelectorAll('.prediction-card');
-            cards.forEach(card => {
-                if (type === 'all') {
-                    card.style.display = 'block';
-                } else {
-                    const recommendation = card.getAttribute('data-recommendation');
-                    card.style.display = (recommendation === type) ? 'block' : 'none';
-                }
-            });
-        }
+        # Prepare template variables
+        admin_message = "Admin Access: Full VIP privileges" if current_user.is_admin else None
+        return render_template(
+            'vip.html',
+            predictions=vip_preds,
+            error=error,
+            calculator_result=calculator_result,
+            vip_days_left=vip_days_left,
+            session_days_left=session_days_left,
+            user=current_user,
+            admin_message=admin_message,
+            now=datetime.now(timezone.utc)
+        )
 
-        // Show loading spinner on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const spinner = document.getElementById('loadingSpinner');
-            setTimeout(() => {
-                spinner.classList.add('d-none');
-            }, 1000);
-        });
-    </script>
-{% endblock %}
+    except OperationalError as e:
+        logger.error(f"❌ Database error in vip route: {e}")
+        flash('Database connection issue. Please try again.', 'danger')
+        return redirect(url_for('home'))
+    except Exception as e:
+        logger.error(f"❌ Unexpected error in vip route: {e}")
+        flash('Server error. Please try again.', 'danger')
+        return redirect(url_for('home'))
