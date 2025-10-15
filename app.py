@@ -8,7 +8,7 @@ from sklearn.naive_bayes import GaussianNB
 import requests
 import os
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from rapidfuzz import fuzz
 import logging
 import sys
@@ -28,6 +28,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.sql import text
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from dotenv import load_dotenv
+from calculator import predict_final_points  # Import the basketball calculator function
 
 # Load environment variables
 load_dotenv()
@@ -1024,23 +1025,79 @@ def home():
         flash('Server error. Please try again.', 'danger')
         return render_template('home.html', predictions=[], error="Server error occurred.", user=current_user)
 
-@app.route('/vip')
+@app.route('/vip', methods=['GET', 'POST'])
 @login_required
 def vip():
     try:
-        if current_user.is_admin:
-            predictions = load_predictions()
-            vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-            return render_template('vip.html', predictions=vip_preds, user=current_user, admin_message="Admin Access: Full VIP privileges")
-        if not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.utcnow()):
-            current_user.is_vip = False
-            current_user.vip_expiry = None
-            db.session.commit()
-            flash('Your VIP subscription has expired. Please renew.', 'warning')
-            return redirect(url_for('pay'))
+        # Initialize variables
         predictions = load_predictions()
         vip_preds = [p for p in predictions if p['Recommendation'] != "NO BET"]
-        return render_template('vip.html', predictions=vip_preds, user=current_user)
+        error = None
+        calculator_result = None
+        vip_days_left = None
+        session_days_left = None
+
+        # Calculate VIP and session days left
+        if current_user.is_vip and current_user.vip_expiry:
+            vip_days_left = (current_user.vip_expiry - datetime.now(timezone.utc)).days
+        if session.get('_user_id'):
+            session_time = session.get('_session_expiry', datetime.now(timezone.utc))
+            session_days_left = (session_time - datetime.now(timezone.utc)).days
+
+        # Handle calculator form submission
+        if request.method == 'POST':
+            try:
+                # Get form inputs
+                over_under = float(request.form.get('over_under'))
+                current_quarter = int(request.form.get('current_quarter'))
+                current_quarter_points = int(request.form.get('current_quarter_points'))
+                minutes_remaining = float(request.form.get('minutes_remaining'))
+                points_per_quarter = []
+                for i in range(current_quarter - 1):
+                    points = request.form.get(f'points_q{i+1}')
+                    points_per_quarter.append(int(points) if points else 0)
+
+                # Validate VIP access
+                if not current_user.is_admin and (not current_user.is_vip or (current_user.vip_expiry and current_user.vip_expiry < datetime.now(timezone.utc))):
+                    current_user.is_vip = False
+                    current_user.vip_expiry = None
+                    db.session.commit()
+                    error = "VIP subscription has expired. Please renew to use the calculator."
+                    logger.warning(f"User {current_user.username} attempted calculator access with expired/no VIP")
+                else:
+                    # Run the calculator
+                    result = predict_final_points(
+                        over_under,
+                        points_per_quarter,
+                        current_quarter_points,
+                        current_quarter,
+                        minutes_remaining
+                    )
+                    if isinstance(result, str):
+                        error = result
+                        logger.error(f"Calculator error for user {current_user.username}: {error}")
+                    else:
+                        calculator_result = result
+                        logger.info(f"Calculator result for user {current_user.username}: {result}")
+
+            except ValueError as e:
+                error = "Invalid input. Please ensure all fields are filled correctly."
+                logger.error(f"Calculator input error for user {current_user.username}: {e}")
+
+        # Prepare template variables
+        admin_message = "Admin Access: Full VIP privileges" if current_user.is_admin else None
+        return render_template(
+            'vip.html',
+            predictions=vip_preds,
+            error=error,
+            calculator_result=calculator_result,
+            vip_days_left=vip_days_left,
+            session_days_left=session_days_left,
+            user=current_user,
+            admin_message=admin_message,
+            now=datetime.now(timezone.utc)
+        )
+
     except OperationalError as e:
         logger.error(f"❌ Database error in vip route: {e}")
         flash('Database connection issue. Please try again.', 'danger')
